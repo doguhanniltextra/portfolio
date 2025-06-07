@@ -1,0 +1,357 @@
+/* Genel Stil */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    overflow: hidden;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: #fff;
+    padding: 80px 0 60px; /* Üst padding'i artırdık */
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hafif bir gölge ekledik */
+}
+
+header h1 {
+    font-size: 56px; /* Daha büyük ve etkileyici bir başlık */
+    margin: 0;
+    font-weight: 700; /* Kalın font */
+    letter-spacing: -1.5px; /* Harfler arası boşluğu azalttık */
+}
+
+header p {
+    font-size: 20px;
+    margin: 10px 0 0;
+    font-weight: 300; /* Daha ince bir font */
+    opacity: 0.9; /* Hafif bir şeffaflık */
+}
+
+header nav {
+    margin-top: 30px; /* Navigasyonu biraz daha aşağıya aldık */
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Navigasyon öğelerini ortala */
+    gap: 25px; /* Öğeler arası boşluk */
+}
+
+header nav ul li {
+    display: inline;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500; /* Orta kalınlıkta font */
+    transition: all 0.3s ease;
+    padding: 8px 16px; /* Buton benzeri bir padding */
+    border-radius: 25px; /* Yuvarlak köşeler */
+}
+
+header nav ul li a:hover {
+    color: #ffdd57;
+    background-color: rgba(255, 255, 255, 0.1); /* Hafif bir arka plan rengi */
+    transform: translateY(-2px); /* Hafif yukarı hareket */
+}
+/* Skills */
+#skills {
+    padding: 60px 0;
+    background: #fff;
+    margin-botton:10px;
+}
+
+#skills h2 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.skill {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.skill i {
+    font-size: 40px;
+    color: #6a11cb;
+    margin-bottom: 20px;
+}
+
+.skill h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.skill p {
+    font-size: 20px;
+    color: #666;
+}
+
+/* Projects */
+#projects {
+    padding: 60px 0;
+    background: #f4f4f4;
+}
+
+#projects h2 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Projects */
+#projects {
+    padding: 60px 0;
+    background: #f4f4f4;
+}
+
+#projects h2 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.project {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.project:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.project h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.project p {
+    font-size: 20px;
+    color: #666;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* Metni 3 satırda sınırla */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Fazla metni üç nokta ile kısalt */
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #6a11cb;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #2575fc;
+}
+
+/* Contact */
+#contact {
+    padding: 60px 0;
+    background: #fff;
+}
+
+#contact h2 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    text-align: center;
+}
+
+.contact-item {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.contact-item i {
+    font-size: 40px;
+    color: #6a11cb;
+    margin-bottom: 20px;
+}
+
+.contact-item p {
+    font-size: 18px;
+    color: #333;
+}
+
+.contact-item a {
+    color: #6a11cb;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+
+
+hr.solid {
+  border-top: 1px solid #bbb;
+  margin: 20px 200px 20px 200px;
+}
+
+
+
+main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  font-family: 'Roboto', sans-serif;
+  place-items: center;
+}
+
+.card {
+  width: 20rem;
+  height: 30rem;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  color: #ffffff;
+  box-shadow: 0 10px 30px 5px rgba(0, 0, 0, 0.2);
+ 
+img {
+  position: absolute;
+  object-fit: cover;
+  object-position: center; /* Resmi ortalar */
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.9;
+  transition: opacity .2s ease-out;
+}
+
+
+  h2 {
+    position: absolute;
+    inset: auto auto 20px 20px;
+    margin: 0;
+    transition: inset .3s .3s ease-out;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color:#6a11cb;
+  }
+  
+  p {
+    position: absolute;
+    opacity: 0;
+    max-width: 80%;
+    transition: opacity .3s ease-out;
+  }
+  
+  p {
+    inset: auto auto 60px 20px;
+  }
+  
+  a {
+    inset: auto auto 30px 20px;
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  &:hover h2 {
+    inset: auto auto 180px 20px;
+    transition: inset .3s ease-out;
+  }
+  
+  &:hover p, &:hover a {
+    opacity: 1;
+    transition: opacity .5s .1s ease-in;
+  }
+  
+  &:hover img {
+    transition: opacity .3s ease-in;
+    opacity: 1;
+  }
+}
+
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  main {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.p_blog {
+  color:#6a11cb;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles_pages.css">
+</head>
+<body>
+ <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Doğuhan Ilter</h1>
+            <p>Software Developer</p>
+            <nav>
+                <ul>
+		    <li><a href="../blogs.html">Notes</a></li>
+<li><a href="../index.html">Home</a></li>                
+</ul>
+            </nav>
+       
+</div>
+    </header>
+       <div class="blog-container">
+        <section class="blog-header">
+            <h1>Understanding Positive and Negative Tests in Software Testing</h1>
+            <p class="author-date">By Doguhan Ilter | March 2025</p>
+        </section>
+        
+        <section class="blog-content">
+            <h2>What Are Positive and Negative Tests?</h2>
+            <p class="corpus">
+                In the world of software testing, there are two main categories that we use to evaluate how a function behaves: <strong>Positive Tests</strong> and <strong>Negative Tests</strong>. These tests are designed to determine if a function works as expected and handles different types of input appropriately. In my own testing practices, the majority of the tests I perform fall under the category of <strong>Positive Tests</strong>.
+            </p>
+            <p class="corpus">
+                A <strong>Positive Test</strong> is one where we test the function with <strong>valid input</strong> to check if the function produces the expected output. For example, if we have a function that calculates the square of a number, a positive test would involve providing a valid number and verifying that the result is the correct square.
+            </p>
+            <p class="corpus">
+                On the other hand, a <strong>Negative Test</strong> involves testing the function with <strong>invalid input</strong>, such as incorrect data types or boundary cases, to see if the function appropriately handles the error. For instance, if we try to calculate the square of a string, a negative test would ensure that the function throws an error or returns a meaningful message indicating that the input is invalid.
+            </p>
+            <p class="corpus">
+                These two types of tests are critical for ensuring that a function is both functional and robust. While positive tests confirm that the function works under normal conditions, negative tests ensure that the function gracefully handles unexpected or erroneous input.
+            </p>
+
+            <h2>The Importance of Positive and Negative Tests</h2>
+            <p class="corpus">
+                Why do we focus on both positive and negative tests? The short answer is that each type of test serves a distinct purpose in verifying the correctness of a function. Positive tests ensure that the function performs correctly under typical use cases, whereas negative tests help identify potential issues that could arise from improper use or unexpected inputs.
+            </p>
+            <p class="corpus">
+                Performing only positive tests would give you confidence that the function works in ideal conditions, but it would leave your software vulnerable to issues that could arise in the real world. By including negative tests, you are actively safeguarding your application against potential errors and failures.
+            </p>
+            <p class="corpus">
+                In essence, these tests provide a safety net for your code and ensure that it works as expected in all scenarios, whether the input is valid or invalid.
+            </p>
+
+            <h3>Mathematical Representation</h3>
+            <p class="corpus">
+                From a theoretical perspective, we can express these two test types using mathematical notation. Consider a function <code>f(x)</code> where <code>x</code> is the input, and the function is expected to produce an output <code>f(x)</code> for valid inputs.
+            </p>
+            <p class="corpus">
+                - For a valid input <code>P</strong> (such as a number), we expect the function to produce the expected output:
+                <code>∀x ∈ P, f(x) = Expected Output</code>
+            </p>
+            <p class="corpus">
+                - For an invalid input <code>¬P</strong> (such as a string or null value), we expect the function to throw an error or handle the situation gracefully:
+                <code>∀x ∈ ¬P, f(x) = Exception ∨ Error</code>
+            </p>
+
+            <h3>Example of Testing</h3>
+            <p class="corpus">
+                To illustrate this further, let’s take a look at an example of a positive test. Suppose we have a function called <code>calculateSquare</code> that computes the square of a number. A positive test would check if the function correctly computes the square for valid inputs.
+            </p>
+            <pre><code>
+function calculateSquare(x) {
+    return x * x;
+}
+</code></pre>
+            <p class="corpus">
+                For the positive test, we might write:
+                <code>assertEquals(25, calculateSquare(5))</code>, where we are verifying that the square of 5 is indeed 25.
+            </p>
+            <p class="corpus">
+                In contrast, a negative test might check how the function behaves when given invalid input, such as a string:
+            </p>
+            <pre><code>
+function calculateSquare(x) {
+    if (typeof x !== 'number') {
+        throw new Error('Invalid input');
+    }
+    return x * x;
+}
+</code></pre>
+            <p class="corpus">
+                In this case, we could write a negative test like:
+                <code>assertThrows(Error, () => calculateSquare("five"))</code>, which checks that the function throws an error when the input is a string.
+            </p>
+            <p class="corpus">
+                Both tests are important because they validate that the function works correctly in expected scenarios (positive test) and that it fails gracefully in edge cases (negative test).
+            </p>
+        </section>
+        
+        <section class="blog-footer">
+            <p class="footer-text">This post explains the concept of positive and negative tests, and how I approach testing my functions. It's essential to include both types of tests in your software development process to ensure the robustness and reliability of your code.</p>
+        </section>
+    </div>
+</body>
+</html>

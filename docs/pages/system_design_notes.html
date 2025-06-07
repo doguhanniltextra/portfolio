@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Notes </title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles_pages.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Doguhan Ilter</h1>
+            <p>Software Developer</p>
+            <nav>
+                <ul>
+                    <li><a href="../blogs.html">Notes</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="blog-container">
+        <section class="blog-header">
+            <h1>System Design Notes</h1>
+            <p class="author-date">By Doguhan Ilter | March 2025</p>
+        </section>
+
+        <section class="blog-content">
+            <p class="corpus">I will dive into the core concepts of system design, covering architecture patterns, scalability, and important considerations for building highly available and efficient systems.</p>
+
+            <h2>1. Peer-2-Peer Architecture</h2>
+            <p class="corpus">A Peer-2-Peer (P2P) system is one where each node in the network can act both as a client and a server. In this decentralized architecture, peers communicate directly with one another without the need for a central server. Each peer has an equal responsibility in the network, and there's no central authority to control the entire system.</p>
+            <ul>
+                <li><strong>Decentralization:</strong> Every node has equal capabilities, and there is no single point of control.</li>
+                <li><strong>Fault Tolerance:</strong> Because there is no central server, the failure of one node doesn’t result in the failure of the entire system. Peers continue communicating directly with each other.</li>
+                <li><strong>Scalability:</strong> P2P systems can scale naturally as more peers are added to the network, allowing it to expand in terms of performance and storage.</li>
+                <li><strong>Examples:</strong> File sharing networks like BitTorrent or blockchain technologies.</li>
+            </ul>
+
+            <h2>2. Master-Slave Architecture</h2>
+            <p class="corpus">Master-Slave is a more centralized approach compared to P2P. In this architecture, a single master node controls the system and directs tasks to multiple slave nodes. The master node has control over data or task flow, while the slave nodes are responsible for executing the tasks assigned by the master.</p>
+            <ul>
+                <li><strong>Centralized Control:</strong> The master node acts as the main controller, directing how the system works, and slave nodes are dependent on it for instructions.</li>
+                <li><strong>Risk of Single Point of Failure (SPOF):</strong> If the master node fails, the entire system can break down, making this a vulnerable architecture.</li>
+                <li><strong>Scaling:</strong> Scaling is typically done by adding more slave nodes to distribute the workload. However, scaling is limited by the capacity of the master node.</li>
+                <li><strong>Examples:</strong> Traditional relational databases (Master-Slave replication), web servers, or any system where a central controller is needed.</li>
+            </ul>
+
+            <h2>3. Single Point of Failure (SPOF)</h2>
+            <p class="corpus">A Single Point of Failure (SPOF) refers to a component in a system that, if it fails, causes the entire system to fail. SPOFs are a significant vulnerability in system design, and mitigating them is crucial to ensuring high availability and reliability. To avoid SPOFs, systems must incorporate redundancy and failover mechanisms that allow other components to take over in case of failure.</p>
+            <ul>
+                <li><strong>Redundancy:</strong> Implementing multiple instances of critical components to ensure that if one fails, another can take its place.</li>
+                <li><strong>Failover Mechanisms:</strong> Setting up automated failover systems to redirect traffic or tasks from a failed node to a working one, ensuring uninterrupted service.</li>
+                <li><strong>Load Balancing:</strong> Distributing traffic across multiple servers to ensure no single server is overloaded and to ensure that failure of one server doesn’t cause a system-wide crash.</li>
+                <li><strong>Example:</strong> In a database system, having master and replica instances where replicas can take over if the master fails.</li>
+            </ul>
+
+            <h2>4. Scalability: Vertical vs Horizontal Scaling</h2>
+            <p class="corpus">Scalability refers to a system’s ability to handle increased load by adding resources. There are two major types of scalability: vertical and horizontal scaling.</p>
+            <h3>Vertical Scaling</h3>
+            <p class="corpus">Vertical scaling (also known as "scaling up") involves adding more power to an existing server. This can include increasing the CPU, adding more RAM, or expanding storage capacity.</p>
+            <ul>
+                <li><strong>Simplicity:</strong> Easy to implement as it involves upgrading an existing system rather than adding more components.</li>
+                <li><strong>Limitations:</strong> It has physical limits. Eventually, the system will reach the maximum capacity that the hardware can handle.</li>
+                <li><strong>Cost:</strong> Vertical scaling can become expensive as the cost of high-performance hardware increases.</li>
+            </ul>
+
+            <h3>Horizontal Scaling</h3>
+            <p class="corpus">Horizontal scaling (or "scaling out") involves adding more machines or nodes to a system. It’s a more flexible approach to scalability, as you can continually add more servers to increase capacity without being limited by the performance of a single server.</p>
+            <ul>
+                <li><strong>Flexibility:</strong> It allows for nearly infinite scalability by adding more resources as needed.</li>
+                <li><strong>Complexity:</strong> More complex to manage, as it requires load balancing, distributed data management, and orchestration.</li>
+                <li><strong>Cost:</strong> Can be more cost-effective in the long run as you can use less expensive machines and still achieve high scalability.</li>
+            </ul>
+
+            <h2>5. Monitoring Tools</h2>
+            <p class="corpus">Monitoring tools are essential for tracking the health, performance, and availability of your system. By collecting metrics and logs, you can detect anomalies, bottlenecks, and potential failures before they impact the system.</p>
+            <ul>
+                <li><strong>Prometheus:</strong> A monitoring tool designed to record real-time metrics in a time-series database. It's commonly used with Grafana for visualization.</li>
+                <li><strong>Grafana:</strong> A powerful visualization tool that works with Prometheus or other data sources to display the system's health and performance metrics in real-time.</li>
+                <li><strong>ELK Stack (Elasticsearch, Logstash, Kibana):</strong> A set of tools for managing logs. Elasticsearch stores the logs, Logstash processes them, and Kibana visualizes them.</li>
+                <li><strong>Alerting:</strong> Setting up alerts to notify the operations team of issues like server downtime, high resource utilization, or other abnormal behaviors.</li>
+            </ul>
+
+            <h2>6. Database Sharding</h2>
+            <p class="corpus">Database sharding is a method used to distribute data across multiple machines (or database instances). Instead of storing all data on one server, data is partitioned into smaller "shards," and each shard is stored on a different machine. This technique improves performance and scalability, especially for large datasets.</p>
+            <ul>
+                <li><strong>Improved Performance:</strong> Sharding helps distribute the load of database queries, reducing the burden on any single machine.</li>
+                <li><strong>Scalability:</strong> As the volume of data grows, more shards can be added to distribute the load further, enabling horizontal scaling of the database.</li>
+                <li><strong>Complexity:</strong> Sharding introduces complexity in data distribution, as queries must be routed to the correct shard, and maintaining consistency across shards can be challenging.</li>
+                <li><strong>Example:</strong> Large applications like social media platforms or e-commerce sites where data grows rapidly and needs to be distributed efficiently.</li>
+            </ul>
+
+            <h2>7. Rate Limiter</h2>
+            <p class="corpus">A rate limiter is a tool that controls the number of requests a user can make to a system within a specific time frame. Rate limiting helps prevent abuse and ensures fair usage by limiting the number of requests any single user or client can make in a given period.</p>
+            <ul>
+                <li><strong>Token Bucket Algorithm:</strong> This is one of the most commonly used algorithms for rate limiting. Tokens are added to the bucket at a fixed rate, and each request requires a token. If the bucket is empty, the request is denied.</li>
+                <li><strong>Leaky Bucket Algorithm:</strong> Similar to the token bucket, but instead of discrete tokens, requests are processed in a steady stream. Excess requests overflow and are discarded.</li>
+                <li><strong>Prevents Abuse:</strong> Rate limiting ensures that a single user does not overload the system with too many requests, preventing DDoS attacks and ensuring fair distribution of resources.</li>
+            </ul>
+
+            <h2>8. CAP Theorem</h2>
+            <p class="corpus">The CAP theorem states that in any distributed data store, you can achieve at most two of the following three properties:</p>
+            <ul>
+                <li><strong>Consistency:</strong> Every read request will return the most recent write, ensuring that all nodes in the system have the same data.</li>
+                <li><strong>Availability:</strong> Every request will receive a response, regardless of whether the data is the most recent or not.</li>
+                <li><strong>Partition Tolerance:</strong> The system will continue to function even if there is a network partition or some nodes cannot communicate with others.</li>
+            </ul>
+<h2>9. Microservices Architecture</h2>
+<p class="corpus">Microservices architecture is a style where a large application is divided into smaller, loosely coupled services that communicate over a network. Each service is responsible for a specific business functionality, and they can be developed, deployed, and scaled independently.</p>
+<ul>
+    <li><strong>Loose Coupling:</strong> Each service is independent and does not rely on others to function, allowing them to be deployed and scaled individually.</li>
+    <li><strong>Fault Isolation:</strong> If one service fails, it doesn’t necessarily affect other services. This improves the system’s resilience.</li>
+    <li><strong>Technology Diversity:</strong> Services can be developed using different technologies that best suit their needs (e.g., different programming languages, databases).</li>
+    <li><strong>Examples:</strong> E-commerce platforms like Amazon or Netflix that break down their monolithic system into manageable, independently deployable services.</li>
+</ul>
+
+<h2>10. Event-Driven Architecture</h2>
+<p class="corpus">Event-driven architecture (EDA) is a design paradigm where events (state changes or updates) trigger system actions. Components react to events by processing them asynchronously, which allows for decoupling of producers and consumers of events.</p>
+<ul>
+    <li><strong>Asynchronous Communication:</strong> Components in an event-driven system do not wait for responses from each other, making the system more scalable and efficient.</li>
+    <li><strong>Real-time Processing:</strong> Events are often processed in real time, enabling fast responses to changes in the system.</li>
+    <li><strong>Examples:</strong> Systems like messaging apps or notification systems that rely on events to trigger real-time updates.</li>
+</ul>
+
+<h2>11. Load Balancing Algorithms</h2>
+<p class="corpus">Load balancing refers to the practice of distributing incoming network traffic across multiple servers to ensure no single server becomes overwhelmed. Different algorithms can be used to determine how traffic should be distributed.</p>
+<ul>
+    <li><strong>Round Robin:</strong> Distributes requests evenly to each server in a circular manner.</li>
+    <li><strong>Least Connections:</strong> Directs traffic to the server with the fewest active connections.</li>
+    <li><strong>IP Hash:</strong> Uses the IP address of the client to determine which server should handle the request.</li>
+    <li><strong>Weighted Load Balancing:</strong> Allocates more traffic to more powerful servers based on predefined weights.</li>
+</ul>
+
+<h2>12. Distributed Caching</h2>
+<p class="corpus">Distributed caching is a technique where cached data is spread across multiple servers, enabling higher performance and scalability compared to traditional single-server caching. It helps reduce the load on databases by serving frequently accessed data from the cache.</p>
+<ul>
+    <li><strong>Improved Performance:</strong> By caching frequently requested data, it reduces latency and improves response time.</li>
+    <li><strong>Scalability:</strong> Distributed caches can scale horizontally by adding more nodes to the cache cluster as the system grows.</li>
+    <li><strong>Examples:</strong> Redis, Memcached, and Amazon ElastiCache are common solutions for distributed caching.</li>
+</ul>
+
+<h2>13. Service Mesh</h2>
+<p class="corpus">A service mesh is a dedicated infrastructure layer that helps manage and secure microservices communication. It abstracts the complexity of managing services and provides features like load balancing, service discovery, and secure communication between services.</p>
+<ul>
+    <li><strong>Service Discovery:</strong> Automatically discovers and tracks the locations of services in the network.</li>
+    <li><strong>Secure Communication:</strong> Provides encryption and authentication between services to ensure secure communication.</li>
+    <li><strong>Examples:</strong> Istio, Linkerd, and Consul are popular service mesh technologies used in microservices architectures.</li>
+</ul>
+
+<h2>14. Containerization & Orchestration</h2>
+<p class="corpus">Containerization involves packaging applications and their dependencies into containers, allowing them to run consistently across different environments. Orchestration tools like Kubernetes manage and automate the deployment, scaling, and operation of containers in large-scale environments.</p>
+<ul>
+    <li><strong>Portability:</strong> Containers provide a consistent environment, making it easy to move applications between different environments (e.g., development to production).</li>
+    <li><strong>Scalability:</strong> Kubernetes can automatically scale containers based on demand, ensuring efficient resource utilization.</li>
+    <li><strong>Examples:</strong> Docker for containerization, Kubernetes for orchestration, and Docker Swarm for simpler container orchestration.</li>
+</ul>
+
+<h2>15. CAP Theorem & Consistency Models</h2>
+<p class="corpus">While the CAP theorem (Consistency, Availability, Partition Tolerance) describes the trade-offs in distributed systems, understanding different consistency models is crucial for backend developers. Different databases or systems offer varying levels of consistency guarantees, which affect the design of the system.</p>
+<ul>
+    <li><strong>Eventual Consistency:</strong> The system guarantees that, given enough time, all replicas will converge to the same value. Common in NoSQL databases.</li>
+    <li><strong>Strong Consistency:</strong> Every read operation returns the most recent write, ensuring strict consistency. Found in systems like traditional relational databases.</li>
+    <li><strong>Read-Your-Writes:</strong> Guarantees that after a write, the system will return the correct data for subsequent read operations.</li>
+    <li><strong>Examples:</strong> DynamoDB provides eventual consistency, while MongoDB allows for tunable consistency settings depending on the use case.</li>
+</ul>
+
+<h2>16. Distributed Tracing</h2>
+<p class="corpus">Distributed tracing is a technique used to track requests as they flow through various microservices in a system. It helps in debugging performance issues and monitoring system health by visualizing the path of a request.</p>
+<ul>
+    <li><strong>Trace Context:</strong> Each request is assigned a unique identifier that propagates through the system, helping track the request's journey across different services.</li>
+    <li><strong>Performance Monitoring:</strong> Distributed tracing helps identify bottlenecks in the system by visualizing time spent in each microservice.</li>
+    <li><strong>Examples:</strong> OpenTelemetry, Jaeger, and Zipkin are popular distributed tracing tools.</li>
+</ul>
+<h2>17. Synchronous vs Asynchronous Communication</h2>
+<p class="corpus">In distributed systems, communication between components can be either synchronous or asynchronous. Understanding the difference is crucial for designing systems that perform well under various conditions.</p>
+<ul>
+    <li><strong>Synchronous Communication:</strong> In this model, the client waits for a response from the server before continuing. It’s simple and easy to implement but can cause delays if the server is slow or unresponsive.</li>
+    <li><strong>Asynchronous Communication:</strong> Here, the client sends a request and continues without waiting for the response. Asynchronous communication is more scalable and resilient but can be more complex to implement.</li>
+    <li><strong>Example:</strong> REST APIs usually use synchronous communication, while message queues or event-driven systems typically rely on asynchronous communication.</li>
+</ul>
+
+            <p class="corpus">Systems must prioritize two of these guarantees, as it is impossible to provide all three simultaneously. Understanding this trade-off is essential when designing distributed systems.</p>
+        </section>
+    </div>
+
+</body>
+
+</html>
