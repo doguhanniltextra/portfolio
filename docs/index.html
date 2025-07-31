@@ -4,237 +4,1262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doğuhan Ilter</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" href="public/icon.jpg" type="image/x-icon">
+    <title>Doğuhan - Full Stack Developer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --tertiary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --quaternary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-heavy: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 15px 25px;
+            display: flex;
+            gap: 25px;
+            z-index: 1000;
+            border: 1px solid var(--glass-border);
+            animation: slideDown 1s ease-out;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-primary);
+            background: var(--glass-bg);
+            transform: translateY(-2px);
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            border-radius: 25px;
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .nav-item:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            padding: 100px 0;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary-gradient);
+            border-radius: 2px;
+            animation: expandWidth 1s ease-out 0.5s both;
+        }
+
+        /* Hero Section */
+        #hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 0;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f0f8ff, #e6e6fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShimmer 3s ease-in-out infinite;
+        }
+
+        .hero-content p {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--secondary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .skill-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .skill-card:hover::before {
+            left: 100%;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-card:hover .skill-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .skill-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .skill-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:nth-child(odd) {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        .project-card:nth-child(even) {
+            background: linear-gradient(135deg, rgba(147, 233, 251, 0.1), rgba(245, 87, 108, 0.05));
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--tertiary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-tag {
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Journey Section */
+        .journey-timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        .journey-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--quaternary-gradient);
+            transform: translateX(-50%);
+        }
+
+        .journey-item {
+            position: relative;
+            margin: 60px 0;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease-out;
+        }
+
+        .journey-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .journey-item:nth-child(odd) .journey-content {
+            margin-right: 50%;
+            padding-right: 40px;
+            text-align: right;
+        }
+
+        .journey-item:nth-child(even) .journey-content {
+            margin-left: 50%;
+            padding-left: 40px;
+        }
+
+        .journey-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .journey-content:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-light);
+        }
+
+        .journey-year {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #43e97b;
+            margin-bottom: 10px;
+        }
+
+        .journey-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .journey-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .journey-dot {
+            position: absolute;
+            left: 50%;
+            top: 30px;
+            width: 16px;
+            height: 16px;
+            background: var(--quaternary-gradient);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            border: 4px solid #1a1a2e;
+            z-index: 2;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .contact-link:hover::before {
+            left: 100%;
+        }
+
+        .contact-link:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Notes Section */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .note-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .note-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .note-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .note-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: #43e97b;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* Floating Elements */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            animation: floatingBubbles 25s infinite linear;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            left: 80%;
+            animation-delay: 8s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            left: 60%;
+            animation-delay: 16s;
+        }
+
+        .balloon {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ffffff;
+            background: transparent;
+            /* içi boş */
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            animation: pop 0.6s ease-out forwards;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            /* hafif bir gölge */
+        }
+
+
+        @keyframes pop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -80%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -120%) scale(1.2);
+            }
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes textShimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes expandWidth {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 80px;
+            }
+        }
+
+        @keyframes floatingBubbles {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navigation {
+                flex-wrap: wrap;
+                gap: 15px;
+                padding: 12px 20px;
+            }
+
+            .nav-item {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .skills-grid,
+            .projects-grid,
+            .notes-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .journey-timeline::before {
+                left: 20px;
+            }
+
+            .journey-item:nth-child(odd) .journey-content,
+            .journey-item:nth-child(even) .journey-content {
+                margin: 0;
+                margin-left: 40px;
+                padding: 20px;
+                text-align: left;
+            }
+
+            .journey-dot {
+                left: 20px;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                display: none;
+            }
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: var(--quaternary-gradient);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <h1>Doğuhan Ilter</h1>
-            <p>Software Developer</p>
-            <nav>
-                <ul>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
-		    <li><a href="blogs.html">Notes</a></li>
-                </ul>
-            </nav>
-       
-</div>
-    </header>
-
-    <!-- Skills -->
-    <section id="skills">
-        <div class="container">
-            <h2>Skills</h2>
-            <div class="skills-grid">
-                <div class="skill">
-                    <i class="fas fa-code"></i>
-                    <h3>Backend Development</h3>
-                    <p>I create backend servers with <span style="color: green;">Spring Boot</span> and <span
-                            style="color: green;">Node.js</span> for handling business logic and data management.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Security</h3>
-                    <p>I implement secure user authentication and authorization using JWT (JSON Web Tokens).</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-database"></i>
-                    <h3>Database Management</h3>
-                    <p>I work with SQL and NoSQL databases to efficiently manage and query data for scalable
-                        applications.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-cogs"></i>
-                    <h3>Microservices Architecture</h3>
-                    <p>I build scalable applications using microservices architecture, ensuring each service is
-                        independent and communicates via REST APIs.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-box"></i>
-                    <h3>Deployment</h3>
-                    <p>I use Docker for deploying and managing applications in isolated containers, ensuring consistent
-                        environments across platforms.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <h3>Performance Optimization</h3>
-                    <p>I optimize applications by implementing caching strategies using Redis to enhance performance and
-                        speed.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-credit-card"></i>
-                    <h3>Payment Integration</h3>
-                    <p>I integrate secure payment systems like Stripe to handle online payments safely.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-users"></i>
-                    <h3>User Interface</h3>
-                    <p>I design intuitive and responsive user interfaces that offer great user experiences, focusing on
-                        accessibility and usability.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-pencil-ruler"></i>
-                    <h3>UI/UX Design</h3>
-                    <p>I design user-friendly interfaces and enhance usability through user research and prototyping.
-                    </p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-cloud"></i>
-                    <h3>Cloud Services</h3>
-                    <p>I deploy and manage applications on cloud platforms like AWS and Vercel for scalability and
-                        availability.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-cogs"></i>
-                    <h3>Testing</h3>
-                    <p>I perform unit and integration testing using tools like JUnit and Postman to ensure application
-                        functionality and stability.</p>
-                </div>
-                <div class="skill">
-                    <i class="fas fa-tools"></i>
-                    <h3>CI/CD Pipeline</h3>
-                    <p>I set up and maintain CI/CD pipelines with tools like Jenkins and GitHub Actions for continuous
-                        integration and deployment.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-<hr class="solid">
-
-<!-- Projects -->
-<section id="projects">
-    <div class="container">
-        <h2>Projects</h2>
-        <div class="projects-grid">
-            <a href="https://github.com/Doguhannilt/Skillify-backend" class="project">
-                <h3>Skillify</h3>
-                <p>An Online Course Management Platform developed using Spring Boot and various technologies. The platform allows users (students, instructors, and admins) to interact with courses, lessons, and other features like authentication, course management, and payment integration.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/Weirdstore-backend" class="project">
-                <h3>Weirdstore</h3>
-                <p>Weirdstore is a comprehensive and innovative store management system designed to simplify and enhance the way you run your store. Whether you are managing a small boutique or a large retail chain, weirdstore provides the tools you need to succeed.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/Hotel-Book-Fullstack" class="project">
-                <h3>Luna Hotel</h3>
-                <p>LunaHotel is a modern full-stack web application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). The project provides a seamless and intuitive platform for users to browse, book, and manage hotel reservations for both leisure and business travel.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/GloriousFood-Fullstack" class="project">
-                <h3>GloriousFood</h3>
-                <p>GloriousFood is a modern food ordering application designed to allow users to manage their food orders and securely store their credit card information. The project is built using React Native, Redux, and AsyncStorage.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/Disease-Fullstack" class="project">
-                <h3>Disease (Machine Learning)</h3>
-                <p>The Finding the disease based on symptoms project is an innovative and crucial application of artificial intelligence in the healthcare domain. The primary objective of this project is to provide users with a powerful tool that can assist in identifying potential diseases or health conditions based on the symptoms they report.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/Driver4U-Fullstack" class="project">
-                <h3>Driver4U</h3>
-                <p>Driver4U is a mobile application designed to provide a location-based transportation service. Users can select their current location and destination to request an Uber ride.</p>
-            </a>
-            <a href="https://github.com/Doguhannilt/Luna-CLI" class="project">
-                <h3>LunaCLI</h3>
-                <p>LunaCLI is a simple command-line tool designed to interact with PostgreSQL databases. It allows users to connect, execute SQL commands, and configure connection settings dynamically.</p>
-            </a>
-        </div>
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
     </div>
 
-<hr class="solid">
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
 
-<!-- Education Timeline -->
-<section id="education">
+    <nav class="navigation">
+        <a href="#hero" class="nav-item active">Home</a>
+        <a href="#skills" class="nav-item">Skills</a>
+        <a href="#projects" class="nav-item">Projects</a>
+        <a href="#journey" class="nav-item">My Journey</a>
+        <a href="#contact" class="nav-item">Contact</a>
+    </nav>
+
     <div class="container">
-        <h2>Milestones in my software career</h2>
-        <div class="timeline">
+        <!-- Hero Section -->
+        <section id="hero" class="section visible">
+            <div class="hero-content">
+                <h1>Doğuhan İlter</h1>
+                <p>Backend Developer</p>
+                <a href="#contact" class="hero-cta">Let's Connect</a>
+            </div>
+        </section>
 
-            <!-- Timeline Item 1 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>First in first</h3>
-                    <p class="degree">Coding my first website with HTML and CSS</p>
-                    <p class="description">Nothing more, I was just a little dude curious about everything related to coding.</p>
-                    <p class="duration">Year: 2011</p>
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <span class="skill-icon">⚙️</span>
+                    <h3 class="skill-title">Backend Development</h3>
+                    <p class="skill-description">Building robust server-side applications with modern frameworks and
+                        best practices.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🔒</span>
+                    <h3 class="skill-title">Security</h3>
+                    <p class="skill-description">Implementing secure authentication, authorization, and data protection
+                        mechanisms.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🗄️</span>
+                    <h3 class="skill-title">Database Management</h3>
+                    <p class="skill-description">Designing and managing efficient database systems for optimal
+                        performance.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🏗️</span>
+                    <h3 class="skill-title">Microservices Architecture</h3>
+                    <p class="skill-description">Creating scalable and maintainable distributed systems architecture.
+                    </p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🚀</span>
+                    <h3 class="skill-title">Deployment</h3>
+                    <p class="skill-description">Implementing ontainerization, cloud deployment, and infrastructure
+                        management.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">⚡</span>
+                    <h3 class="skill-title">Performance Optimization</h3>
+                    <p class="skill-description">Optimizing applications for speed, efficiency, and scalability.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🎨</span>
+                    <h3 class="skill-title">User Interface</h3>
+                    <p class="skill-description">Creating beautiful, responsive, and user-friendly interfaces.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">☁️</span>
+                    <h3 class="skill-title">Cloud Services</h3>
+                    <p class="skill-description">Leveraging cloud platforms for scalable and reliable applications.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🧪</span>
+                    <h3 class="skill-title">Testing</h3>
+                    <p class="skill-description">Comprehensive testing strategies including unit, integration, and e2e
+                        testing.</p>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🔄</span>
+                    <h3 class="skill-title">CI/CD Pipeline</h3>
+                    <p class="skill-description">Automating development workflows for continuous integration and
+                        deployment.</p>
                 </div>
             </div>
+        </section>
 
-            <!-- Timeline Item 2 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Artificial Intel... What?</h3>
-                    <p class="description">Nothing Discovering what the heck AI was, thanks to the Portal 2 game and GlaDOS. I created my first AI(?) assistant with if-else conditions in Python.</p>
-                    <p class="duration">Year: 2014</p>
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <h2 class="section-title">Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <a href="https://github.com/doguhanniltextra/patient-management">
+                        <h3 class="project-title">Patient Management</h3>
+                        <p class="project-description">This project is a microservices-based backend system for managing
+                            appointments, patients, doctors, and billing in a healthcare environment. It follows a
+                            modular, scalable design and uses different databases tailored to each service's needs.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Spring Boot</span>
+                            <span class="tech-tag">Java</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">Microservices</span>
+                            <span class="tech-tag">MySQL</span>
+                            <span class="tech-tag">Docker</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">Kafka</span>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/Skillify-backend">
+                        <h3 class="project-title">Skillify</h3>
+                        <p class="project-description">An Online Course Management Platform developed using Spring Boot
+                            and various technologies. The platform allows users (students, instructors, and admins) to
+                            interact with courses, lessons, and other features like authentication, course management,
+                            and payment integration.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Spring Boot</span>
+                            <span class="tech-tag">Java</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">React</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/Weirdstore-backend">
+                        <h3 class="project-title">Weirdstore</h3>
+                        <p class="project-description">Weirdstore is a comprehensive and innovative store management
+                            system
+                            designed to simplify and enhance the way you run your store. Whether you are managing a
+                            small
+                            boutique or a large retail chain, weirdstore provides the tools you need to succeed.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Node.js</span>
+                            <span class="tech-tag">Express</span>
+                            <span class="tech-tag">MongoDB</span>
+                            <span class="tech-tag">React</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/mongodb-docker-starter">
+                        <h3 class="project-title">MongoDB Dockerized Local Dev Environment</h3>
+                        <p class="project-description">A reproducible MongoDB setup for local development using Docker.
+                            Includes auto-init scripts, isolated network and volume config, and shell scripts to spin
+                            up/tear down the environment with custom credentials.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Docker</span>
+                            <span class="tech-tag">MongoDB</span>
+                            <span class="tech-tag">Shell scripting</span>
+                            <span class="tech-tag">Init script</span>
+                            <span class="tech-tag">Environment automation</span>
+                            <span class="tech-tag">Infrastructure setup</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/Hotel-Book-Fullstack">
+                        <h3 class="project-title">Luna Hotel</h3>
+                        <p class="project-description">LunaHotel is a modern full-stack web application built using the
+                            MERN
+                            stack (MongoDB, Express.js, React.js, Node.js). The project provides a seamless and
+                            intuitive
+                            platform for users to browse, book, and manage hotel reservations for both leisure and
+                            business
+                            travel.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">MERN Stack</span>
+                            <span class="tech-tag">MongoDB</span>
+                            <span class="tech-tag">Express.js</span>
+                            <span class="tech-tag">React.js</span>
+                            <span class="tech-tag">Node.js</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/GloriousFood-Fullstack">
+                        <h3 class="project-title">GloriousFood</h3>
+                        <p class="project-description">GloriousFood is a modern food ordering application designed to
+                            allow
+                            users to manage their food orders and securely store their credit card information. The
+                            project
+                            is built using React Native, Redux, and AsyncStorage.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">React Native</span>
+                            <span class="tech-tag">Redux</span>
+                            <span class="tech-tag">AsyncStorage</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/Disease-Fullstack">
+                        <h3 class="project-title">Disease (Machine Learning)</h3>
+                        <p class="project-description">The Finding the disease based on symptoms project is an
+                            innovative
+                            and crucial application of artificial intelligence in the healthcare domain. The primary
+                            objective of this project is to provide users with a powerful tool that can assist in
+                            identifying potential diseases or health conditions based on the symptoms they report.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Machine Learning</span>
+                            <span class="tech-tag">AI</span>
+                            <span class="tech-tag">Healthcare</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/Driver4U-Fullstack">
+                        <h3 class="project-title">Driver4U</h3>
+                        <p class="project-description">Driver4U is a mobile application designed to provide a
+                            location-based
+                            transportation service. Users can select their current location and destination to request
+                            an
+                            Uber ride.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Mobile App</span>
+                            <span class="tech-tag">Location Services</span>
+                            <span class="tech-tag">Maps API</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="project-card">
+                    <a href="https://github.com/Doguhannilt/LunaCLI-Postgresql">
+                        <h3 class="project-title">LunaCLI</h3>
+                        <p class="project-description">LunaCLI is a simple command-line tool designed to interact with
+                            PostgreSQL databases. It allows users to connect, execute SQL commands, and configure
+                            database
+                            connections efficiently.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">CLI Tool</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">Database</span>
+                            <span class="tech-tag">Command Line</span>
+                        </div>
+                    </a>
                 </div>
             </div>
+        </section>
 
-            <!-- Timeline Item 3 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Concept of OOP and High-Level Languages</h3>
-                    <p class="description">Understanding Object-Oriented Programming with C# in high school.</p>
-                    <p class="duration">Year: 2016</p>
+        <!-- My Journey Section -->
+        <section id="journey" class="section">
+            <h2 class="section-title">My Journey</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px; font-size: 1.2rem;">
+                Milestones in my software career</p>
+            <div class="journey-timeline">
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2011</div>
+                        <h3 class="journey-title">First in first</h3>
+                        <p class="journey-description">Coding my first website with HTML and CSS. Nothing more, I was
+                            just a little dude curious about everything related to coding.</p>
+                    </div>
+                    <div class="journey-dot"></div>
+                </div>
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2014</div>
+                        <h3 class="journey-title">Artificial Intel... What?</h3>
+                        <p class="journey-description">Discovering what the heck AI was, thanks to the Portal 2 game and
+                            GlaDOS. I created my first AI(?) assistant with if-else conditions in Python.</p>
+                    </div>
+                    <div class="journey-dot"></div>
+                </div>
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2016</div>
+                        <h3 class="journey-title">Concept of OOP and High-Level Languages</h3>
+                        <p class="journey-description">Understanding Object-Oriented Programming with C# in high school.
+                        </p>
+                    </div>
+                    <div class="journey-dot"></div>
+                </div>
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2022-2023</div>
+                        <h3 class="journey-title">I've made some projects about ML & DL</h3>
+                        <p class="journey-description">The projects were about health, space, and earthquakes. You can
+                            check my GitHub.</p>
+                    </div>
+                    <div class="journey-dot"></div>
+                </div>
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2023 - I'm still in it</div>
+                        <h3 class="journey-title">...But web development is not bad, huh?</h3>
+                        <p class="journey-description">React, Node.js, Spring Boot, Figma, architectures...</p>
+                    </div>
+                    <div class="journey-dot"></div>
+                </div>
+                <div class="journey-item">
+                    <div class="journey-content">
+                        <div class="journey-year">2024 - 2025</div>
+                        <h3 class="journey-title">My first startup came to an end.</h3>
+                        <p class="journey-description">A short adventure with my friends taught me how a small software
+                            business usually runs.</p>
+                    </div>
+                    <div class="journey-dot"></div>
                 </div>
             </div>
+        </section>
 
-            <!-- Timeline Item 4 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>I've made some projects about ML & DL</h3>
-                    <p class="description">The projects were about health, space, and earthquakes. You can check my <a href="https://www.github.com/doguhannilt" target="_blank">GitHub</a>.</p>
-                    <p class="duration">Year: 2022-2023</p>
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2 class="section-title">Contact</h2>
+            <div class="contact-content">
+                <p style="color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 40px;">Let's connect and build
+                    something amazing together!</p>
+                <div class="contact-links">
+                    <a href="mailto:Doguhannilt@gmail.com" class="contact-link">
+                        <span class="contact-icon">📧</span>
+                        <div>
+                            <div style="font-weight: 600;">Email</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Doguhannilt@gmail.com</div>
+                        </div>
+                    </a>
+                    <a href="#" class="contact-link">
+                        <span class="contact-icon">💼</span>
+                        <div>
+                            <div style="font-weight: 600;">LinkedIn</div>
+                            <div style="font-size: 14px; opacity: 0.8;">LinkedIn Profile</div>
+                        </div>
+                    </a>
+                    <a href="#" class="contact-link">
+                        <span class="contact-icon">💻</span>
+                        <div>
+                            <div style="font-weight: 600;">GitHub</div>
+                            <div style="font-size: 14px; opacity: 0.8;">GitHub Profile</div>
+                        </div>
+                    </a>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <!-- Timeline Item 5 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>...But web development is not bad, huh?</h3>
-                    <p class="description">React, Node.js, Spring Boot, Figma, architectures...</p>
-                    <p class="duration">Year: 2023 - I'm still in it</p>
-                </div>
-            </div>
+    <script>
+        document.body.addEventListener("click", (e) => {
 
-           <!-- Timeline Item 6 -->
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>My first startup came to an end.</h3>
-                    <p class="description">A short adventure with my friends taught me how a small software business usually runs.</p>
-                    <p class="duration">Year: 2024 - 2025</p>
-                </div>
-            </div>
+            if (e.button !== 0) return;
 
-        </div> 
-    </div> 
-<hr class="solid">
-</section>
-    <!-- Contact -->
-    <section id="contact">
-        <div class="container">
-            <h2>Contact</h2>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <p>Email: <a href="mailto:Doguhannilt@gmail.com">Doguhannilt@gmail.com</a></p>
-                </div>
-                <div class="contact-item">
-                    <i class="fab fa-linkedin"></i>
-                    <p>LinkedIn: <a href="https://www.linkedin.com/in/doguhan-ilter/">LinkedIn Profile</a></p>
-                </div>
-                <div class="contact-item">
-                    <i class="fab fa-github"></i>
-                    <p>GitHub: <a href="https://github.com/doguhannilt">GitHub Profile</a></p>
-                </div>
-            </div>
-<div class="lazydude">
-This site was made with just HTML and CSS. I was a bit too lazy to use any frameworks. Thanks.
-</div> 
-        </div>
-    </section>
+            const balloon = document.createElement("div");
+            balloon.className = "balloon";
+            balloon.innerText = "";
+
+            balloon.style.left = `${e.clientX}px`;
+            balloon.style.top = `${e.clientY}px`;
+
+            document.body.appendChild(balloon);
+
+            setTimeout(() => {
+                balloon.remove();
+            }, 600);
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                e.target.classList.add('active');
+
+                // Get target section
+                const targetId = e.target.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+
+                // Add ripple effect
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    left: 50%; top: 50%;
+                    width: 20px; height: 20px;
+                    margin-left: -10px; margin-top: -10px;
+                `;
+
+                e.target.style.position = 'relative';
+                e.target.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Update active navigation
+                    const sectionId = entry.target.getAttribute('id');
+                    document.querySelectorAll('.nav-item').forEach(nav => {
+                        nav.classList.remove('active');
+                        if (nav.getAttribute('href') === `#${sectionId}`) {
+                            nav.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Journey items observer
+        const journeyObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.journey-item').forEach(item => {
+            journeyObserver.observe(item);
+        });
+
+        // Scroll progress indicator
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+
+            document.querySelector('.scroll-progress').style.width = scrollPercent + '%';
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const currentActive = document.querySelector('.nav-item.active');
+            let currentIndex = Array.from(navItems).indexOf(currentActive);
+
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                navItems[currentIndex].classList.remove('active');
+                navItems[currentIndex - 1].classList.add('active');
+                navItems[currentIndex - 1].click();
+            } else if (e.key === 'ArrowRight' && currentIndex < navItems.length - 1) {
+                navItems[currentIndex].classList.remove('active');
+                navItems[currentIndex + 1].classList.add('active');
+                navItems[currentIndex + 1].click();
+            }
+        });
+
+        // Mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.skill-card, .project-card, .note-card');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+
+                const deltaX = (e.clientX - cardCenterX) * 0.01;
+                const deltaY = (e.clientY - cardCenterY) * 0.01;
+
+                card.style.transform = `perspective(1000px) rotateX(${-deltaY}deg) rotateY(${deltaX}deg)`;
+            });
+        });
+
+        // Reset card transforms when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            const cards = document.querySelectorAll('.skill-card, .project-card, .note-card');
+            cards.forEach(card => {
+                card.style.transform = '';
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Preload animations
+        window.addEventListener('load', () => {
+            document.body.style.overflow = 'visible';
+
+            // Trigger initial animations
+            setTimeout(() => {
+                document.querySelector('#hero').classList.add('visible');
+            }, 100);
+        });
+
+        // Add smooth hover effects for contact links
+        document.querySelectorAll('.contact-link').forEach(link => {
+            link.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+
+            link.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
 </body>
+
 </html>
