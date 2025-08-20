@@ -12,11 +12,13 @@
             box-sizing: border-box;
         }
 
+
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --tertiary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --quaternary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+            --primary-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            --secondary-gradient: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            --tertiary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --quaternary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
             --text-primary: #ffffff;
@@ -45,52 +47,52 @@
 
         }
 
- .navigation {
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(20px);
-    border-radius: 50px;
-    padding: 15px 25px;
-    display: flex;
-    gap: 25px;
-    z-index: 1000;
-    border: 1px solid var(--glass-border);
-    animation: slideDown 1s ease-out;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
+        .navigation {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 15px 25px;
+            display: flex;
+            gap: 25px;
+            z-index: 1000;
+            border: 1px solid var(--glass-border);
+            animation: slideDown 1s ease-out;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
 
-.nav-item {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    position: relative;
-    padding: 8px 16px;
-    border-radius: 25px;
-    cursor: pointer;
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
 
-    /* sadece gerekli animasyonlar */
-    transition: 
-        color 0.3s ease,
-        background 0.3s ease,
-        transform 0.25s ease-out;
-}
+            /* sadece gerekli animasyonlar */
+            transition:
+                color 0.3s ease,
+                background 0.3s ease,
+                transform 0.25s ease-out;
+        }
 
-.nav-item:hover,
-.nav-item.active {
-    color: var(--text-primary);
-    background: var(--glass-bg);
-    transform: translateY(-2px);
-}
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-primary);
+            background: var(--glass-bg);
+            transform: translateY(-2px);
+        }
 
 
 
-.nav-item:hover::before {
-    transform: translateX(100%);
-}
+        .nav-item:hover::before {
+            transform: translateX(100%);
+        }
 
         /* Sections */
         .section {
@@ -1065,7 +1067,7 @@
                             <div style="font-size: 14px; opacity: 0.8;">GitHub Profile</div>
                         </div>
                     </a>
-                        <a href="https://github.com/doguhannilt" class="contact-link">
+                    <a href="https://github.com/doguhannilt" class="contact-link">
                         <span class="contact-icon">💻</span>
                         <div>
                             <div style="font-weight: 600;">GitHub - 2</div>
