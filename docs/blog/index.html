@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Doğuhan İlter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../main.css" />
+    <link rel="stylesheet" href="blog.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../public/dogupiksel.png" />
+            </div>
+            <h1>Doğuhan İlter</h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../index.html">About</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#experience">Experience</a></li>
+                <li><a href="../index.html#skills">Skills</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Content -->
+    <div class="container">
+        <div class="blog-header">
+            <h1>Technical Blog</h1>
+            <p class="blog-subtitle">Thoughts on backend development, microservices, and software architecture</p>
+        </div>
+
+        <div class="blog-layout">
+            <!-- Main Blog Posts -->
+            <main class="blog-main">
+                <!-- Featured Post -->
+                <article class="blog-post-card featured">
+                    <span class="featured-badge">Featured</span>
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> November 1, 2025
+                    </time>
+                    <h2 class="post-title">
+                        <a href="./page/patient_management_blog_0.html">Building a Microservices Architecture: My Patient
+                            Management Journey</a>
+                    </h2>
+                    <p class="post-excerpt">
+                        The story behind designing and implementing a microservices-based patient management system using Spring
+                        Boot, PostgreSQL, Kafka and more.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 4 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Spring Boot</span>
+                            <span class="tag">Microservices</span>
+                            <span class="tag">PostgreSQL</span>
+                            <span class="tag">Kafka</span>
+                        </div>
+                    </div>
+                    <a href="./page/patient_management_blog_0.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="blog-sidebar">
+
+
+                <!-- Categories -->
+                <div class="sidebar-widget">
+                    <h3>Categories</h3>
+                    <ul class="category-list">
+                        <li>
+                            <p><i class="fas fa-folder"></i> Microservices </p>
+                        </li>
+                        <li>
+                            <p><i class="fas fa-folder"></i> Databases </p>
+                        </li>
+                        <li>
+                            <p><i class="fas fa-folder"></i> DevOps </p>
+                        </li>
+                        <li>
+                            <p><i class="fas fa-folder"></i> Architecture </p>
+                        </li>
+                        <li>
+                            <p><i class="fas fa-folder"></i> Open Source </p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Popular Tags -->
+                <div class="sidebar-widget">
+                    <h3>Popular Tags</h3>
+                    <div class="tag-cloud">
+                        <p class="cloud-tag">Spring Boot</p>
+                        <p class="cloud-tag">Microservices</p>
+                        <p class="cloud-tag">Docker</p>
+                        <p class="cloud-tag">Kubernetes</p>
+                        <p class="cloud-tag">PostgreSQL</p>
+                        <p class="cloud-tag">Kafka</p>
+                        <p class="cloud-tag">Go</p>
+                        <p class="cloud-tag">API Design</p>
+                        <p class="cloud-tag">DevOps</p>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        // Active nav link
+        document.querySelectorAll('.nav a').forEach(link => {
+            if (link.getAttribute('href') === 'index.html' || link.textContent.trim() === 'Blog') {
+                link.classList.add('active');
+            }
+        });
+
+        // Newsletter form
+        document.querySelector('.newsletter-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Newsletter subscription coming soon!');
+        });
+    </script>
+</body>
+
+</html>

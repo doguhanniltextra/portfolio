@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Microservice Journey - Doğuhan İlter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+            
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2025-11-01">
+                        <i class="far fa-calendar"></i> Nov 1, 2025
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 4 min read
+                    </span>
+                </div>
+                
+                <h1 class="post-title-main">My Microservice Journey</h1>
+                
+                <div class="post-tags-header">
+                    <span class="tag">Microservices</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">DevOps</span>
+                    <span class="tag">Java</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                
+                <!-- Lead Paragraph -->
+                <p class="lead">
+                    8 months ago, there was only one question that created chaos in my mind. How do banking, healthcare, and government software systems work, and what kind of architecture do these systems usually use?
+                </p>
+
+                <h2>The Beginning</h2>
+                
+                <p>
+                    My first thought was, "They must be monolithic, serverless, and on-prem," but after a couple of attempts, I discovered microservice architecture. THAT WAS AWESOME! Because all the questions in my mind were answered in that moment. Then, I've bought books about the microservice. The first book was "Building Microservices: Designing Fine-Grained Systems" by Sam Newman and the other one was "Microservices Patterns: With Examples in Java" by Chris Richardson. Those books gave me the fundamentals I've needed to start a project based on microservice architecture.
+                </p>
+
+                <h2>The Challenge</h2>
+
+                <p>
+                    But let me be honest, that was incredibly challenging for me because it was difficult to understand how a framework or a useful tool can be integrated into a project that is based on microservice architecture. What about logging, security, deployment, or managing independent libraries… And all these problems have created a learning curve that I've had to handle.
+                </p>
+
+                <h2>Planning the Project</h2>
+
+                <p>
+                    Finally, I was confident to create a project based on a microservices architecture. I've got a pen and paper, and I started thinking about what type of project I should make. I've decided on a healthcare project because I already knew what a healthcare project looks like from my previous projects that I've worked on with my boys. I've just drawn tons of schema about the database, every module, and connections between the modules  and decided which framework, tool, and technology I should use.
+                </p>
+
+                <h2>Choosing the Programming Language</h2>
+
+                <p>
+                    I've been using Java for almost 3 years and I've gotten used to creating and maintaining Spring Boot projects, so my first attempt was actually using Java as a programming language in my project. But why not Golang? I know both languages and I should give an answer to myself why Java, but not Golang? So it took a week to convince myself.
+                </p>
+
+                <h3>Here are my notes from that week:</h3>
+
+                <ul>
+                    <li>Java has a huge ecosystem for creating a microservice project.</li>
+                    <li>I can use Spring Boot, and the framework is going to give many and many dependencies as I need.</li>
+                    <li>Today's companies are using Java if the project is based on a microservice architecture.</li>
+                    <li>I don't need high performance, excellent concurrency; I just need a platform that is suitable, secure and easy to work with.</li>
+                </ul>
+
+                <h2>Choosing the Tools</h2>
+
+                <p>
+                    And here we go, I've decided programming language for creating my project. It was time to choose dependencies and tools that are suitable and would be integrated perfectly into the project.
+                </p>
+
+                <h3>Message Broker: Kafka</h3>
+
+                <p>
+                    Kafka is a perfect option if you want to make asynchronous communication between the A to B services. RabbitMQ is good too but I want to provide separate data based on topics such as email topic, subs topic, etc. And also, I've worked with Kafka a couple of times in my previous projects and that's why the configuration is not that complicated for me.
+                </p>
+
+                <h3>API Gateway: Spring Cloud Gateway</h3>
+
+                <p>
+                    I've used Spring Cloud Gateway to ensure security for gathering requests and this way fits in with why I use Java/Spring Boot and its ecosystem.
+                </p>
+
+                <h3>Databases</h3>
+
+                <p>
+                    What about the databases? Clearly, I was okay with using a different database for each module because loose-coupling is one of the features of microservice architecture:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> MySQL for the Doctor Service</h4>
+                        <p>Because it's generally optimized for read-heavy operations and offers slightly better performance in that context. I don't need flexibility; just need to read as fast as it should be.</p>
+                    </div>
+                    
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> PostgreSQL for the Appointment Service</h4>
+                        <p>I've just used PostgreSQL for the Appointment Service because this service is the one that all CRUD operations come to an end. Patient data, doctor data and other related data have created an appointment for a patient. It's the same for the Patient Service and reliable consistency is everything in this module.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> MongoDB for the Analytics Service</h4>
+                        <p>MongoDB is an excellent choice for the Analytics Service because this service doesn't require ACID, as known as Atomicity, Consistency, Isolation and Durability. MongoDB is optimized for storing large volumes of semi-structured or unstructured data, that's why I've chosen MongoDB.</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Note:</strong> But I must confess this approach is not sustainable if you provide the principles of GreenOps.
+                </div>
+
+                <h3>Containerization</h3>
+
+                <p>
+                    In containerization, I've chosen Docker and K8s because they were quite easy to manage and maintain but I've upgraded containerization step by step. First of all, I've used Docker all alone but it was harshly difficult to manage multiple containers at the same time. This was the place where K8s welcomed us.
+                </p>
+
+                <h3>Logging</h3>
+
+                <p>
+                    As a logger, I've just used SLF4J because I wanted to keep it simple as much as I could and I have a long story with SLF4J with Minecraft; I got crashes continuously thanks to this built-in dependency.
+                </p>
+
+                <h2>The Result</h2>
+
+                <div class="callout callout-success">
+                    <strong>✅ Done:</strong> The whole process took 6 months — my sleep schedule collapsed, my friends forgot my face, but at least I got a shiny-tiny microservice project out of it.
+                </div>
+
+                <p>
+                    The project is not ready-to-deploy but done is better than perfect. After a couple of months, I've just updated the project and named it the Patient Management project. Also, added continuous integration in GitHub to deploy my project to Docker Hub and tons of K8s YAML files.
+                </p>
+
+                <p>
+                    Huh, here is the whole story beyond the project. It was a pleasure to write down in order not to forget the story.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                
+                <!-- Share Buttons -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=My%20Microservice%20Journey" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications, 
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
