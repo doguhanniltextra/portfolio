@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://doguhanniltextra.github.io/portfolio/sitemap.xml
+
+# Disallow specific directories if needed
+# Disallow: /private/
+# Disallow: /temp/

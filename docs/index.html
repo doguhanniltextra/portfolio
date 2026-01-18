@@ -4,40 +4,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Doğuhan İlter - Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes. Based in Istanbul, Turkey.">
+    <meta name="keywords"
+        content="Backend Developer, Microservices, Spring Boot, Java, Go, Docker, Kubernetes, PostgreSQL, Istanbul">
+    <meta name="author" content="Doğuhan İlter">
+    <meta property="og:title" content="Doğuhan İlter - Backend Developer">
+    <meta property="og:description"
+        content="Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Doğuhan İlter - Backend Developer">
+    <meta name="twitter:description"
+        content="Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes.">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/">
     <title>Doğuhan İlter - Backend Developer</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="main.css" />
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Doğuhan İlter",
+      "jobTitle": "Backend Developer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Qoex Teknoloji"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/",
+      "sameAs": [
+        "https://www.linkedin.com/in/doguhan-ilter/",
+        "https://github.com/doguhanniltextra"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Istanbul",
+        "addressCountry": "Turkey"
+      },
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "Gedik University"
+      },
+      "knowsAbout": [
+        "Java",
+        "Spring Boot",
+        "Go",
+        "Microservices",
+        "Docker",
+        "Kubernetes",
+        "PostgreSQL",
+        "MySQL",
+        "Apache Kafka",
+        "AWS"
+      ],
+      "email": "doguhannilt@email.com"
+    }
+    </script>
 </head>
 
 <body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Header -->
-    <header class="header">
+    <header class="header" role="banner">
         <div class="container">
             <div class="profile-img">
-                <img src="./public/dogupiksel.png" />
+                <img src="./public/dogupiksel.png" alt="Doğuhan İlter profile photo" />
             </div>
             <h1>Doğuhan İlter</h1>
             <div class="title">Backend Developer</div>
             <div class="location">Istanbul, Turkey</div>
-            <div class="social-links">
-                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
-                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
-                        class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            <div class="social-links" role="navigation" aria-label="Social media links">
+                <a href="mailto:doguhannilt@email.com" aria-label="Send email to doguhannilt@email.com"><i
+                        class="fas fa-envelope" aria-hidden="true"></i><span class="sr-only">Email</span></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank" rel="noopener noreferrer"
+                    aria-label="Visit LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i><span
+                        class="sr-only">LinkedIn</span></a>
+                <a href="https://github.com/doguhanniltextra" target="_blank" rel="noopener noreferrer"
+                    aria-label="Visit GitHub profile"><i class="fab fa-github" aria-hidden="true"></i><span
+                        class="sr-only">GitHub</span></a>
             </div>
         </div>
     </header>
 
     <!-- Navigation -->
-    <nav class="nav">
+    <nav class="nav" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
             <ul>
-                <li><a href="#about" class="active">About</a></li>
+                <li><a href="#about" class="active" aria-current="page">About</a></li>
                 <li><a href="blog/index.html">Blog</a></li>
-                <li><a href="#projects">Projects</a></li>
                 <li><a href="#experience">Experience</a></li>
+                <li><a href="#projects">Projects</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><button id="theme-toggle" aria-label="Toggle dark mode" class="theme-toggle"><i class="fas fa-moon"
+                            aria-hidden="true"></i></button></li>
             </ul>
         </div>
     </nav>
@@ -45,7 +108,31 @@
     <!-- Main Content -->
     <div class="container">
         <div class="main-content">
-            <main class="content">
+            <main id="main-content" class="content" role="main">
+                <!-- About -->
+                <section id="about" class="section fade-in">
+                    <h2>About</h2>
+                    <div class="about-text">
+                        <p>I'm a backend developer based in Istanbul, currently working at Qoex Teknoloji. My focus is
+                            on building scalable systems using microservices architecture, where I get to work with
+                            technologies like Spring Boot, Go, Docker, and Kubernetes.</p>
+
+                        <p>What I enjoy most is figuring out how to make services work independently while still
+                            communicating effectively. Whether it's setting up event-driven architectures with Kafka or
+                            containerizing applications with Docker, I like solving the kinds of problems that come up
+                            when you're trying to build something that needs to scale.</p>
+
+                        <p>My recent work includes building a patient management system with microservices, where each
+                            service handles its own domain and database. I've also contributed to open-source projects
+                            like VMware Secrets Manager, improving secret rotation logic and fixing edge cases.</p>
+
+                        <p>I graduated from Gedik University and have been picking up skills through certifications in
+                            Docker, Kubernetes, and machine learning. When I'm not coding, I'm usually exploring new
+                            backend patterns or working on side projects that help me understand distributed systems
+                            better.</p>
+                    </div>
+                </section>
+
                 <!-- Skills -->
                 <section id="skills" class="section fade-in">
                     <h3>Technical Skills</h3>
@@ -101,6 +188,66 @@
                             <span class="skill-tag">IntelliJ IDEA</span>
                             <span class="skill-tag">Postman</span>
                             <span class="skill-tag">CLI Development</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Experience -->
+                <section id="experience" class="section fade-in">
+                    <h2>Experience</h2>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="exp-title">Backend Developer</div>
+                                <div class="exp-company">Qoex Teknoloji</div>
+                                <div style="color: #666; font-size: 0.95rem;">Istanbul, Turkey</div>
+                            </div>
+                            <div class="exp-period">2025 — Present</div>
+                        </div>
+                        <div class="exp-description">
+                            <ul>
+                                <li>Developing system architecture for production applications</li>
+                                <li>Implementing RBAC-based authorization systems for role and permission management
+                                </li>
+                                <li>Managing cloud deployments on AWS, handling infrastructure and deployment pipelines
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="exp-title">Software Development Intern</div>
+                                <div class="exp-company">Impress IT & Education Technologies</div>
+                                <div style="color: #666; font-size: 0.95rem;">Istanbul, Kadıköy</div>
+                            </div>
+                            <div class="exp-period">2025</div>
+                        </div>
+                        <div class="exp-description">
+                            <ul>
+                                <li>Gained exposure to ERP systems and enterprise software development</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="exp-title">Engineering Intern</div>
+                                <div class="exp-company">Alberk QA International Technical Control and Certification
+                                    Inc.</div>
+                                <div style="color: #666; font-size: 0.95rem;">Istanbul, Ataşehir</div>
+                            </div>
+                            <div class="exp-period">2022</div>
+                        </div>
+                        <div class="exp-description">
+                            <ul>
+                                <li>Maintained archival systems and documentation using various tools</li>
+                                <li>Managed client portfolios and tracked job entry/exit records</li>
+                                <li>Handled new client registration and file management</li>
+                            </ul>
                         </div>
                     </div>
                 </section>
@@ -187,11 +334,29 @@
                         </div>
                         <div class="project-description">
                             <ul>
-                                <li>The platform allows users to create, edit, and delete projects with detailed information including timelines, descriptions, and status tracking. The intuitive React-based interface provides a seamless experience for quick project setup and organization, while the Go backend ensures fast and efficient data processing.</li>
-                                <li>Create and manage issues with comprehensive features including priority levels (Low, Medium, High, Critical), customizable due dates, team member assignments, and real-time status updates (To Do, In Progress, Done). The system provides visual indicators and notifications to keep team members informed of task progress.</li>
-                                <li> Built with Go's high-performance capabilities, Managify delivers exceptional speed and efficiency. The Fiber framework provides lightning-fast HTTP routing and middleware support, while MongoDB's flexible document structure allows for rapid data retrieval and scalability. The application is optimized for handling multiple concurrent users with minimal resource consumption.</li>
-                                <li>The desktop application, built with Electron, React 19, and Vite, provides a native-like experience with fast hot module replacement during development and optimized production builds. Tailwind CSS and Ant Design components ensure a consistent, professional, and responsive user interface across all screen sizes.</li>
-                                <li>The backend follows clean architecture principles with clear separation between domain logic, use cases, repository patterns, and delivery layers. This design ensures maintainability, testability, and scalability as the application grows. Each layer has well-defined responsibilities, making the codebase easy to understand and extend.</li>
+                                <li>The platform allows users to create, edit, and delete projects with detailed
+                                    information including timelines, descriptions, and status tracking. The intuitive
+                                    React-based interface provides a seamless experience for quick project setup and
+                                    organization, while the Go backend ensures fast and efficient data processing.</li>
+                                <li>Create and manage issues with comprehensive features including priority levels (Low,
+                                    Medium, High, Critical), customizable due dates, team member assignments, and
+                                    real-time status updates (To Do, In Progress, Done). The system provides visual
+                                    indicators and notifications to keep team members informed of task progress.</li>
+                                <li> Built with Go's high-performance capabilities, Managify delivers exceptional speed
+                                    and efficiency. The Fiber framework provides lightning-fast HTTP routing and
+                                    middleware support, while MongoDB's flexible document structure allows for rapid
+                                    data retrieval and scalability. The application is optimized for handling multiple
+                                    concurrent users with minimal resource consumption.</li>
+                                <li>The desktop application, built with Electron, React 19, and Vite, provides a
+                                    native-like experience with fast hot module replacement during development and
+                                    optimized production builds. Tailwind CSS and Ant Design components ensure a
+                                    consistent, professional, and responsive user interface across all screen sizes.
+                                </li>
+                                <li>The backend follows clean architecture principles with clear separation between
+                                    domain logic, use cases, repository patterns, and delivery layers. This design
+                                    ensures maintainability, testability, and scalability as the application grows. Each
+                                    layer has well-defined responsibilities, making the codebase easy to understand and
+                                    extend.</li>
                             </ul>
                         </div>
                     </div>
@@ -430,24 +595,30 @@
                         </div>
                         <div class="project-description">
                             <ul>
-                                <li>LunaCLI is a powerful command-line interface (CLI) tool designed for managing PostgreSQL
-                                databases efficiently. It provides users with the ability to connect to databases,
-                                execute SQL commands, and configure connection settings dynamically. The tool is ideal
-                                for developers, database administrators, and power users who prefer a lightweight,
-                                terminal-based interface for database operations.</li>
+                                <li>LunaCLI is a powerful command-line interface (CLI) tool designed for managing
+                                    PostgreSQL
+                                    databases efficiently. It provides users with the ability to connect to databases,
+                                    execute SQL commands, and configure connection settings dynamically. The tool is
+                                    ideal
+                                    for developers, database administrators, and power users who prefer a lightweight,
+                                    terminal-based interface for database operations.</li>
 
-                                <li>LunaCLI allows users to connect to PostgreSQL databases using custom credentials, modify
-                                connection parameters such as username, password, database name, and port, and execute
-                                SQL queries directly from the CLI. It supports a wide range of database operations,
-                                including transactions, table management, schema creation, stored procedures, and
-                                multiple query execution, with results displayed in an organized table format.</li>
+                                <li>LunaCLI allows users to connect to PostgreSQL databases using custom credentials,
+                                    modify
+                                    connection parameters such as username, password, database name, and port, and
+                                    execute
+                                    SQL queries directly from the CLI. It supports a wide range of database operations,
+                                    including transactions, table management, schema creation, stored procedures, and
+                                    multiple query execution, with results displayed in an organized table format.</li>
 
                                 <li>Key features include history tracking, scheduling queries, executing SQL files,
-                                exporting table data to CSV, saving frequently used SQL commands as snippets, and
-                                retrieving results sequentially for batch operations. Prometheus support is included for
-                                query monitoring, enabling users to track database performance metrics. Additionally,
-                                LunaCLI supports cloning user entities and dynamic port configuration, providing
-                                flexibility for diverse development and testing scenarios.</li>
+                                    exporting table data to CSV, saving frequently used SQL commands as snippets, and
+                                    retrieving results sequentially for batch operations. Prometheus support is included
+                                    for
+                                    query monitoring, enabling users to track database performance metrics.
+                                    Additionally,
+                                    LunaCLI supports cloning user entities and dynamic port configuration, providing
+                                    flexibility for diverse development and testing scenarios.</li>
                             </ul>
                         </div>
                     </div>
@@ -455,43 +626,7 @@
         </div>
         </section>
 
-        <!-- Experience -->
-        <section id="experience" class="section fade-in">
-            <h2>Experience</h2>
 
-                <div class="experience-item">
-                    <div class="exp-header">
-                        <div>
-                            <div class="exp-title">Backend Developer</div>
-                            <div class="exp-company">Qoex Teknoloji</div>
-                            <div style="color: #666; font-size: 0.95rem;">Istanbul, Turkey</div>
-                        </div>
-                        <div class="exp-period">2025 — Present</div>
-                    </div>
-                </div>
-
-                <div class="experience-item">
-                <div class="exp-header">
-                    <div>
-                        <div class="exp-title">Software Development Intern</div>
-                        <div class="exp-company">Impress IT & Education Technologies</div>
-                        <div style="color: #666; font-size: 0.95rem;">Istanbul, Kadıköy</div>
-                    </div>
-                    <div class="exp-period">2025</div>
-                </div>
-            </div>
-
-            <div class="experience-item">
-                <div class="exp-header">
-                    <div>
-                        <div class="exp-title">Engineering Intern</div>
-                        <div class="exp-company">Alberk QA International Technical Control and Certification Inc.</div>
-                        <div style="color: #666; font-size: 0.95rem;">Istanbul, Ataşehir</div>
-                    </div>
-                    <div class="exp-period">2022</div>
-                </div>
-            </div>
-        </section>
 
         <!-- Achievements -->
         <section class="section fade-in">
@@ -521,7 +656,8 @@
                     </li>
                     <li><i class="fas fa-phone"></i> Upon Request</li>
                     <li><i class="fas fa-map-marker-alt"></i> Istanbul, Turkey</li>
-                    <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">LinkedIn Profile</a></li>
+                    <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/"
+                            target="_blank">LinkedIn Profile</a></li>
                 </ul>
             </section>
 
@@ -561,81 +697,118 @@
     </div>
     </div>
 
-<script>
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('.nav a').forEach(link => {
-        link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            
-            // Eğer external link veya blog linkiyse normal davransın
-            if (!href.startsWith('#')) {
-                return; // Blog linki için preventDefault yapma
+    <script>
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            themeToggle.setAttribute('aria-label', 'Toggle light mode');
+        }
+
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                themeToggle.setAttribute('aria-label', 'Toggle light mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                themeToggle.setAttribute('aria-label', 'Toggle dark mode');
+                localStorage.setItem('theme', 'light');
             }
-            
-            // Sadece # ile başlayan linkler için smooth scroll
-            e.preventDefault();
+        });
 
-            // Remove active class from all links
-            document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
 
-            // Add active class to clicked link
-            this.classList.add('active');
+                // Eğer external link veya blog linkiyse normal davransın
+                if (!href.startsWith('#')) {
+                    return; // Blog linki için preventDefault yapma
+                }
 
-            // Get target section
-            const target = document.querySelector(href);
-            if (target) {
-                const offsetTop = target.offsetTop - 70;
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
+                // Sadece # ile başlayan linkler için smooth scroll
+                e.preventDefault();
+
+                // Remove active class and aria-current from all links
+                document.querySelectorAll('.nav a').forEach(l => {
+                    l.classList.remove('active');
+                    l.removeAttribute('aria-current');
                 });
-            }
+
+                // Add active class and aria-current to clicked link
+                this.classList.add('active');
+                this.setAttribute('aria-current', 'page');
+
+                // Get target section
+                const target = document.querySelector(href);
+                if (target) {
+                    const offsetTop = target.offsetTop - 70;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
         });
-    });
 
-    // Update active nav link based on scroll position
-    window.addEventListener('scroll', function () {
-        const sections = document.querySelectorAll('.section[id]');
-        const navLinks = document.querySelectorAll('.nav a');
+        // Update active nav link based on scroll position
+        window.addEventListener('scroll', function () {
+            const sections = document.querySelectorAll('.section[id]');
+            const navLinks = document.querySelectorAll('.nav a');
 
-        let current = '';
+            let current = '';
 
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 100;
-            if (scrollY >= sectionTop) {
-                current = section.getAttribute('id');
-            }
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                link.removeAttribute('aria-current');
+                const href = link.getAttribute('href');
+                // Sadece anchor linkler için active class ekle
+                if (href === '#' + current) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                }
+            });
         });
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            const href = link.getAttribute('href');
-            // Sadece anchor linkler için active class ekle
-            if (href === '#' + current) {
-                link.classList.add('active');
-            }
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
         });
-    });
-
-    // Fade in animation on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function (entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.fade-in').forEach(el => {
-        observer.observe(el);
-    });
-</script>
+    </script>
 </body>
 
 </html>
