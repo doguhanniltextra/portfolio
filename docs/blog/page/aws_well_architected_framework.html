@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Well-Architected Framework - Doğuhan İlter</title>
+    <meta name="description"
+        content="A comprehensive guide to AWS Well-Architected Framework covering all six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.">
+    <meta name="keywords"
+        content="AWS, Well-Architected Framework, Cloud Architecture, DevOps, Security, Reliability, Performance, Cost Optimization, Sustainability">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-06">
+                        <i class="far fa-calendar"></i> February 6, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 8 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">AWS Well-Architected Framework</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">AWS</span>
+                    <span class="tag">Cloud Architecture</span>
+                    <span class="tag">DevOps</span>
+                    <span class="tag">Best Practices</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    The AWS Well-Architected Framework provides a consistent approach for customers and partners to
+                    evaluate architectures and implement designs that scale over time. This comprehensive guide covers
+                    all six pillars and essential design principles for building robust cloud solutions.
+                </p>
+
+                <h2>The Six Pillars</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-cogs"></i>
+                        <h4>Operational Excellence</h4>
+                        <p>Support development to deliver business value and continuously improve processes</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Security</h4>
+                        <p>Protect data, systems, and assets using cloud technologies</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Reliability</h4>
+                        <p>Perform intended functions correctly and consistently when expected</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h4>Performance Efficiency</h4>
+                        <p>Use computing resources efficiently and maintain efficiency as demand changes</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h4>Cost Optimization</h4>
+                        <p>Run systems to deliver business value at the lowest price point</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-leaf"></i>
+                        <h4>Sustainability</h4>
+                        <p>Minimize environmental impacts through efficiency and reduced resource consumption</p>
+                    </div>
+                </div>
+
+                <h3>Operational Excellence</h3>
+                <p>
+                    The ability to support development in delivering business value, run workloads effectively, gain
+                    insights into operations, and continuously improve supporting processes and procedures.
+                </p>
+
+                <h3>Security</h3>
+                <p>
+                    Describes how to leverage cloud technologies to protect data, systems, and assets, and improve your
+                    security posture.
+                </p>
+
+                <h3>Reliability</h3>
+                <p>
+                    The ability of a workload to perform its intended function correctly and consistently when it's
+                    expected to.
+                </p>
+
+                <h3>Performance Efficiency</h3>
+                <p>
+                    The ability to use computing resources efficiently to meet system requirements and to maintain that
+                    efficiency as demand changes and technologies evolve.
+                </p>
+
+                <h3>Cost Optimization</h3>
+                <p>
+                    The ability to run systems to deliver business value at the lowest price point.
+                </p>
+
+                <h3>Sustainability</h3>
+                <p>
+                    The ability to continually improve sustainability impacts by reducing energy consumption and
+                    increasing efficiency across all components of a workload, maximizing the benefits from the
+                    provisioned resources and minimizing the total resources required.
+                </p>
+
+                <h2>General Design Principles</h2>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> Stop Guessing Your Capacity Needs</h4>
+                        <p>With cloud computing, you can use as much or as little capacity as you need and scale up and
+                            down automatically, eliminating expensive idle resources or performance issues from
+                            insufficient capacity.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-vial"></i> Test Systems at Production Scale</h4>
+                        <p>Create a production-scale test environment on demand, complete your testing, and then shut
+                            down the resources. You only pay for the test environment when it's running.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-robot"></i> Automate with Architectural Experimentation in Mind</h4>
+                        <p>Automation allows you to create and replicate workloads at low cost, track changes, audit
+                            impacts, and revert to previous parameters when necessary.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-sync-alt"></i> Consider Evolutionary Architectures</h4>
+                        <p>The cloud enables systems to evolve over time through on-demand automation and testing,
+                            allowing businesses to benefit from innovations as a standard practice.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> Drive Architectures Using Data</h4>
+                        <p>Collect data on how architectural choices affect workload behavior to make fact-based
+                            decisions. Your cloud infrastructure is code, so use data to inform improvements over time.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-gamepad"></i> Improve Through Game Days</h4>
+                        <p>Regularly schedule Game Days to test architecture and processes by simulating production
+                            events, helping identify improvements and build organizational experience.</p>
+                    </div>
+                </div>
+
+                <h2>Architecture Team Roles</h2>
+                <p>
+                    Technology architecture teams typically include a range of roles such as <strong>Technical
+                        Architect</strong> (infrastructure), <strong>Solution Architect</strong> (software),
+                    <strong>Data Architect</strong>, <strong>Network Architect</strong>, and <strong>Security
+                        Architect</strong>. These teams often utilize TOGAF or similar architectural capability
+                    frameworks.
+                </p>
+
+                <h2>Governance and Compliance</h2>
+
+                <div class="callout callout-info">
+                    <strong>💡 Key Insight:</strong> Validate that you have mechanisms to identify changes to internal
+                    governance and external compliance requirements.
+                </div>
+
+                <p>There are two different rule-makers to monitor:</p>
+                <ul>
+                    <li><strong>Internal Governance:</strong> Your organization's own policies, standards, and best
+                        practices</li>
+                    <li><strong>External Compliance:</strong> Regulatory requirements, industry standards, and legal
+                        obligations</li>
+                </ul>
+
+                <h2>Monitoring vs Observability</h2>
+
+                <p>
+                    <strong>Monitoring</strong> is tracking known issues (Known-Unknowns). You open a dashboard and say
+                    "notify me if CPU exceeds 90%". The answer is either yes or no.
+                </p>
+
+                <p>
+                    <strong>Observability</strong>, on the other hand, is the ability to debug unknown issues
+                    (Unknown-Unknowns). The system can tell you that CPU is high because microservice X is sending too
+                    many queries to database Y, and 30% of these queries are creating deadlocks.
+                </p>
+
+                <h3>The Three Pillars of Observability</h3>
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-bar"></i> Metrics</h4>
+                        <p>Numerical data stored as time-series</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-file-alt"></i> Logs</h4>
+                        <p>Text records of what happened at a specific moment</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-route"></i> Traces</h4>
+                        <p>The journey of a request through the system</p>
+                    </div>
+                </div>
+
+                <h2>Runbook vs Playbook</h2>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Important Distinction:</strong> Use established runbooks for well-understood events, and
+                    use playbooks to aid in investigation.
+                </div>
+
+                <ul>
+                    <li><strong>Runbook:</strong> Like a recipe - the outcome is known. If you can write a runbook for
+                        something (step-by-step instructions are clear), ideally it should be a bash script or AWS
+                        Systems Manager Automation document.</li>
+                    <li><strong>Playbook:</strong> The outcome is uncertain. It's more of a guide than a solution,
+                        helping with investigation rather than providing definitive answers.</li>
+                </ul>
+
+                <h2>Security Considerations</h2>
+
+                <h3>The Customer Support Dilemma</h3>
+                <p>
+                    When a customer comes with an issue like "I can't open my account", one solution is to build an
+                    interface for support staff. However, developing, maintaining, and securing this interface creates
+                    its own ecosystem with hidden and significant costs.
+                </p>
+
+                <p>
+                    Alternatively, approaches like banning SSH, using VPN/Private Link instead of Bastion Hosts are
+                    examples of the principle of <strong>protecting developers from themselves</strong>.
+                </p>
+
+                <h3>AWS Identity Types</h3>
+                <ul>
+                    <li><strong>Human Identities:</strong> Your administrators, developers, operators, and end users
+                        require an identity to access your AWS environments and applications</li>
+                    <li><strong>Machine Identities:</strong> Your service applications, operational tools, and workloads
+                        require an identity to make requests to AWS services</li>
+                </ul>
+
+                <h2>Threat Modeling</h2>
+
+                <p>
+                    <strong>Threat Modeling</strong> means thinking "How would a hacker break this system?" before
+                    writing any code.
+                </p>
+
+                <p>In the Backend/Cloud world, this is represented by the <strong>STRIDE</strong> model:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-user-secret"></i>
+                        <h4>Spoofing</h4>
+                        <p>Can someone impersonate an admin?</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-edit"></i>
+                        <h4>Tampering</h4>
+                        <p>Can someone intercept and modify packets?</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-ban"></i>
+                        <h4>Repudiation</h4>
+                        <p>Can someone say "I didn't do it"?</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-unlock"></i>
+                        <h4>Information Disclosure</h4>
+                        <p>Can data leak?</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-server"></i>
+                        <h4>Denial of Service</h4>
+                        <p>Can someone lock up the system?</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-user-shield"></i>
+                        <h4>Elevation of Privilege</h4>
+                        <p>Can a regular user become an admin?</p>
+                    </div>
+                </div>
+
+                <h2>Storage Types in AWS</h2>
+
+                <h3>Object Storage (Amazon S3)</h3>
+                <p>
+                    Object storage makes data accessible from any internet location. In S3, there are no files or
+                    folders - there are <strong>Objects</strong>. Each object has a <strong>Key</strong> and a
+                    <strong>Value</strong>. Access is via REST API.
+                </p>
+                <div class="callout callout-warning">
+                    <strong>⚠️ Limitation:</strong> Write Once, Read Many - You cannot change 1 byte in the middle of a
+                    file; you must re-upload the entire file. This is why you cannot run a database on S3.
+                </div>
+
+                <h3>Block Storage (Amazon EBS)</h3>
+                <p>
+                    Block storage is like the SSD you attach to a computer. It's raw disk space. The operating system
+                    formats it and installs a file system, reading or writing data in small blocks. Access protocol is
+                    direct I/O. It can only be attached to a single EC2 instance.
+                </p>
+
+                <h3>File Storage (Amazon EFS / FSx)</h3>
+                <p>
+                    Classic folder tree structure. Access protocol is NFS for Linux or SMB for Windows. Multiple EC2
+                    instances can mount this disk simultaneously and read/write to the same file.
+                </p>
+
+                <h2>Blame-Free Culture</h2>
+
+                <div class="callout callout-success">
+                    <strong>✅ Best Practice:</strong> A blame-free approach that encourages diving deep into issues
+                    without fear of punishment.
+                </div>
+
+                <p>
+                    In theory, if an error causes the system to crash, the culprit is not person X, but the process that
+                    allowed person X to make that error. This is called <strong>Psychological Safety</strong>. The goal
+                    is to ensure people don't hide their mistakes.
+                </p>
+
+                <p>This approach encourages:</p>
+                <ul>
+                    <li>Open discussion of failures</li>
+                    <li>Learning from mistakes</li>
+                    <li>Improving processes rather than punishing individuals</li>
+                    <li>Building trust within teams</li>
+                    <li>Creating an environment where innovation can thrive</li>
+                </ul>
+
+                <h2>Conclusion</h2>
+                <p>
+                    The AWS Well-Architected Framework provides a comprehensive foundation for building secure,
+                    high-performing, resilient, and efficient infrastructure for applications. By understanding and
+                    implementing these six pillars and design principles, organizations can make informed decisions
+                    about their cloud architectures and continuously improve their systems over time.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=AWS%20Well-Architected%20Framework&url=https://doguhanniltextra.github.io/portfolio/blog/page/aws_well_architected_framework.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/aws_well_architected_framework.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
