@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Internals: Resource Management & Kernel Interaction - Doğuhan İlter</title>
+    <meta name="description"
+        content="Deep dive into how Kubernetes translates YAML definitions into Linux kernel instructions, covering OOM killer, CPU throttling, scheduling algorithms, and eviction policies.">
+    <meta name="keywords"
+        content="Kubernetes, Linux Kernel, OOM Killer, CPU Throttling, CFS, Resource Management, Container Orchestration, DevOps, Cloud Native">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-11">
+                        <i class="far fa-calendar"></i> February 11, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 12 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Kubernetes Internals: Resource Management & Kernel Interaction</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Kubernetes</span>
+                    <span class="tag">Linux Kernel</span>
+                    <span class="tag">Container Orchestration</span>
+                    <span class="tag">DevOps</span>
+                    <span class="tag">Cloud Native</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Ever wondered what happens behind the scenes when you set resource requests and limits in your
+                    Kubernetes YAML? This deep dive explores how Kubernetes translates abstract definitions into
+                    concrete Linux kernel instructions, covering scheduling algorithms, CPU throttling logic, and
+                    memory termination signals.
+                </p>
+
+                <h2>1. The Linux OOM Killer & QoS Classes</h2>
+
+                <p>
+                    When a node runs out of memory, the Linux Kernel triggers the <strong>Out of Memory (OOM)
+                        Killer</strong>. This is not a random process; it is a deterministic algorithm based on a
+                    scoring system. Kubernetes manipulates this system using Quality of Service (QoS) classes to
+                    protect critical workloads.
+                </p>
+
+                <h3>The Mechanism: oom_score and oom_score_adj</h3>
+
+                <p>
+                    Every process in Linux has an <code>oom_score</code> (seen at
+                    <code>/proc/&lt;pid&gt;/oom_score</code>), ranging from 0 (never kill) to 1000 (kill first).
+                    Kubernetes adjusts this score via the <code>oom_score_adj</code> value based on the Pod's QoS
+                    class.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Key Insight:</strong> The QoS class is automatically determined by Kubernetes based on
+                    your resource configuration—you don't set it explicitly.
+                </div>
+
+                <h3>QoS Classes Explained</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-crown"></i> Guaranteed</h4>
+                        <p><strong>Condition:</strong> <code>requests.memory == limits.memory</code> (and CPU)</p>
+                        <p><strong>oom_score_adj:</strong> -998</p>
+                        <p><strong>Behavior:</strong> "The VIP". The kernel will practically never kill this pod unless
+                            the system is in a catastrophic state (OOM on system daemons).</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-balance-scale"></i> Burstable</h4>
+                        <p><strong>Condition:</strong> <code>requests.memory &lt; limits.memory</code></p>
+                        <p><strong>oom_score_adj:</strong> 2 to 999</p>
+                        <p><strong>Behavior:</strong> "The Middle Class". The score is calculated dynamically based on
+                            how much memory the pod requested vs. how much it is currently using above that request.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-triangle"></i> BestEffort</h4>
+                        <p><strong>Condition:</strong> No requests or limits defined</p>
+                        <p><strong>oom_score_adj:</strong> 1000</p>
+                        <p><strong>Behavior:</strong> "The Sacrificial Lamb". These pods have the highest possible kill
+                            score. They are the first to be terminated when the node experiences memory pressure.</p>
+                    </div>
+                </div>
+
+                <h3>The OOM Algorithm</h3>
+
+                <p>When <code>Available Memory &lt; Threshold</code>:</p>
+
+                <ol>
+                    <li>The Kernel invokes <code>select_bad_process()</code></li>
+                    <li>It iterates through all processes</li>
+                    <li>It calculates <code>badness = oom_score + oom_score_adj</code></li>
+                    <li>The process with the highest badness receives <strong>SIGKILL (Signal 9)</strong>. It cannot be
+                        caught or ignored; the process is terminated immediately.</li>
+                </ol>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Deep Dive Note:</strong> If a container exceeds its own Limit (not the Node's limit),
+                    the cgroup memory controller kills it immediately, regardless of the node's overall status. This is
+                    a <strong>Cgroup OOM</strong>, not a <strong>Node OOM</strong>.
+                </div>
+
+                <h2>2. CPU Architecture: CFS, Quotas, and Throttling</h2>
+
+                <p>
+                    Unlike memory, CPU is a <strong>compressible resource</strong>. When a process demands more CPU
+                    than allowed, it is not killed; it is <strong>throttled</strong>. Kubernetes relies on the
+                    <strong>Completely Fair Scheduler (CFS)</strong> within the Linux Kernel to handle this.
+                </p>
+
+                <h3>The CFS Mechanism</h3>
+
+                <p>The CFS manages CPU allocation using two key settings in the cgroup:</p>
+
+                <ul>
+                    <li><code>cpu.cfs_period_us</code>: The accounting period (usually 100ms or 100,000µs)</li>
+                    <li><code>cpu.cfs_quota_us</code>: The amount of time a process is allowed to run within that
+                        period</li>
+                </ul>
+
+                <h3>The Throttling Algorithm</h3>
+
+                <p>If you set <code>limits: cpu: 250m</code> (0.25 cores), Kubernetes translates this to:</p>
+
+                <ul>
+                    <li><strong>Period:</strong> 100ms</li>
+                    <li><strong>Quota:</strong> 25ms</li>
+                </ul>
+
+                <div class="callout callout-info">
+                    <strong>The Scenario:</strong>
+                    <ol>
+                        <li>Your application starts a heavy computation at T=0ms</li>
+                        <li>It burns through its 25ms quota by T=25ms</li>
+                        <li>The Kernel suspends the process threads. They are removed from the CPU run queue</li>
+                        <li>The application sleeps for the remaining 75ms</li>
+                        <li>At T=100ms (next period), the quota resets, and the application resumes</li>
+                    </ol>
+                </div>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ The Latency Trap:</strong> This "stop-start" behavior causes tail latency. Your
+                    application isn't slow because of code; it's slow because the Kernel is actively preventing it from
+                    running 75% of the time. This is monitored via the
+                    <code>container_cpu_cfs_throttled_periods_total</code> metric.
+                </div>
+
+                <h2>3. The Kube-Scheduler: Filtering & Scoring Logic</h2>
+
+                <p>
+                    The <code>kube-scheduler</code> does not randomly pick nodes. It follows a strict
+                    <strong>Scheduling Framework</strong> pipeline for every unscheduled Pod.
+                </p>
+
+                <h3>Phase 1: Filtering (Predicates)</h3>
+
+                <p>This is a boolean (Yes/No) pass. If a node fails any check, it is discarded.</p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-memory"></i> PodFitsResources</h4>
+                        <p>Does the node have enough allocatable CPU/Memory for the Pod's requests?</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-tags"></i> MatchNodeSelector / NodeAffinity</h4>
+                        <p>Does the node match the required labels?</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-ban"></i> TaintToleration</h4>
+                        <p>Does the Pod tolerate the Node's taints (e.g., NoSchedule)?</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-hdd"></i> VolumeZone</h4>
+                        <p>If the pod needs an EBS volume in us-east-1a, filter out nodes in us-east-1b.</p>
+                    </div>
+                </div>
+
+                <h3>Phase 2: Scoring (Priorities)</h3>
+
+                <p>The remaining nodes are ranked 0-100. The highest score wins.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-image"></i>
+                        <h4>ImageLocality</h4>
+                        <p>Nodes that already have the Docker image cached get a boost (saves bandwidth/time)</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                        <h4>LeastRequested</h4>
+                        <p>Favors nodes with the most free resources (spreads load)</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                        <h4>MostRequested</h4>
+                        <p>Favors nodes that are already mostly full (bin-packing, saves cost)</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-network-wired"></i>
+                        <h4>InterPodAffinity</h4>
+                        <p>Favors nodes running other specific pods (for lower network latency)</p>
+                    </div>
+                </div>
+
+                <h3>Phase 3: Preemption (The Bully Logic)</h3>
+
+                <p>If no nodes survive Phase 1, the Scheduler checks <code>PriorityClass</code>.</p>
+
+                <p>
+                    If the pending Pod has a higher <code>priorityClassName</code> than existing pods on a node, the
+                    Scheduler initiates <strong>Preemption</strong>:
+                </p>
+
+                <ol>
+                    <li>It evicts the lower-priority pods</li>
+                    <li>Wait for them to terminate</li>
+                    <li>Schedule the high-priority pod</li>
+                </ol>
+
+                <h2>4. Kubelet Eviction Manager (Node Pressure)</h2>
+
+                <p>
+                    While OOMKill is the Kernel's last resort (panic button), <strong>Eviction</strong> is Kubelet's
+                    proactive attempt to save the node. The Kubelet monitors node stability signals.
+                </p>
+
+                <h3>Eviction Signals</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-memory"></i> memory.available</h4>
+                        <p>Low RAM</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-hdd"></i> nodefs.available</h4>
+                        <p>Low disk space (for logs/containers)</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-file"></i> nodefs.inodesFree</h4>
+                        <p><strong>Critical.</strong> Running out of file descriptors (inodes). Even if you have 100GB
+                            of disk space, if you have millions of tiny files, the filesystem locks up.</p>
+                    </div>
+                </div>
+
+                <h3>Hard vs. Soft Eviction</h3>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-hourglass-half"></i>
+                        <h4>Soft Eviction</h4>
+                        <p><strong>Config:</strong> <code>eviction-soft: memory.available&lt;1.5GB</code><br>
+                            <code>eviction-soft-grace-period: 1m30s</code>
+                        </p>
+                        <p><strong>Behavior:</strong> If the threshold is breached, Kubelet waits for the grace period.
+                            If it persists, it terminates pods gracefully (SIGTERM → wait → SIGKILL).</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Hard Eviction</h4>
+                        <p><strong>Config:</strong> <code>eviction-hard: memory.available&lt;100Mi</code></p>
+                        <p><strong>Behavior:</strong> Immediate action. Kubelet sends SIGKILL instantly. No grace
+                            period.</p>
+                    </div>
+                </div>
+
+                <h3>Eviction Ranking (Who dies first?)</h3>
+
+                <p>When Kubelet decides to evict, it ranks candidates differently than the Kernel OOM Killer:</p>
+
+                <ol>
+                    <li>Pods that consume more than their requests</li>
+                    <li>PriorityClass (Low priority first)</li>
+                    <li>BestEffort pods</li>
+                </ol>
+
+                <div class="callout callout-success">
+                    <strong>✅ Key Takeaway:</strong> This logic ensures that pods sticking to their Service Level
+                    Agreements (SLAs)—i.e., staying within requests—are the last to be touched.
+                </div>
+
+                <h2>Practical Implications</h2>
+
+                <h3>Best Practices for Resource Configuration</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-check-circle"></i> Set Requests Accurately</h4>
+                        <p>Requests determine scheduling decisions and eviction priority. Set them based on actual
+                            baseline usage, not peak usage.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> Monitor Throttling</h4>
+                        <p>Watch <code>container_cpu_cfs_throttled_periods_total</code> metrics. High throttling
+                            indicates your CPU limits are too restrictive.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-shield-alt"></i> Use Guaranteed QoS for Critical Workloads</h4>
+                        <p>For mission-critical services, set <code>requests == limits</code> to achieve Guaranteed QoS
+                            and maximum protection from OOM killer.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-layer-group"></i> Leverage PriorityClasses</h4>
+                        <p>Define PriorityClasses for different workload tiers to ensure critical services can preempt
+                            less important ones during resource contention.</p>
+                    </div>
+                </div>
+
+                <h2>Conclusion</h2>
+
+                <p>
+                    Understanding how Kubernetes interacts with the Linux kernel is crucial for building reliable,
+                    performant containerized applications. The abstractions provided by Kubernetes YAML are powerful,
+                    but knowing what happens under the hood—from OOM scores to CFS throttling to scheduler
+                    predicates—enables you to make informed decisions about resource allocation and troubleshoot
+                    production issues effectively.
+                </p>
+
+                <p>
+                    The next time you see a pod getting OOMKilled or experiencing high latency, you'll know exactly
+                    where to look: check the QoS class, examine throttling metrics, review eviction events, and
+                    understand the kernel-level mechanisms at play.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Kubernetes%20Internals%3A%20Resource%20Management%20%26%20Kernel%20Interaction&url=https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_internals.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_internals.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>

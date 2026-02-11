@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Resource Management: Hands-On Practice - Doğuhan İlter</title>
+    <meta name="description"
+        content="A practical, hands-on guide to understanding Kubernetes resource requests and limits. Learn by doing with simple examples and real-world scenarios.">
+    <meta name="keywords"
+        content="Kubernetes, Resource Management, Hands-On, Tutorial, Container Resources, Kubernetes Tutorial, DevOps Practice">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-11">
+                        <i class="far fa-calendar"></i> February 11, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 6 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Kubernetes Resource Management: Hands-On Practice</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Kubernetes</span>
+                    <span class="tag">Hands-On</span>
+                    <span class="tag">Tutorial</span>
+                    <span class="tag">DevOps</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Ready to get your hands dirty with Kubernetes resource management? This practical guide will walk
+                    you through simple exercises to understand how requests and limits work in real scenarios. No
+                    complex theory—just practical examples you can run right now.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>📋 Prerequisites:</strong> You'll need a Kubernetes cluster (Minikube, kind, or any cloud
+                    provider). Basic kubectl knowledge is helpful but not required.
+                </div>
+
+                <h2>Exercise 1: Creating Your First Pod with Resources</h2>
+
+                <p>Let's start simple. We'll create a pod that requests specific CPU and memory resources.</p>
+
+                <h3>Step 1: Create a Basic Pod</h3>
+
+                <p>Create a file called <code>simple-pod.yaml</code>:</p>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-app
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"</code></pre>
+
+                <div class="callout callout-info">
+                    <strong>💡 What does this mean?</strong>
+                    <ul>
+                        <li><strong>requests.memory: "64Mi"</strong> - Kubernetes will find a node with at least 64MB
+                            free</li>
+                        <li><strong>requests.cpu: "250m"</strong> - 250 millicores = 0.25 CPU cores</li>
+                        <li><strong>limits.memory: "128Mi"</strong> - Pod will be killed if it uses more than 128MB
+                        </li>
+                        <li><strong>limits.cpu: "500m"</strong> - Pod will be throttled if it tries to use more than
+                            0.5 cores</li>
+                    </ul>
+                </div>
+
+                <h3>Step 2: Deploy and Observe</h3>
+
+                <pre><code class="language-bash"># Apply the configuration
+kubectl apply -f simple-pod.yaml
+
+# Check if the pod is running
+kubectl get pods
+
+# View detailed information
+kubectl describe pod simple-app</code></pre>
+
+                <p>Look for the <code>QoS Class</code> in the output. It should say <strong>Burstable</strong> because
+                    requests ≠ limits.</p>
+
+                <h2>Exercise 2: Understanding QoS Classes</h2>
+
+                <p>Let's create three pods with different QoS classes to see how they behave.</p>
+
+                <h3>Pod 1: Guaranteed QoS</h3>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: guaranteed-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "100Mi"
+        cpu: "100m"
+      limits:
+        memory: "100Mi"  # Same as requests
+        cpu: "100m"      # Same as requests</code></pre>
+
+                <h3>Pod 2: Burstable QoS</h3>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: burstable-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "50Mi"
+        cpu: "50m"
+      limits:
+        memory: "200Mi"  # Higher than requests
+        cpu: "200m"      # Higher than requests</code></pre>
+
+                <h3>Pod 3: BestEffort QoS</h3>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: besteffort-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    # No resources defined at all!</code></pre>
+
+                <h3>Deploy and Compare</h3>
+
+                <pre><code class="language-bash"># Deploy all three pods
+kubectl apply -f guaranteed-pod.yaml
+kubectl apply -f burstable-pod.yaml
+kubectl apply -f besteffort-pod.yaml
+
+# Check their QoS classes
+kubectl describe pod guaranteed-pod | grep "QoS Class"
+kubectl describe pod burstable-pod | grep "QoS Class"
+kubectl describe pod besteffort-pod | grep "QoS Class"</code></pre>
+
+                <div class="callout callout-success">
+                    <strong>✅ Expected Results:</strong>
+                    <ul>
+                        <li>guaranteed-pod → QoS Class: <strong>Guaranteed</strong></li>
+                        <li>burstable-pod → QoS Class: <strong>Burstable</strong></li>
+                        <li>besteffort-pod → QoS Class: <strong>BestEffort</strong></li>
+                    </ul>
+                </div>
+
+                <h2>Exercise 3: Simulating Memory Pressure</h2>
+
+                <p>Now let's see what happens when a pod tries to use more memory than its limit.</p>
+
+                <h3>Create a Memory-Hungry Pod</h3>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-demo
+spec:
+  containers:
+  - name: memory-eater
+    image: polinux/stress
+    resources:
+      requests:
+        memory: "50Mi"
+      limits:
+        memory: "100Mi"
+    command: ["stress"]
+    args: ["--vm", "1", "--vm-bytes", "150M", "--vm-hang", "1"]</code></pre>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ What's happening here?</strong> This pod is trying to allocate 150MB of memory, but its
+                    limit is only 100MB. Let's see what Kubernetes does!
+                </div>
+
+                <pre><code class="language-bash"># Deploy the pod
+kubectl apply -f memory-demo.yaml
+
+# Watch what happens (it will get OOMKilled)
+kubectl get pods -w
+
+# Check the reason for termination
+kubectl describe pod memory-demo</code></pre>
+
+                <p>You should see <code>Reason: OOMKilled</code> in the output. The pod exceeded its memory limit and
+                    was terminated by the kernel!</p>
+
+                <h2>Exercise 4: CPU Throttling in Action</h2>
+
+                <p>Unlike memory, CPU is a compressible resource. Let's see throttling in action.</p>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-demo
+spec:
+  containers:
+  - name: cpu-burner
+    image: polinux/stress
+    resources:
+      requests:
+        cpu: "100m"
+      limits:
+        cpu: "200m"
+    command: ["stress"]
+    args: ["--cpu", "2"]</code></pre>
+
+                <pre><code class="language-bash"># Deploy the pod
+kubectl apply -f cpu-demo.yaml
+
+# Monitor CPU usage
+kubectl top pod cpu-demo
+
+# Check for throttling (if metrics-server is installed)
+kubectl get --raw /apis/metrics.k8s.io/v1beta1/pods/cpu-demo</code></pre>
+
+                <p>The pod will try to use 2 full CPU cores, but Kubernetes will throttle it to 200m (0.2 cores).</p>
+
+                <h2>Exercise 5: Resource Quotas for Namespaces</h2>
+
+                <p>Let's create a namespace with resource limits to prevent resource hogging.</p>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: Namespace
+metadata:
+  name: limited-namespace
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: limited-namespace
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "2"
+    limits.memory: "2Gi"
+    pods: "10"</code></pre>
+
+                <pre><code class="language-bash"># Create the namespace and quota
+kubectl apply -f resource-quota.yaml
+
+# Try to create a pod that exceeds the quota
+kubectl run big-pod --image=nginx \
+  --namespace=limited-namespace \
+  --requests='cpu=2,memory=2Gi' \
+  --limits='cpu=2,memory=2Gi'
+
+# This should fail! Check why:
+kubectl describe resourcequota compute-quota -n limited-namespace</code></pre>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Quota Exceeded!</strong> The pod requests more CPU than the namespace allows. This is
+                    how you protect your cluster from runaway resource consumption.
+                </div>
+
+                <h2>Key Takeaways</h2>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-check-circle"></i> Always Set Requests</h4>
+                        <p>Requests help the scheduler find the right node. Without them, your pod might land on an
+                            overloaded node.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-shield-alt"></i> Use Limits Wisely</h4>
+                        <p>Memory limits prevent OOM situations. CPU limits prevent one pod from starving others.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-layer-group"></i> Understand QoS Classes</h4>
+                        <p>Guaranteed pods are protected during eviction. BestEffort pods are sacrificed first.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> Monitor Your Resources</h4>
+                        <p>Use <code>kubectl top</code> and metrics-server to track actual usage vs. limits.</p>
+                    </div>
+                </div>
+
+                <h2>Clean Up</h2>
+
+                <p>Don't forget to clean up your test resources:</p>
+
+                <pre><code class="language-bash"># Delete all test pods
+kubectl delete pod simple-app guaranteed-pod burstable-pod besteffort-pod memory-demo cpu-demo
+
+# Delete the test namespace
+kubectl delete namespace limited-namespace</code></pre>
+
+                <h2>Next Steps</h2>
+
+                <p>
+                    Now that you've practiced the basics, you're ready to dive deeper! Check out my other post on
+                    <a href="./kubernetes_internals.html">Kubernetes Internals</a> to understand what's happening under
+                    the hood with the Linux kernel, OOM killer, and CFS scheduler.
+                </p>
+
+                <div class="callout callout-success">
+                    <strong>🎉 Congratulations!</strong> You've completed the hands-on exercises. You now understand
+                    how to configure resource requests and limits, recognize QoS classes, and predict pod behavior
+                    under resource pressure.
+                </div>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Kubernetes%20Resource%20Management%3A%20Hands-On%20Practice&url=https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_resource_management_hands_on.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_resource_management_hands_on.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>
