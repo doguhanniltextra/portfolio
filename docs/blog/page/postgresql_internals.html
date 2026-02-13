@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL Internals: Understanding Database Architecture & MVCC - Doğuhan İlter</title>
+    <meta name="description"
+        content="Deep dive into PostgreSQL internals covering PGDATA, database clusters, system catalogs, schemas, tablespaces, the Postmaster process, and Multi-Version Concurrency Control (MVCC) with transaction isolation levels.">
+    <meta name="keywords"
+        content="PostgreSQL, Database Internals, MVCC, Transaction Isolation, PGDATA, Postmaster, System Catalog, Database Architecture, Backend Development">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-14">
+                        <i class="far fa-calendar"></i> February 14, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 15 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">PostgreSQL Internals: Understanding Database Architecture & MVCC</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">PostgreSQL</span>
+                    <span class="tag">Database Internals</span>
+                    <span class="tag">MVCC</span>
+                    <span class="tag">Transaction Isolation</span>
+                    <span class="tag">Backend Development</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    PostgreSQL is more than just a relational database—it's a sophisticated system with intricate
+                    internal mechanisms. This deep dive explores the fundamental architecture of PostgreSQL, from
+                    PGDATA and database clusters to the Postmaster process and Multi-Version Concurrency Control
+                    (MVCC), revealing how PostgreSQL achieves data consistency and high concurrency.
+                </p>
+
+                <h2>1. PGDATA: The Database Cluster Root</h2>
+
+                <p>
+                    <code>PGDATA</code> is an environment variable that points to the <strong>root directory</strong>
+                    of a PostgreSQL database cluster on disk. Technically, this directory contains all the
+                    configuration files, data files, and transaction logs required for the database system to operate.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Important Note:</strong> In PostgreSQL terminology, a <strong>Cluster</strong> does not
+                    refer to multiple servers working together. Instead, it represents a collection of databases
+                    managed by a single PostgreSQL server instance.
+                </div>
+
+                <h3>How PostgreSQL Locates PGDATA</h3>
+
+                <p>When a PostgreSQL server starts, it needs to know which data and configuration to use. There are
+                    two ways to specify this:</p>
+
+                <ol>
+                    <li><strong>Using the -D parameter:</strong> <code>pg_ctl start -D
+                            /var/lib/postgresql/data</code></li>
+                    <li><strong>Using the PGDATA environment variable:</strong> If <code>-D</code> is not specified,
+                        the system defaults to the path defined in the <code>PGDATA</code> environment variable.</li>
+                </ol>
+
+                <h3>Default Databases in a Fresh Cluster</h3>
+
+                <p>After running <code>initdb</code> to create a new cluster, PostgreSQL creates three identical
+                    databases:</p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> template0</h4>
+                        <p><strong>Purpose:</strong> The pristine root template created by <code>initdb</code>. It
+                            represents the purest state of a PostgreSQL database.</p>
+                        <p><strong>Key Characteristics:</strong> When a database is created, the
+                            <code>LC_COLLATE</code> and <code>LC_CTYPE</code> (locale/region) settings from the
+                            template are inherited and cannot be changed later. <code>template0</code> is also used
+                            when restoring logical backups.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> template1</h4>
+                        <p><strong>Purpose:</strong> The default source for all new user-created databases.</p>
+                        <p><strong>Behavior:</strong> When you execute <code>CREATE DATABASE x;</code>, PostgreSQL
+                            creates a copy of <code>template1</code> and names it <code>x</code>. Any modifications
+                            made to <code>template1</code> (such as installing extensions) will be inherited by all
+                            subsequently created databases.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> postgres</h4>
+                        <p><strong>Purpose:</strong> The default user database.</p>
+                        <p><strong>Behavior:</strong> When you connect to the server (e.g., using <code>psql</code>)
+                            without specifying a database name, the system connects you to the <code>postgres</code>
+                            database by default.</p>
+                    </div>
+                </div>
+
+                <h2>2. System Catalog: PostgreSQL's Metadata Repository</h2>
+
+                <p>
+                    All database objects (tables, indexes, data types, functions, etc.) in every cluster are stored in
+                    the <strong>System Catalog</strong>. Each database has its own set of catalog tables. However,
+                    some catalog tables are cluster-wide and do not belong to any specific database.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Naming Convention:</strong> All system catalog tables start with <code>pg_</code>, such
+                    as <code>pg_database</code>, <code>pg_class</code>, <code>pg_attribute</code>, etc.
+                </div>
+
+                <h2>3. Schemas: Logical Database Partitions</h2>
+
+                <p>
+                    A database is divided into logical partitions called <strong>Schemas</strong>. You can think of
+                    schemas as a folder structure within a database. Within the same database, you can have two tables
+                    with the same name in different schemas (e.g., <code>schema1.users</code> and
+                    <code>schema2.users</code>), and they will not conflict. Every database object must belong to a
+                    schema.
+                </p>
+
+                <h3>Default Schemas</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-folder"></i> public</h4>
+                        <p>The default "user" schema. When you create a table without specifying a schema
+                            (<code>CREATE TABLE table_name</code>), the system automatically places it in the
+                            <code>public</code> schema.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-folder"></i> pg_catalog</h4>
+                        <p>The database's metadata repository. This schema contains all the system catalog tables that
+                            store information about database objects.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-folder"></i> information_schema</h4>
+                        <p>A set of SQL standard-compliant metadata views. This schema provides a standardized way to
+                            query database metadata across different SQL database systems.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-folder"></i> pg_toast</h4>
+                        <p>PostgreSQL's TOAST (The Oversized-Attribute Storage Technique) mechanism. Data pages in
+                            PostgreSQL have a fixed size, but if a row exceeds this size, PostgreSQL compresses or
+                            moves the data to TOAST tables.</p>
+                    </div>
+                </div>
+
+                <h2>4. Tablespaces: Physical Storage Locations</h2>
+
+                <p>
+                    A <strong>Tablespace</strong> is nothing more than a file system directory at the operating system
+                    level. It defines where database objects are physically stored on disk.
+                </p>
+
+                <h3>Tablespace Relationships</h3>
+
+                <ul>
+                    <li><strong>One Tablespace → Multiple Databases:</strong> Multiple databases can share the same
+                        tablespace.</li>
+                    <li><strong>One Database → Multiple Tablespaces:</strong> A single database can use multiple
+                        tablespaces to store different objects.</li>
+                </ul>
+
+                <h2>5. Postmaster: The PostgreSQL Orchestrator</h2>
+
+                <p>
+                    The <strong>Postmaster</strong> is the first and primary process that runs when a PostgreSQL
+                    database server starts. It is the orchestrator of the system. Technically, PostgreSQL uses a
+                    <strong>multi-process architecture</strong>, and the Postmaster is the parent of all other
+                    processes.
+                </p>
+
+                <h3>Core Responsibilities of Postmaster</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-power-off"></i> 1. Initialization and Memory Management</h4>
+                        <p>When you execute <code>pg_ctl start</code>, you are actually starting the Postmaster. It
+                            performs the following tasks:</p>
+                        <ul>
+                            <li>Validates the database files in <code>PGDATA</code></li>
+                            <li>Checks if recovery is needed (e.g., after an unclean shutdown)</li>
+                            <li>Allocates <strong>Shared Memory</strong> from the operating system, which serves as a
+                                common data pool for all processes</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-network-wired"></i> 2. Network Listening and Connection Handling</h4>
+                        <p>The Postmaster listens on port 5432 by default. When a client sends a connection request,
+                            the Postmaster is the first component to receive it. It initiates the authentication
+                            process using <code>pg_hba.conf</code>.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-code-branch"></i> 3. Forking Backend Processes</h4>
+                        <p>The Postmaster creates a new process for each incoming connection. It never executes SQL
+                            queries itself; it only opens the door, assigns a new worker (<strong>backend
+                                process</strong>), and returns to listening for new requests. This ensures that heavy
+                            operations by one user cannot lock the main server.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-shield-alt"></i> 4. Supervision and Recovery</h4>
+                        <p>The Postmaster monitors the health of all child processes (backend workers, autovacuum,
+                            checkpointer, etc.). If a child process crashes unexpectedly, the Postmaster intervenes and
+                            takes corrective action.</p>
+                    </div>
+                </div>
+
+                <h3>Key Background Processes Managed by Postmaster</h3>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-play-circle"></i>
+                        <h4>Startup Process</h4>
+                        <p>Runs during <code>pg_ctl start</code>. If the system did not shut down cleanly, it replays
+                            WAL (Write-Ahead Log) files to recover the database to a consistent state.</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-broom"></i>
+                        <h4>Autovacuum Launcher/Worker</h4>
+                        <p>PostgreSQL's automatic cleanup mechanism. It removes dead tuples (rows) left by deleted or
+                            updated records, freeing up disk space and preventing transaction ID wraparound.</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-pen"></i>
+                        <h4>WAL Writer</h4>
+                        <p>Writes transaction logs to disk. Even if a transaction is not committed, it ensures data is
+                            not lost and balances I/O load.</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-save"></i>
+                        <h4>Checkpointer</h4>
+                        <p>Creates checkpoints by flushing dirty pages from shared buffers to disk, ensuring data
+                            durability and reducing recovery time.</p>
+                    </div>
+
+                    <div class="feature-box">
+                        <i class="fas fa-edit"></i>
+                        <h4>Background Writer</h4>
+                        <p>Assists the Checkpointer by gradually writing dirty pages to disk before a checkpoint
+                            occurs, reducing I/O spikes.</p>
+                    </div>
+                </div>
+
+                <h2>6. SQL Standard Isolation Levels</h2>
+
+                <p>
+                    Isolation levels determine how much concurrent transactions can affect each other. The fundamental
+                    principle is: <strong>the higher the isolation level, the greater the data consistency, but the
+                        lower the performance.</strong> There is an inverse relationship between consistency and
+                    concurrency.
+                </p>
+
+                <h3>Data Inconsistency Anomalies</h3>
+
+                <p>Before understanding isolation levels, we must first understand the types of anomalies that can
+                    occur when multiple transactions run concurrently.</p>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Note:</strong> All the following scenarios assume Transaction A and Transaction B are
+                    running concurrently.
+                </div>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-circle"></i> Dirty Read</h4>
+                        <p><strong>Scenario:</strong> Transaction B updates a row but does not commit. Transaction A
+                            reads this uncommitted (dirty) data. Then Transaction B rolls back. Transaction A has read
+                            data that never actually existed in the database.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-circle"></i> Non-Repeatable Read</h4>
+                        <p><strong>Scenario:</strong> Transaction A reads a row (SELECT). Then Transaction B updates
+                            that row and commits. Transaction A reads the same row again and sees a different value.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-circle"></i> Phantom Read</h4>
+                        <p><strong>Scenario:</strong> Transaction A executes a query with a condition (e.g., WHERE age
+                            > 18) and gets five rows. Transaction B inserts a new row that matches this condition and
+                            commits. Transaction A re-executes the same query and now sees six rows.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-circle"></i> Serialization Anomaly</h4>
+                        <p><strong>Scenario:</strong> When transactions run in parallel, the final result does not
+                            match any possible outcome if those transactions had been executed sequentially.</p>
+                    </div>
+                </div>
+
+                <h3>SQL Standard Isolation Levels</h3>
+
+                <p>The SQL standard defines four isolation levels based on which anomalies are permitted:</p>
+
+                <div class="callout callout-info">
+                    <strong>📊 Isolation Levels vs. Anomalies:</strong>
+                    <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f5f5f5;">
+                                <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Isolation Level
+                                </th>
+                                <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Dirty Read
+                                </th>
+                                <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Non-Repeatable
+                                    Read</th>
+                                <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Phantom Read
+                                </th>
+                                <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Serialization
+                                    Anomaly</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Read Uncommitted</strong>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Read Committed</strong>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Repeatable Read</strong>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;">Allowed</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Serializable</strong>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                                <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: center;"><strong
+                                        style="color: green;">Prevented</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout callout-success">
+                    <strong>✅ PostgreSQL's Stricter Approach:</strong> PostgreSQL behaves more strictly than the SQL
+                    standard:
+                    <ul>
+                        <li><strong>Read Uncommitted does not exist</strong> in PostgreSQL (it is treated as Read
+                            Committed)</li>
+                        <li><strong>Repeatable Read is stronger</strong> and uses Snapshot Isolation, which also
+                            prevents Phantom Reads</li>
+                    </ul>
+                </div>
+
+                <h2>7. Multi-Version Concurrency Control (MVCC)</h2>
+
+                <p>
+                    PostgreSQL achieves high concurrency and isolation using <strong>Transaction IDs (XID)</strong>.
+                    Every transaction that writes data is assigned a unique, sequentially increasing number. These IDs
+                    allow PostgreSQL to create an "identity card" for each row (tuple) in the database.
+                </p>
+
+                <h3>The xmin and xmax System Columns</h3>
+
+                <p>
+                    Although you don't see them in a regular <code>SELECT * FROM table</code> query, every row on disk
+                    has the following metadata:
+                </p>
+
+                <ul>
+                    <li><strong>xmin (Creator XID):</strong> Which transaction created this row?</li>
+                    <li><strong>xmax (Deleter XID):</strong> Which transaction deleted or updated this row?</li>
+                </ul>
+
+                <h3>How MVCC Works: A Simple Example</h3>
+
+                <p>Let's assume the current Transaction ID is 100.</p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-plus-circle"></i> Step 1: INSERT (Creation)</h4>
+                        <p>Transaction 100 inserts a row.</p>
+                        <ul>
+                            <li>The row is written to disk</li>
+                            <li><code>xmin: 100</code> (I created it)</li>
+                            <li><code>xmax: 0</code> (Not yet deleted, still alive)</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-trash-alt"></i> Step 2: DELETE (Deletion)</h4>
+                        <p>Transaction 101 deletes this row.</p>
+                        <ul>
+                            <li><strong>PostgreSQL does NOT physically delete the row from disk!</strong> (This is
+                                crucial!)</li>
+                            <li>It only writes <code>xmax: 101</code> on the row</li>
+                            <li>The row is still on disk, but it is marked as "Transaction 101 killed me"</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-edit"></i> Step 3: UPDATE (Modification)</h4>
+                        <p>Transaction 102 updates the row.</p>
+                        <ul>
+                            <li><strong>In PostgreSQL, UPDATE = DELETE + INSERT</strong></li>
+                            <li>The old row's <code>xmax</code> is set to <code>102</code> (I killed it)</li>
+                            <li>A new row is created with <code>xmin: 102</code> (I created it)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Visibility Rules</h3>
+
+                <p>When a transaction reads data, PostgreSQL determines which row versions are visible based on the
+                    transaction's snapshot and the <code>xmin</code>/<code>xmax</code> values:</p>
+
+                <ul>
+                    <li>If <code>xmin</code> is committed and less than the transaction's snapshot, the row is visible
+                    </li>
+                    <li>If <code>xmax</code> is set and committed before the transaction's snapshot, the row is not
+                        visible (it was deleted)</li>
+                    <li>Multiple versions of the same row can exist on disk simultaneously, allowing different
+                        transactions to see different versions</li>
+                </ul>
+
+                <div class="callout callout-success">
+                    <strong>✅ Key Benefit:</strong> This mechanism allows readers and writers to work without blocking
+                    each other. Readers see a consistent snapshot of the data without waiting for writers to finish,
+                    and writers can modify data without blocking readers.
+                </div>
+
+                <h2>Practical Implications</h2>
+
+                <h3>Best Practices for PostgreSQL</h3>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-check-circle"></i> Choose the Right Isolation Level</h4>
+                        <p>Use <strong>Read Committed</strong> for most applications (PostgreSQL's default). Use
+                            <strong>Repeatable Read</strong> when you need consistent reads within a transaction. Use
+                            <strong>Serializable</strong> only when absolute consistency is critical and you can handle
+                            serialization failures.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-broom"></i> Monitor and Tune Autovacuum</h4>
+                        <p>Since PostgreSQL does not physically delete rows immediately, dead tuples accumulate.
+                            Autovacuum is essential for reclaiming space. Monitor <code>pg_stat_user_tables</code> to
+                            ensure autovacuum is running effectively.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> Understand Transaction ID Wraparound</h4>
+                        <p>PostgreSQL uses 32-bit transaction IDs, which can wrap around after ~2 billion transactions.
+                            Autovacuum prevents this by freezing old tuples. Ensure autovacuum is not disabled or
+                            blocked.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> Monitor Bloat</h4>
+                        <p>Frequent updates can cause table and index bloat due to dead tuples. Use tools like
+                            <code>pgstattuple</code> to monitor bloat and consider periodic <code>VACUUM FULL</code> or
+                            <code>REINDEX</code> for heavily updated tables.
+                        </p>
+                    </div>
+                </div>
+
+                <h2>Conclusion</h2>
+
+                <p>
+                    Understanding PostgreSQL's internal architecture—from PGDATA and the Postmaster process to MVCC and
+                    transaction isolation—is essential for building robust, high-performance database applications. The
+                    abstractions provided by SQL are powerful, but knowing what happens under the hood enables you to
+                    make informed decisions about schema design, transaction management, and performance tuning.
+                </p>
+
+                <p>
+                    The next time you execute a query or encounter a performance issue, you'll know exactly where to
+                    look: check the isolation level, examine autovacuum activity, review transaction ID usage, and
+                    understand the MVCC mechanisms at play.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=PostgreSQL%20Internals%3A%20Understanding%20Database%20Architecture%20%26%20MVCC&url=https://doguhanniltextra.github.io/portfolio/blog/page/postgresql_internals.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/postgresql_internals.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</body>
+
+</html>
