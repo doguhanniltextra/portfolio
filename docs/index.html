@@ -74,7 +74,6 @@
                 <img src="./public/dogupiksel.png" alt="Doğuhan İlter profile photo" />
             </div>
             <h1>Doğuhan İlter</h1>
-            <div class="title">Backend Developer</div>
             <div class="location">Istanbul, Turkey</div>
             <div class="social-links" role="navigation" aria-label="Social media links">
                 <a href="mailto:doguhannilt@email.com" aria-label="Send email to doguhannilt@email.com"><i
@@ -96,7 +95,7 @@
                 <li><a href="#about" class="active" aria-current="page">About</a></li>
                 <li><a href="blog/index.html">Blog</a></li>
                 <li><a href="#experience">Experience</a></li>
-                <li><a href="#projects">Projects</a></li>
+
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li><button id="theme-toggle" aria-label="Toggle dark mode" class="theme-toggle"><i class="fas fa-moon"
@@ -110,61 +109,76 @@
         <div class="main-content">
             <main id="main-content" class="content" role="main">
 
+                <!-- About -->
+                <section id="about" class="section fade-in">
+                    <h2>About Me</h2>
+                    <div class="about-narrative">
+                        <p>
+                            I am a developer who enjoys building reliable backend systems. My primary focus is on
+                            <span class="about-highlight">architecting distributed services</span> using
+                            <strong>Go</strong> and <strong>Java</strong>, and I find
+                            satisfaction in designing efficient communication patterns with <strong>gRPC</strong> and
+                            <strong>Kafka</strong>.
+                        </p>
+                        <p>
+                            Beyond application logic, I value <span class="about-highlight">Infrastructure as
+                                Code</span> because it ensures environments are reproducible and secure. I use
+                            <strong>Terraform</strong> on <strong>AWS</strong> to manage
+                            complex infrastructure with the same rigor as I apply to my code.
+                        </p>
+                        <p>
+                            I also like working on <span class="about-highlight">native tools</span>. Building
+                            cross-platform desktop applications with <strong>Go</strong> and <strong>Wails</strong>
+                            offers a different set of challenges that I appreciate
+                            solving. Currently, I am reading about <strong>Kubernetes</strong>
+                            internals and exploring new ways to improve system reliability.
+                        </p>
+                    </div>
+                </section>
+
                 <!-- Skills -->
                 <section id="skills" class="section fade-in">
                     <h3>Technical Skills</h3>
 
                     <div class="skill-category">
-                        <h4>Programming & Frameworks</h4>
+                        <h4>Languages</h4>
                         <div class="skills-list">
+                            <span class="skill-tag">Go (Golang)</span>
                             <span class="skill-tag">Java</span>
-                            <span class="skill-tag">Spring Boot</span>
-                            <span class="skill-tag">Go</span>
+                            <span class="skill-tag">SQL</span>
                         </div>
                     </div>
 
                     <div class="skill-category">
-                        <h4>Architecture & Patterns</h4>
+                        <h4>Cloud & DevOps</h4>
                         <div class="skills-list">
-                            <span class="skill-tag">Microservices</span>
-                            <span class="skill-tag">Event-Driven Architecture</span>
-                            <span class="skill-tag">API Gateway</span>
-                            <span class="skill-tag">Database Design</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <h4>Databases</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">PostgreSQL</span>
-                            <span class="skill-tag">MySQL</span>
-                            <span class="skill-tag">NoSQL Databases</span>
-                            <span class="skill-tag">Redis</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <h4>DevOps & Cloud</h4>
-                        <div class="skills-list">
+                            <span class="skill-tag">AWS (VPC, ECS, IAM)</span>
+                            <span class="skill-tag">Terraform</span>
                             <span class="skill-tag">Docker</span>
                             <span class="skill-tag">Kubernetes</span>
                             <span class="skill-tag">GitHub Actions</span>
-                            <span class="skill-tag">CI/CD</span>
-                            <span class="skill-tag">AWS</span>
                         </div>
                     </div>
 
                     <div class="skill-category">
-                        <h4>Tools & Technologies</h4>
+                        <h4>Backend Architecture</h4>
                         <div class="skills-list">
-                            <span class="skill-tag">Apache Kafka</span>
-                            <span class="skill-tag">JWT Authentication</span>
-                            <span class="skill-tag">Maven</span>
-                            <span class="skill-tag">JUnit</span>
-                            <span class="skill-tag">Git & GitHub</span>
-                            <span class="skill-tag">IntelliJ IDEA</span>
-                            <span class="skill-tag">Postman</span>
-                            <span class="skill-tag">CLI Development</span>
+                            <span class="skill-tag">Microservices</span>
+                            <span class="skill-tag">REST API</span>
+                            <span class="skill-tag">gRPC</span>
+                            <span class="skill-tag">Kafka</span>
+                            <span class="skill-tag">Event-Driven Architecture</span>
+                            <span class="skill-tag">Spring Boot</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>Security</h4>
+                        <div class="skills-list">
+                            <span class="skill-tag">SPIFFE/SPIRE</span>
+                            <span class="skill-tag">OAuth2</span>
+                            <span class="skill-tag">Zero-Trust</span>
+                            <span class="skill-tag">AES-256</span>
                         </div>
                     </div>
                 </section>
@@ -229,449 +243,79 @@
                     </div>
                 </section>
 
-                <!-- Projects -->
-                <section id="projects" class="section fade-in">
-                    <h2>Projects</h2>
 
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">Patient Management</div>
-                            <div class="project-links">
-                                <a href="https://github.com/doguhanniltextra/patient-management"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Spring Boot</span>
-                                <span class="tech-tag">Java</span>
-                                <span class="tech-tag">PostgreSQL</span>
-                                <span class="tech-tag">Microservices</span>
-                                <span class="tech-tag">MySQL</span>
-                                <span class="tech-tag">Docker</span>
-                                <span class="tech-tag">Kafka</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>I chose a microservice architecture to achieve loose coupling, scalability, and
-                                    independent deployments. Each service is responsible for a specific domain
-                                    (patients, doctors, appointments, billing, authentication), which makes the system
-                                    modular and easier to maintain. This design also allows services to use different
-                                    databases and technologies depending on their requirements, rather than being
-                                    restricted to a single stack. In addition, microservices enable fault isolation — if
-                                    one service fails, the others can continue functioning, improving the system’s
-                                    reliability</li>
-                                <li>Each microservice has its own database to respect the loose coupling principle. I
-                                    used PostgreSQL for the Patient Service because of its powerful relational features,
-                                    JSONB support, and advanced querying capabilities, which fit patient data well. On
-                                    the other hand, I chose MySQL for the Doctor Service since it is lightweight and
-                                    efficient for handling structured data with high read/write operations.</li>
-                                <li>I used Apache Kafka for asynchronous, event-driven communication between services.
-                                    Instead of relying only on HTTP calls, Kafka enabled me to build a scalable and
-                                    fault-tolerant data pipeline. Producers generate events (such as patient updates or
-                                    logs), and consumers process them independently, which reduces coupling and improves
-                                    system resilience.</li>
-                                <li>Docker allowed me to containerize services and databases, ensuring they run
-                                    consistently across environments. Volumes were used to persist user data. Kubernetes
-                                    provided orchestration features such as service discovery, load balancing, scaling,
-                                    and persistent storage management, making deployments production-ready and easier to
-                                    maintain.</li>
-                                <li>I implemented an API Gateway to act as the single entry point for all requests. This
-                                    simplified routing, authentication, and abstraction, since clients do not need to
-                                    know individual service endpoints. It also centralized security and cross-cutting
-                                    concerns like logging and request filtering, improving both usability and
-                                    maintainability.</li>
-                                <li>I set up GitHub Actions to automate build, test, and deployment pipelines. This
-                                    reduced deployment time to under 15 minutes and ensured multi-platform Docker images
-                                    could be pushed and deployed to cloud providers (AWS, GCP, Azure). The CI/CD
-                                    pipeline improved reliability, minimized human error, and made the project more
-                                    production-ready.</li>
-                            </ul>
+                <!-- Achievements -->
+                <section class="section fade-in">
+                    <h2>Achievements</h2>
+
+                    <div class="achievement">
+                        <div class="achievement-title">VMware Secrets Manager Contributor</div>
+                        <div class="achievement-desc">
+                            Enhanced VMware's Secrets Manager through approved pull requests improving secret rotation
+                            logic.
+                            Improved secret rotation retry logic and fixed edge case bugs to increase system reliability
+                            and
+                            robustness.
+                            Collaborated with the core development team through thorough code reviews and iterative
+                            improvements,
+                            demonstrating strong understanding of secure secrets management in cloud-native
+                            environments.
                         </div>
                     </div>
+                </section>
+            </main>
 
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">Skillify</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Evolve-Vitalis/managify-go"><i class="fab fa-github"></i>
-                                    GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Go</span>
-                                <span class="tech-tag">MongoDB</span>
-                                <span class="tech-tag">Docker</span>
-                                <span class="tech-tag">React</span>
-                                <span class="tech-tag">Electron</span>
-                                <span class="tech-tag">Ant Design </span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>The platform allows users to create, edit, and delete projects with detailed
-                                    information including timelines, descriptions, and status tracking. The intuitive
-                                    React-based interface provides a seamless experience for quick project setup and
-                                    organization, while the Go backend ensures fast and efficient data processing.</li>
-                                <li>Create and manage issues with comprehensive features including priority levels (Low,
-                                    Medium, High, Critical), customizable due dates, team member assignments, and
-                                    real-time status updates (To Do, In Progress, Done). The system provides visual
-                                    indicators and notifications to keep team members informed of task progress.</li>
-                                <li> Built with Go's high-performance capabilities, Managify delivers exceptional speed
-                                    and efficiency. The Fiber framework provides lightning-fast HTTP routing and
-                                    middleware support, while MongoDB's flexible document structure allows for rapid
-                                    data retrieval and scalability. The application is optimized for handling multiple
-                                    concurrent users with minimal resource consumption.</li>
-                                <li>The desktop application, built with Electron, React 19, and Vite, provides a
-                                    native-like experience with fast hot module replacement during development and
-                                    optimized production builds. Tailwind CSS and Ant Design components ensure a
-                                    consistent, professional, and responsive user interface across all screen sizes.
-                                </li>
-                                <li>The backend follows clean architecture principles with clear separation between
-                                    domain logic, use cases, repository patterns, and delivery layers. This design
-                                    ensures maintainability, testability, and scalability as the application grows. Each
-                                    layer has well-defined responsibilities, making the codebase easy to understand and
-                                    extend.</li>
-                            </ul>
-                        </div>
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Contact -->
+                <section id="contact" class="section fade-in">
+                    <h3>Contact Information</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-envelope"></i> <a
+                                href="mailto:doguhannilt@gmail.com">doguhannilt@gmail.com</a>
+                        </li>
+                        <li><i class="fas fa-phone"></i> Upon Request</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Istanbul, Turkey</li>
+                        <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/"
+                                target="_blank">LinkedIn Profile</a></li>
+                    </ul>
+                </section>
+
+
+
+                <!-- Education -->
+                <section class="section fade-in">
+                    <h3>Education</h3>
+                    <div class="education-item">
+                        <div class="edu-degree">Associate Degree</div>
+                        <div class="edu-school">Gedik University</div>
+                        <div class="edu-location">Istanbul, Pendik • Completed</div>
                     </div>
+                </section>
 
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">Weirdstore</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/Weirdstore-backend"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Node.js</span>
-                                <span class="tech-tag">Express</span>
-                                <span class="tech-tag">MongoDB</span>
-                                <span class="tech-tag">React</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>Weirdstore is an innovative and comprehensive store management system designed to
-                                    simplify and enhance retail operations, whether for a small boutique or a large
-                                    chain. It provides an intuitive user interface for managing inventory, sales,
-                                    customer profiles, and generating reports, while maintaining robust security
-                                    measures. The system is modular, scalable, and built to support a seamless user
-                                    experience across all functionalities.</li>
-                                <li>The backend of Weirdstore is built as a microservices architecture, with each
-                                    service responsible for a specific domain and operating independently. Key services
-                                    include the Category Service for managing categories, Product Service for handling
-                                    product data and inventory, Order Service for processing and tracking orders, Upload
-                                    Service for managing images and media, and User Service for authentication, roles,
-                                    and permissions. MongoDB is used as the primary database for all services, while JWT
-                                    ensures secure communication and authorization.</li>
-                                <li>The frontend is built using React, styled with Tailwind CSS, and leverages Redux
-                                    Toolkit (RTK) for state management. RTK is chosen for its simplified configuration,
-                                    improved performance, enhanced readability, and built-in best practices for scalable
-                                    Redux code. The frontend communicates with the backend microservices via RESTful
-                                    APIs, allowing a smooth and dynamic user experience.</li>
-                            </ul>
-                        </div>
+                <!-- Languages -->
+                <section class="section fade-in">
+                    <h3>Languages</h3>
+                    <div class="about-text">
+                        <p><strong>Turkish:</strong> Native</p>
+                        <p><strong>English:</strong> Proficiency</p>
                     </div>
+                </section>
 
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">MongoDB Dockerized Local Dev Environment</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/mongodb-docker-starter"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Docker</span>
-                                <span class="tech-tag">MongoDB</span>
-                                <span class="tech-tag">Shell scripting</span>
-                                <span class="tech-tag">Init script</span>
-                                <span class="tech-tag">Environment automation</span>
-                                <span class="tech-tag">Infrastructure setup</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>A reproducible MongoDB setup for local development using Docker.</li>
-                                <li>Includes auto-init scripts, isolated network and volume config, and shell scripts to
-                                    spin up/tear down the environment with custom credentials.</li>
-                            </ul>
-                        </div>
+                <!-- Certifications -->
+                <section class="section fade-in">
+                    <h3>Certifications</h3>
+                    <div class="about-text">
+                        <p><strong>[Udemy]</strong> Docker and Kubernetes: The Complete Course from Zero to Hero - 2025
+                        </p>
+                        <p><strong>[Coursera]</strong> Python for Data Visualization: Matplotlib & Seaborn - 2022</p>
+                        <p><strong>[SkillUp Online]</strong> Machine Learning - 2022</p>
+                        <p><strong>[SkillUp Online]</strong> Data Science With Python - 2022</p>
+                        <p><strong>[Bilgeİş]</strong> Artifical Intelligence For Everybody I/II - 2021</p>
                     </div>
-
-
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">GloriousFood</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/GloriousFood-Fullstack"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">React Native</span>
-                                <span class="tech-tag">Redux</span>
-                                <span class="tech-tag">AsyncStorage</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>GloriousFood is a modern food ordering mobile application built with React Native,
-                                    designed to allow users to easily manage their food orders and securely store credit
-                                    card information. The app provides a clean and visually appealing interface with
-                                    purple-themed styling, enhancing the user experience while making navigation
-                                    intuitive. Key features include order management, secure card storage, and JWT-based
-                                    user session management for authentication and secure logout.</li>
-                                <li>The app’s frontend leverages Redux for state management, ensuring smooth handling of
-                                    order data, selected restaurants, and payment information. AsyncStorage is used for
-                                    persistent local storage of user data, while React Native Credit Card Input collects
-                                    and validates card information securely. The application includes modular components
-                                    such as a dynamic search bar, home page with categories and featured offers, and
-                                    detailed restaurant pages for a seamless browsing and ordering experience.</li>
-                                <li>On the backend, Node.js with Express and Mongoose is used to handle authentication,
-                                    user management, and order processing. JWT provides secure session management, while
-                                    MongoDB stores all application data. The backend supports features such as order
-                                    creation, increment/decrement of items, deletion of orders, and tracking total
-                                    payment amounts. Security is enhanced with bcryptjs for password hashing and
-                                    environment variables for configuration management.</li>
-                                <li>GloriousFood integrates a fully functional payment workflow using Redux for frontend
-                                    state and JWT for secure authentication. Users can view selected orders, track total
-                                    costs, and clear payment data when needed. Conditional rendering ensures the order
-                                    icon is only displayed when items are selected. Login validation prevents
-                                    unauthorized access to sensitive pages, such as Orders, Payments, or Order History,
-                                    ensuring that only authenticated users can interact with core features.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">Disease (Machine Learning)</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/Disease-Fullstack"><i class="fab fa-github"></i>
-                                    GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Python</span>
-                                <span class="tech-tag">Machine Learning</span>
-                                <span class="tech-tag">AI</span>
-                                <span class="tech-tag">Healthcare</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>Finding the Disease Based on Symptoms is an innovative AI-powered healthcare
-                                    application designed to assist users in identifying potential diseases or health
-                                    conditions based on their reported symptoms. The system provides a preliminary
-                                    screening tool that encourages users to seek professional medical advice when
-                                    necessary. By leveraging advanced machine learning algorithms and natural language
-                                    processing techniques, the application delivers a convenient and accessible way for
-                                    individuals to gain early insights into their health.</li>
-                                <li>The project is built using Streamlit for a modern and interactive user interface,
-                                    replacing the older Flask-based version. Key upgrades include the integration of
-                                    TF-IDF for text analysis, a HuggingFace Question-Answer system for intelligent
-                                    responses, and a patient profile side selection for personalized assessments.
-                                    Additionally, a Symptom Weight Visualizer helps users understand the potential
-                                    impact of specific symptoms on their health within two days. Code optimizations have
-                                    reduced app startup time to approximately 8.2 seconds, improving user experience.
-                                </li>
-                                <li>For disease prediction, the project employs a K-Nearest Neighbors (KNN) classifier,
-                                    achieving an accuracy range of 72% to 85%. Multiple datasets from Kaggle were used
-                                    for training and validation, providing a robust foundation for symptom-based
-                                    classification. While the model is capable of reasonably accurate predictions,
-                                    results are intended as informative guidelines rather than definitive medical
-                                    diagnoses. Users are reminded that professional consultation is essential for
-                                    conclusive evaluation.</li>
-                                <li>The system offers several benefits, including increased accessibility, early
-                                    awareness of potential health issues, and the promotion of public health through
-                                    timely intervention. Users can perform preliminary assessments from home or
-                                    on-the-go, encouraging proactive health management. However, limitations include
-                                    dependence on the quality and scope of the training data and the inherent inability
-                                    of AI to fully replace medical professionals.</li>
-                                <li>All project resources, including Python scripts, HTML/CSS code, and checkpoints, are
-                                    provided to facilitate further development and experimentation. The system is
-                                    intended to complement medical expertise and empower users to actively participate
-                                    in their healthcare journey. Feedback and contributions are welcomed to enhance
-                                    model accuracy and the overall effectiveness of the application, promoting early
-                                    detection and improved healthcare accessibility.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">Driver4U</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/Driver4U-Fullstack"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">Mobile App</span>
-                                <span class="tech-tag">Location Services</span>
-                                <span class="tech-tag">Maps API</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>Driver4U is a mobile application designed to provide location-based transportation
-                                    services, enabling users to request rides similar to Uber. The app allows users to
-                                    select their current location and desired destination, dynamically calculating fares
-                                    based on the distance. Real-time updates on ride status and fare changes ensure a
-                                    seamless and convenient experience for users.</li>
-                                <li>The frontend of Driver4U is built with React Native, using TailwindCSS for
-                                    responsive styling and Expo for accelerated development. Navigation is managed with
-                                    Expo Router, and Redux (with RTK Query) is employed for state management, ensuring
-                                    efficient handling of user data and app interactions. The app integrates Google Maps
-                                    APIs to provide accurate location selection, mapping, and distance calculations.
-                                </li>
-                                <li>Key features include dynamic fare calculation, an intuitive map interface for
-                                    selecting pickup and drop-off points, real-time ride status updates, and
-                                    login/sign-up functionality. Users can easily track their rides, view calculated
-                                    fares, and interact with the app in a smooth, visually appealing interface designed
-                                    for cross-platform mobile devices.</li>
-                                <li>The backend is powered by MongoDB and Express, with JWT-based authentication for
-                                    secure user login and session management. Environment variables, including a Google
-                                    API key, are used to ensure proper integration with Google Maps services. The
-                                    modular architecture allows for scalable development and future feature
-                                    enhancements.</li>
-                                <li>Installation and usage are straightforward: after cloning the repository and
-                                    installing dependencies, users can run the app on iOS or Android devices using Expo
-                                    commands. The project encourages contributions and feedback, making it a
-                                    collaborative and continually evolving solution for modern ride-hailing services.
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="project">
-                        <div class="project-header">
-                            <div class="project-title">LunaCLI</div>
-                            <div class="project-links">
-                                <a href="https://github.com/Doguhannilt/LunaCLI-Postgresql"><i
-                                        class="fab fa-github"></i> GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-tech">
-                            <div class="tech-tags">
-                                <span class="tech-tag">CLI Tool</span>
-                                <span class="tech-tag">PostgreSQL</span>
-                                <span class="tech-tag">Database</span>
-                                <span class="tech-tag">Command Line</span>
-                            </div>
-                        </div>
-                        <div class="project-description">
-                            <ul>
-                                <li>LunaCLI is a powerful command-line interface (CLI) tool designed for managing
-                                    PostgreSQL
-                                    databases efficiently. It provides users with the ability to connect to databases,
-                                    execute SQL commands, and configure connection settings dynamically. The tool is
-                                    ideal
-                                    for developers, database administrators, and power users who prefer a lightweight,
-                                    terminal-based interface for database operations.</li>
-
-                                <li>LunaCLI allows users to connect to PostgreSQL databases using custom credentials,
-                                    modify
-                                    connection parameters such as username, password, database name, and port, and
-                                    execute
-                                    SQL queries directly from the CLI. It supports a wide range of database operations,
-                                    including transactions, table management, schema creation, stored procedures, and
-                                    multiple query execution, with results displayed in an organized table format.</li>
-
-                                <li>Key features include history tracking, scheduling queries, executing SQL files,
-                                    exporting table data to CSV, saving frequently used SQL commands as snippets, and
-                                    retrieving results sequentially for batch operations. Prometheus support is included
-                                    for
-                                    query monitoring, enabling users to track database performance metrics.
-                                    Additionally,
-                                    LunaCLI supports cloning user entities and dynamic port configuration, providing
-                                    flexibility for diverse development and testing scenarios.</li>
-                            </ul>
-                        </div>
-                    </div>
-
+                </section>
+            </aside>
         </div>
-        </section>
-
-
-
-        <!-- Achievements -->
-        <section class="section fade-in">
-            <h2>Achievements</h2>
-
-            <div class="achievement">
-                <div class="achievement-title">VMware Secrets Manager Contributor</div>
-                <div class="achievement-desc">
-                    Enhanced VMware's Secrets Manager through approved pull requests improving secret rotation logic.
-                    Improved secret rotation retry logic and fixed edge case bugs to increase system reliability and
-                    robustness.
-                    Collaborated with the core development team through thorough code reviews and iterative
-                    improvements,
-                    demonstrating strong understanding of secure secrets management in cloud-native environments.
-                </div>
-            </div>
-        </section>
-        </main>
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <!-- Contact -->
-            <section id="contact" class="section fade-in">
-                <h3>Contact Information</h3>
-                <ul class="contact-info">
-                    <li><i class="fas fa-envelope"></i> <a href="mailto:doguhannilt@email.com">doguhannilt@email.com</a>
-                    </li>
-                    <li><i class="fas fa-phone"></i> Upon Request</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Istanbul, Turkey</li>
-                    <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/"
-                            target="_blank">LinkedIn Profile</a></li>
-                </ul>
-            </section>
-
-
-
-            <!-- Education -->
-            <section class="section fade-in">
-                <h3>Education</h3>
-                <div class="education-item">
-                    <div class="edu-degree">Associate Degree</div>
-                    <div class="edu-school">Gedik University</div>
-                    <div class="edu-location">Istanbul, Pendik • Completed</div>
-                </div>
-            </section>
-
-            <!-- Languages -->
-            <section class="section fade-in">
-                <h3>Languages</h3>
-                <div class="about-text">
-                    <p><strong>Turkish:</strong> Native</p>
-                    <p><strong>English:</strong> Proficiency</p>
-                </div>
-            </section>
-
-            <!-- Certifications -->
-            <section class="section fade-in">
-                <h3>Certifications</h3>
-                <div class="about-text">
-                    <p><strong>[Udemy]</strong> Docker and Kubernetes: The Complete Course from Zero to Hero - 2025</p>
-                    <p><strong>[Coursera]</strong> Python for Data Visualization: Matplotlib & Seaborn - 2022</p>
-                    <p><strong>[SkillUp Online]</strong> Machine Learning - 2022</p>
-                    <p><strong>[SkillUp Online]</strong> Data Science With Python - 2022</p>
-                    <p><strong>[Bilgeİş]</strong> Artifical Intelligence For Everybody I/II - 2021</p>
-                </div>
-            </section>
-        </aside>
-    </div>
     </div>
 
     <script>

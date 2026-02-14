@@ -615,3 +615,21 @@ button:focus {
 .section:nth-child(4) {
     animation-delay: 0.4s;
 }
+
+/* Styles for the narrative About section */
+.about-narrative {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin-bottom: 40px;
+}
+
+.about-narrative p {
+    margin-bottom: 20px;
+}
+
+.about-highlight {
+    color: var(--accent-primary);
+    font-weight: 500;
+}
