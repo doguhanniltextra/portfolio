@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Tunnel: Secure Infrastructure Connectivity Without Public IP - Doğuhan İlter</title>
+    <meta name="description"
+        content="Discover Cloudflare Tunnel: a secure way to connect your infrastructure to Cloudflare without exposing public IP addresses. Learn about outbound-only connections and protection against bypass attacks.">
+    <meta name="keywords"
+        content="Cloudflare, Tunnel, cloudflared, Security, Infrastructure, Network Architecture, DevOps, Zero Trust">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-15">
+                        <i class="far fa-calendar"></i> February 15, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 7 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Cloudflare Tunnel: Secure Infrastructure Connectivity Without Public IP</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Cloudflare</span>
+                    <span class="tag">Security</span>
+                    <span class="tag">DevOps</span>
+                    <span class="tag">Infrastructure</span>
+                    <span class="tag">Zero Trust</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Cloudflare Tunnel provides a secure way to connect your resources to Cloudflare without requiring a publicly routable IP address. Instead of exposing your infrastructure to the internet, a lightweight daemon (cloudflared) creates outbound-only connections to Cloudflare's global network, eliminating the attack surface of traditional firewall rules and VPN configurations.
+                </p>
+
+                <h2>What is Cloudflare Tunnel?</h2>
+
+                <p>
+                    Cloudflare Tunnel is a service that enables you to safely expose applications and infrastructure to the internet without ever putting a publicly routable IP address in your DNS. This is achieved through a simple daemon process that runs in your infrastructure and maintains persistent outbound connections to Cloudflare's edge network.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Key Insight:</strong> With Cloudflare Tunnel, traffic never goes to an external IP address. Instead, the lightweight cloudflared daemon creates outbound-only connections, ensuring your infrastructure remains protected and isolated from direct internet exposure.
+                </div>
+
+                <h2>How It Works</h2>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-network-wired"></i> Outbound-Only Connections</h4>
+                        <p>The cloudflared daemon creates persistent outbound connections to Cloudflare's global network. No inbound connections are accepted, eliminating firewall complexity.</p>
+                    </div>
+                    
+                    <div class="service-item">
+                        <h4><i class="fas fa-shield-alt"></i> Attack Surface Reduction</h4>
+                        <p>Your origins can serve traffic through Cloudflare without being vulnerable to attacks that attempt to bypass Cloudflare's protective layer.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-globe"></i> Global Network</h4>
+                        <p>Traffic is routed through Cloudflare's global network, providing automatic performance optimization and DDoS protection across all points of presence.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-lock"></i> Zero Trust Architecture</h4>
+                        <p>Implements zero trust principles by removing the need to trust your network perimeter. All traffic is authenticated and encrypted.</p>
+                    </div>
+                </div>
+
+                <h2>Supported Protocols & Services</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-globe"></i>
+                        <h4>HTTP/HTTPS</h4>
+                        <p>Web servers and APIs</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-terminal"></i>
+                        <h4>SSH</h4>
+                        <p>Secure shell access</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-desktop"></i>
+                        <h4>RDP</h4>
+                        <p>Remote desktop connections</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-plug"></i>
+                        <h4>Custom Protocols</h4>
+                        <p>TCP and UDP tunneling</p>
+                    </div>
+                </div>
+
+                <h2>Key Benefits</h2>
+
+                <h3>1. Enhanced Security</h3>
+                <p>
+                    By eliminating public IPs, you drastically reduce your attack surface. Your infrastructure is not directly exposed to the internet, and all traffic flows through Cloudflare's protective infrastructure. This means:
+                </p>
+                <ul>
+                    <li>No direct DDoS attacks on your origin servers</li>
+                    <li>Automatic threat protection and WAF rules</li>
+                    <li>Encrypted connections from cloudflared to Cloudflare</li>
+                    <li>Protection against IP enumeration and reconnaissance</li>
+                </ul>
+
+                <h3>2. Simplified Network Architecture</h3>
+                <p>
+                    Traditional approaches require complex firewall rules, port forwarding, and VPN configurations. Cloudflare Tunnel simplifies this dramatically:
+                </p>
+                <ul>
+                    <li>No need to open inbound ports on firewalls</li>
+                    <li>Simple daemon installation and configuration</li>
+                    <li>No VPN infrastructure to manage</li>
+                    <li>Consistent experience across multiple data centers</li>
+                </ul>
+
+                <h3>3. Bypass Attack Prevention</h3>
+                <p>
+                    One of the most critical advantages of Cloudflare Tunnel is that your origins can serve traffic safely through Cloudflare without being vulnerable to attacks that attempt to bypass Cloudflare's protective layer. Attackers cannot:
+                </p>
+                <ul>
+                    <li>Directly attack your origin's IP address (it's not publicly routable)</li>
+                    <li>Enumerate your infrastructure and find alternative attack vectors</li>
+                    <li>Bypass Cloudflare's security policies through IP-level access</li>
+                </ul>
+
+                <h3>4. Performance & Reliability</h3>
+                <p>
+                    Leverage Cloudflare's global network for automatic traffic optimization:
+                </p>
+                <ul>
+                    <li>Automatic failover and load balancing</li>
+                    <li>Geographic load balancing</li>
+                    <li>Caching and compression</li>
+                    <li>Reduced latency through optimized routing</li>
+                </ul>
+
+                <h2>Getting Started with Cloudflare Tunnel</h2>
+
+                <h3>Installation</h3>
+                <p>
+                    The cloudflared daemon is lightweight and easy to install on various platforms:
+                </p>
+                <pre><code class="language-bash">
+# macOS
+brew install cloudflare/cloudflare/cloudflared
+
+# Linux (Debian/Ubuntu)
+curl -L https://pkg.cloudflare.com/cloudflare-main.gpg | sudo apt-key add -
+echo 'deb http://pkg.cloudflare.com/linux/ focal main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+sudo apt-get update && sudo apt-get install cloudflared
+
+# Windows
+choco install cloudflare-wintun
+                </code></pre>
+
+                <h3>Basic Configuration</h3>
+                <p>
+                    Create a simple configuration to tunnel your local service:
+                </p>
+                <pre><code class="language-yaml">
+tunnel: my-secure-tunnel
+credentials-file: /path/to/credentials/UUID.json
+
+ingress:
+  - hostname: example.com
+    service: http://localhost:8080
+  - hostname: api.example.com
+    service: http://localhost:3000
+  - service: http_status:404
+                </code></pre>
+
+                <h3>Running the Tunnel</h3>
+                <pre><code class="language-bash">
+# Authenticate with Cloudflare
+cloudflared tunnel login
+
+# Create a tunnel
+cloudflared tunnel create my-secure-tunnel
+
+# Route DNS to the tunnel
+cloudflared tunnel route dns my-secure-tunnel example.com
+
+# Run the tunnel
+cloudflared tunnel run my-secure-tunnel
+                </code></pre>
+
+                <div class="callout callout-success">
+                    <strong>✅ Best Practice:</strong> Run cloudflared as a service or daemon in production using systemd (Linux), launchd (macOS), or Windows Service. This ensures automatic restarts and reliable connectivity.
+                </div>
+
+                <h2>Use Cases</h2>
+
+                <h3>1. SaaS Applications</h3>
+                <p>
+                    Host multi-tenant SaaS applications securely without exposing infrastructure directly to users.
+                </p>
+
+                <h3>2. Internal Tools & APIs</h3>
+                <p>
+                    Securely expose internal APIs and administrative tools to trusted users without VPN overhead.
+                </p>
+
+                <h3>3. Development Environments</h3>
+                <p>
+                    Share development/staging environments with stakeholders and testers securely without manual firewall changes.
+                </p>
+
+                <h3>4. Remote Access</h3>
+                <p>
+                    Provide SSH and RDP access to remote servers without exposing them to direct internet attacks.
+                </p>
+
+                <h3>5. Hybrid Cloud Architectures</h3>
+                <p>
+                    Connect on-premises infrastructure with cloud services securely through a single unified network layer.
+                </p>
+
+                <h2>Considerations & Best Practices</h2>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Important:</strong> Always authenticate cloudflared with your Cloudflare account credentials and protect your tunnel configuration files. Credentials should be stored securely and rotated regularly.
+                </div>
+
+                <ul>
+                    <li><strong>Monitoring:</strong> Set up monitoring and alerting for tunnel health and connection status</li>
+                    <li><strong>High Availability:</strong> Run multiple cloudflared instances for fault tolerance</li>
+                    <li><strong>Access Control:</strong> Use Cloudflare Access policies to control who can reach your tunneled services</li>
+                    <li><strong>Logging:</strong> Enable and analyze Cloudflare logs for security and compliance</li>
+                    <li><strong>Rate Limiting:</strong> Configure rate limits to protect against abuse</li>
+                    <li><strong>SSL/TLS:</strong> Terminate SSL at Cloudflare's edge and enable end-to-end encryption</li>
+                </ul>
+
+                <h2>Conclusion</h2>
+
+                <p>
+                    Cloudflare Tunnel represents a modern approach to infrastructure connectivity and security. By enabling outbound-only connections without public IP exposure, it significantly reduces your attack surface while simplifying network operations. Whether you're running SaaS applications, internal tools, or hybrid cloud architectures, Cloudflare Tunnel provides a secure, performant, and reliable foundation for your connectivity needs.
+                </p>
+
+                <p>
+                    The combination of zero-trust principles, automatic DDoS protection, and global performance optimization makes Cloudflare Tunnel an essential tool for contemporary infrastructure design.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                
+                <!-- Share Buttons -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?url=https://doguhannilter.dev/blog/page/cloudflare_tunnel.html" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhannilter.dev/blog/page/cloudflare_tunnel.html" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications, 
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
