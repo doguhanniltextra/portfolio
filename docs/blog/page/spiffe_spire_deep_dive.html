@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lessons from the Trenches: What I Learned Implementing SPIFFE/SPIRE in SecurePay - Doğuhan İlter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-18">
+                        <i class="far fa-calendar"></i> February 18, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 12 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Lessons from the Trenches: What I Learned Implementing SPIFFE/SPIRE in
+                    SecurePay</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Security</span>
+                    <span class="tag">Zero Trust</span>
+                    <span class="tag">SPIFFE</span>
+                    <span class="tag">SPIRE</span>
+                    <span class="tag">Kubernetes</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Implementing Zero-Trust isn't just about following standards—it's about hardware-bound identity,
+                    kernel-level validation, and the reality of cross-language gRPC. Here is a brief explanation of what
+                    I've learned using SPIFFE/SPIRE on the SecurePay project.
+                </p>
+
+                <h2>1. The Problem: The "Secret Zero" Dilemma</h2>
+
+                <p>
+                    In modern Cloud-Native environments (Kubernetes, AWS, Hybrid), IP addresses are ephemeral, and
+                    network perimeters are porous. We shifted to application-level security using
+                    <strong>Secrets</strong> (API Keys, Database Passwords, Certs).
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ The Dilemma:</strong> To access the Vault to get your secret, you need a token (Secret
+                    Zero). Where do you store that token? If you bake it into the image or environment, you've just
+                    moved the same vulnerability to a different layer.
+                </div>
+
+                <p>
+                    <strong>SPIFFE (Secure Production Identity Framework for Everyone)</strong> solves this by assigning
+                    a <strong>cryptographic identity</strong> to every workload, bootstrapped from the platform itself,
+                    without sharing static secrets.
+                </p>
+
+                <h2>2. The SPIFFE Standard (The "What")</h2>
+
+                <p>
+                    SPIFFE is a set of open-source specifications defining how workloads identify themselves. It rests
+                    on three main pillars:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-id-card"></i> SPIFFE ID</h4>
+                        <p>A structured URI uniquely identifying a workload. Example:
+                            <code>spiffe://example.org/ns/default/sa/payment-service</code>
+                        </p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-file-contract"></i> SVID</h4>
+                        <p>The <strong>SPIFFE Verifiable Identity Document</strong> (X.509 or JWT) that proves the
+                            identity with short life-cycles and automatic rotation.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-plug"></i> Workload API</h4>
+                        <p>A local Unix Domain Socket that workloads call to ask: <em>"Who am I?"</em>. No passwords
+                            needed—the identity is based on process attributes.</p>
+                    </div>
+                </div>
+
+                <h2>3. SPIRE Architecture (The "How")</h2>
+
+                <p><strong>SPIRE (SPIFFE Runtime Environment)</strong> is the production-ready implementation of the
+                    SPIFFE standard. It consists of two main components:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-brain"></i>
+                        <h4>SPIRE Server</h4>
+                        <p>The central Certificate Authority (CA). It manages registration entries and verifies the
+                            validity of nodes in the cluster.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-hands"></i>
+                        <h4>SPIRE Agent</h4>
+                        <p>Runs on every node (DaemonSet). It exposes the Workload API and performs "Workload
+                            Attestation" by interrogating the Kernel.</p>
+                    </div>
+                </div>
+
+                <h2>4. The Magic: How It Works Step-by-Step</h2>
+
+                <h3>Phase 1: Node Attestation (Machine Identity)</h3>
+                <p>Before the Agent can issue IDs, it must prove it is a valid member of the cluster. In AWS, this is
+                    handled via the <strong>AWS IID (Instance Identity Document)</strong>. The SPIRE Server validates
+                    this signature against AWS APIs directly.</p>
+
+                <h3>Phase 2: Workload Attestation (Process Identity)</h3>
+                <ol>
+                    <li><strong>The Ask:</strong> A pod connects to <code>/run/spire/sockets/agent.sock</code>.</li>
+                    <li><strong>The Interrogation:</strong> The SPIRE Agent looks at the <strong>Kernel</strong> to find
+                        the PID, Pod UID, Labels, and Namespace.</li>
+                    <li><strong>The Check:</strong> The Agent compares these "Selectors" against registration entries
+                        synced from the Server.</li>
+                    <li><strong>The Issuance:</strong> If a match is found, the Agent hands a short-lived SVID
+                        certificate to the workload.</li>
+                </ol>
+
+                <div class="callout callout-info">
+                    <strong>💡 Technical Insight:</strong> The application doesn't need to know anything about
+                    certificates. It just asks the local socket, and SPIRE handles the cryptographic heavy lifting.
+                </div>
+
+                <h2>5. AWS Implementation Specifics</h2>
+
+                <p>In the SecurePay environment, we define registration entries using specific selectors that tie the
+                    SPIFFE identity to Kubernetes Service Accounts:</p>
+
+                <pre><code class="language-bash">
+spire-server entry create \
+    -parentID spiffe://example.org/ns/spire/sa/spire-agent \
+    -spiffeID spiffe://example.org/ns/default/sa/payment-service \
+    -selector k8s:ns:default \
+    -selector k8s:sa:payment-service
+                </code></pre>
+
+                <h2>6. Real-World Scenario: mTLS in Action</h2>
+
+                <p>Once <code>payment-service</code> and <code>account-service</code> have their SVIDs:</p>
+
+                <ul>
+                    <li><strong>Connection:</strong> They initiate a standard TLS connection.</li>
+                    <li><strong>Handshake:</strong> They exchange SVIDs. Both verify they are signed by the same SPIRE
+                        CA.</li>
+                    <li><strong>Authorization:</strong> The services can check the SPIFFE ID inside the cert against
+                        their internal ACLs.</li>
+                </ul>
+
+                <p>
+                    <strong>The Result:</strong> Zero passwords. Zero API keys. Zero static firewall rules.
+                    Authentication is purely based on <strong>proven identity</strong>.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="#" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>

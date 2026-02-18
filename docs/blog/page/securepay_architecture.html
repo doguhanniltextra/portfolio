@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering SecurePay: A Deep Dive into Zero-Trust, Event-Driven Fintech Architecture - Doğuhan İlter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+            
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-18">
+                        <i class="far fa-calendar"></i> February 18, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 10 min read
+                    </span>
+                </div>
+                
+                <h1 class="post-title-main">Engineering SecurePay: A Deep Dive into Zero-Trust, Event-Driven Fintech Architecture</h1>
+                
+                <div class="post-tags-header">
+                    <span class="tag">Go</span>
+                    <span class="tag">Zero-Trust</span>
+                    <span class="tag">Kafka</span>
+                    <span class="tag">Fintech</span>
+                    <span class="tag">AWS</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                
+                <p class="lead">
+                    In the high-stakes world of financial technology, the "move fast and break things" philosophy is a liability. For <strong>SecurePay</strong>, a high-performance, polyglot payment platform, the philosophy was different: <strong>"Secure by design, resilient by default."</strong>
+                </p>
+
+                <p>
+                    Today, I’m pulling back the curtain on the architectural journey of building SecurePay—a project that traverses the landscape of Zero-Trust security, Distributed Systems, and Infrastructure as Code.
+                </p>
+
+                <h2>1. The Architectural Blueprint: Beyond the Perimeter</h2>
+                
+                <p>
+                    Traditional security models rely on a "walled garden" approach—once you're inside the network, you're trusted. In SecurePay, we operate on a <strong>Zero-Trust</strong> principle. We don't trust the network, and we don't trust the IP addresses.
+                </p>
+
+                <h3>The Stack at a Glance:</h3>
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-code"></i> Languages</h4>
+                        <p>Go (Core Backend & Gateway), Java 21/Spring Boot (Notification Engine).</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-shield-alt"></i> Security</h4>
+                        <p>SPIFFE/SPIRE for mTLS workload identity.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-cloud"></i> Infrastructure</h4>
+                        <p>AWS (EKS, RDS, MSK, ElastiCache) managed via Terraform.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> Observability</h4>
+                        <p>OpenTelemetry, Jaeger, Prometheus, and Grafana.</p>
+                    </div>
+                </div>
+
+                <h2>2. Deep Dive: Zero-Trust Identity with SPIFFE/SPIRE</h2>
+                
+                <p>
+                    The most critical security feature of SecurePay is the elimination of static credentials for service-to-service communication.
+                </p>
+
+                <h3>The SVID Mechanism</h3>
+                <p>Each microservice (API Gateway, Payment, Account) is assigned a <strong>SPIFFE ID</strong> (e.g., <code>spiffe://securepay.dev/payment-service</code>).</p>
+                
+                <ol>
+                    <li><strong>Workload Attestation:</strong> When a Pod starts in Kubernetes, the <strong>SPIRE Agent</strong> identifies it based on its Kubernetes ServiceAccount and Namespace.</li>
+                    <li><strong>SVID Issuance:</strong> The SPIRE Server issues a short-lived <strong>SVID (SPIFFE Verifiable Identity Document)</strong>—an X.509 certificate.</li>
+                    <li><strong>Automatic Rotation:</strong> These certificates are rotated every few hours automatically. There are no passwords to leak and no certificates to manually manage.</li>
+                </ol>
+
+                <div class="callout callout-info">
+                    <strong>💡 Technical Detail:</strong> When the Payment Service calls the Account Service via gRPC, they perform a <strong>Mutual TLS (mTLS)</strong> handshake using these SVIDs. If a service doesn't have a valid SVID matching the trust policy, the connection is rejected at the transport layer.
+                </div>
+
+                <h2>3. Orchestrating the "Happy Path": The Payment Lifecycle</h2>
+                
+                <p>A simple payment involves a complex dance between four independent services and three different data stores.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-door-open"></i>
+                        <h4>Step 1: Gateway</h4>
+                        <p>Go-based entry point handling JWT validation, rate limiting, and gRPC interceptors with OTel propagation.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-cogs"></i>
+                        <h4>Step 2: Orchestrator</h4>
+                        <p>Payment Service manages state machines, idempotency via Redis, and initial ledger entries in PostgreSQL.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-wallet"></i>
+                        <h4>Step 3: Verification</h4>
+                        <p>Account Service provides real-time balance checks via gRPC with read-aside caching in Redis.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-broadcast-tower"></i>
+                        <h4>Step 4: Kafka</h4>
+                        <p>Decoupled event propagation for transaction settlement and external notifications.</p>
+                    </div>
+                </div>
+
+                <h2>4. Infrastructure as Code: The AWS Ecosystem</h2>
+                
+                <p>Scaling SecurePay required a robust cloud foundation. I used <strong>Terraform</strong> to build a repeatable, Multi-AZ environment on AWS.</p>
+
+                <ul>
+                    <li><strong>VPC (10.0.0.0/16):</strong> Split into 3 public subnets (IGW/NAT) and 3 private subnets for enhanced security.</li>
+                    <li><strong>Amazon EKS:</strong> Managed Kubernetes 1.28 cluster using IRSA (IAM Roles for Service Accounts).</li>
+                    <li><strong>Amazon MSK:</strong> Production-grade Kafka cluster with TLS encryption for all internal traffic.</li>
+                    <li><strong>Amazon RDS:</strong> PostgreSQL 16 instance with gp3 storage, residing strictly in private subnets.</li>
+                </ul>
+
+                <h2>5. Full-Stack Observability: Distributed Tracing</h2>
+                
+                <p>In a microservices world, debugging "The request is slow" is impossible without distributed tracing.</p>
+
+                <div class="callout callout-success">
+                    <strong>✅ Implementation:</strong> Using <strong>OpenTelemetry (OTel)</strong>, I implemented manual and automatic instrumentation where every request carries a <code>trace_id</code> through the entire stack—from API Gateway to Kafka consumers.
+                </div>
+
+                <h2>6. Engineering Challenges & Victories</h2>
+
+                <h3>The "Polyglot gRPC" Battle</h3>
+                <p>Getting a Go-based client to talk to a Java-based server using SPIRE-issued certificates was a significant challenge. It required implementing custom <code>KeepAlive</code> parameters and carefully configuring the SPIRE Sidecar Helper to ensure the Java KeyStore (JKS) was updated whenever the SVID rotated.</p>
+
+                <h3>Eventual Consistency</h3>
+                <p>Handling edge cases where Kafka production failed after a DB commit was solved using the <strong>Transactional Outbox Pattern</strong>, ensuring no payment event is ever lost.</p>
+
+                <p>
+                    SecurePay is currently 95% complete. The final mile includes advanced CI/CD integration with Snyk/Trivy and 10k TPS load testing to optimize our Redis caching strategy.
+                </p>
+
+                <p>
+                    <em>Explore the architecture more deeply in our <a href="../../docs/c4.html">C4 Model Documentation</a>.</em>
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="#" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications, 
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
