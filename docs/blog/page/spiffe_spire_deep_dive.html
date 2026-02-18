@@ -56,7 +56,7 @@
                         <i class="far fa-calendar"></i> February 18, 2026
                     </time>
                     <span class="reading-time">
-                        <i class="far fa-clock"></i> 12 min read
+                        <i class="far fa-clock"></i> 15 min read
                     </span>
                 </div>
 
@@ -199,6 +199,66 @@ spire-server entry create \
                     <strong>The Result:</strong> Zero passwords. Zero API keys. Zero static firewall rules.
                     Authentication is purely based on <strong>proven identity</strong>.
                 </p>
+
+                <h2>7. SPIFFE/SPIRE Implementation: Mistakes & Solutions</h2>
+                <p>
+                    Building a Zero-Trust environment isn't without its growing pains. This document chronicles the
+                    technical challenges and "gotchas" encountered while building the Zero-Trust environment for
+                    SecurePay on Kubernetes (Minikube).
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Challenge 1: The "Trust Domain Mismatch" Ghost</strong>
+                    <p><strong>Mistake:</strong> When reinstalling SPIRE via Helm after a failed attempt, the SPIRE
+                        Server would crash with a <code>trust domain mismatch</code> because Minikube's
+                        <code>hostpath-provisioner</code> was retaining the SPIRE Server's database files.</p>
+                    <p><strong>Solution:</strong> Added a cleanup step to the deployment script to wipe the hostpath
+                        directory before fresh installs.</p>
+                </div>
+                <pre><code class="language-bash">minikube ssh 'sudo rm -rf /tmp/hostpath-provisioner/spire/spire-data-spire-server-0'</code></pre>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Challenge 2: SVID Selector Conflicts (WSL to K8s Migration)</strong>
+                    <p><strong>Mistake:</strong> In the initial local setup (WSL without K8s), we used Unix-based
+                        selectors like <code>unix:uid</code>. When moving to Kubernetes, these became unstable as Pod
+                        UIDs are dynamic.</p>
+                    <p><strong>Solution:</strong> Shifted the entire workload registration strategy to
+                        <strong>Kubernetes-native selectors</strong> like <code>k8s:ns</code> (Namespace) and
+                        <code>k8s:sa</code> (ServiceAccount).</p>
+                </div>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Challenge 3: Duplicate Registration Crashes</strong>
+                    <p><strong>Mistake:</strong> Automation scripts for <code>spire-server entry create</code> would
+                        fail with an "Already Exists" error if run twice, stopping the idempotent deployment pipeline.
+                    </p>
+                    <p><strong>Solution:</strong> Injected a check-and-delete logic into the registration script to
+                        fetch the Entry ID first and delete it if it exists before recreation.</p>
+                </div>
+                <pre><code class="language-bash">
+EXISTING_ENTRY=$(kubectl exec -n spire spire-server-0 -- /opt/spire/bin/spire-server entry show -spiffeID spiffe://securepay.dev/api-gateway | grep "Entry ID" | awk '{print $NF}')
+if [ ! -z "$EXISTING_ENTRY" ]; then
+    kubectl exec -n spire spire-server-0 -- /opt/spire/bin/spire-server entry delete -entryID $EXISTING_ENTRY
+fi
+                </code></pre>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Challenge 4: The "Invisible" Agent Socket</strong>
+                    <p><strong>Mistake:</strong> Services were throwing <code>connection refused</code> errors because
+                        the SDK couldn't find the SPIRE Agent socket.</p>
+                    <p><strong>Solution:</strong> Standardized the environment variable
+                        <code>SPIFFE_ENDPOINT_SOCKET</code> across all containers and ensured the <code>hostPath</code>
+                        socket volume was correctly mounted in the deployment YAML.</p>
+                </div>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Challenge 5: Polyglot mTLS: The Java vs Go Handshake</strong>
+                    <p><strong>Mistake:</strong> Go services communicated perfectly, but the Java-based Notification
+                        Service failed due to strict TrustBundle propagation requirements.</p>
+                    <p><strong>Solution:</strong> Deployed a <strong>SPIRE Sidecar Helper</strong> that automatically
+                        pulls SVIDs from the Workload API and translates them into a standard Java Keystore/Truststore
+                        (JKS) for the Spring Boot application.</p>
+                </div>
 
             </div>
 
