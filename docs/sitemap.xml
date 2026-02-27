@@ -2,14 +2,80 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://doguhanniltextra.github.io/portfolio/</loc>
-    <lastmod>2026-01-18</lastmod>
+    <lastmod>2026-02-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://doguhanniltextra.github.io/portfolio/blog/index.html</loc>
-    <lastmod>2026-01-18</lastmod>
+    <lastmod>2026-02-27</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/p95_latency.html</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/spiffe_spire_deep_dive.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/securepay_architecture.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/cloudflare_tunnel.html</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/postgresql_internals.html</loc>
+    <lastmod>2026-02-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_internals.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_resource_management_hands_on.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/aws_well_architected_framework.html</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/self_maintenance_and_self_care_0.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/patient_management_blog_0.html</loc>
+    <lastmod>2025-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/dataops_blog_0.html</loc>
+    <lastmod>2025-11-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
