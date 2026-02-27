@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P95 Latency Explained: What It Is and Why It Matters - Doğuhan İlter</title>
+    <meta name="description" content="A simple, practical explanation of P95 (95th percentile) latency: what it means, why averages lie, and how to use percentile metrics to understand your system's real-world performance.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-02-27">
+                        <i class="far fa-calendar"></i> February 27, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 5 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">P95 Latency Explained: What It Is and Why It Matters</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Performance</span>
+                    <span class="tag">Observability</span>
+                    <span class="tag">Backend</span>
+                    <span class="tag">SRE</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    When it comes to measuring how fast your system is, the average latency is almost always a lie.
+                    P95 latency tells you a much more honest (and scarier) story.
+                </p>
+
+                <h2>1. What Does "Latency" Even Mean?</h2>
+
+                <p>
+                    Latency is the time it takes for your system to respond to a single request, measured from when the client
+                    sends it to when it receives the response. Think of it as round-trip time for a single API call.
+                </p>
+
+                <p>
+                    When you have thousands of requests per second, latency isn't a single number. It's a
+                    <strong>distribution</strong>. Some requests are fast. Some are slow. And a few are painfully slow.
+                    To understand this distribution, we use <strong>percentiles</strong>.
+                </p>
+
+                <h2>2. What Is P95 Latency?</h2>
+
+                <p>
+                    <strong>P95 (95th percentile) latency</strong> is the maximum latency experienced by 95% of your
+                    requests when all requests are sorted from fastest to slowest. In other words:
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Simple Definition:</strong> If your P95 latency is 200ms, it means 95 out of every 100
+                    requests completed in <em>200ms or less</em>. The remaining 5% took longer than 200ms.
+                </div>
+
+                <p>
+                    Let's say you get 1,000 requests. Sort them all by response time, from fastest to slowest.
+                    Point to request number 950. The response time at that position is your P95 latency.
+                </p>
+
+                <h2>3. Why Not Just Use the Average?</h2>
+
+                <p>
+                    The average is dangerously misleading. Here's a simple example. Imagine 10 requests with these
+                    response times (in milliseconds):
+                </p>
+
+                <pre><code class="language-bash">10, 12, 11, 13, 10, 11, 12, 10, 11, 500</code></pre>
+
+                <p>
+                    The <strong>average</strong> is about 59ms. That sounds reasonable. But 9 out of 10 of those
+                    requests finished in around 11ms. One request took 500ms, a full half-second. That one slow
+                    request is a real user sitting there waiting. The average hides it completely.
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>The Problem with Averages:</strong> A single extremely slow request (an "outlier") can
+                    skew your average in a way that masks serious performance issues. Percentiles don't lie like this.
+                </div>
+
+                <h2>4. The Percentile Family</h2>
+
+                <p>
+                    P95 isn't the only percentile worth knowing. Here's the full picture:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-bolt"></i> P50 (Median)</h4>
+                        <p>Half of your requests are faster than this, half are slower. This is the "typical" user
+                            experience. A good baseline to track.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-chart-line"></i> P95</h4>
+                        <p>95% of requests complete within this time. This is the most commonly used SLO (Service Level
+                            Objective) threshold because it captures the experience of nearly all users while ignoring
+                            extreme edge cases.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-triangle"></i> P99</h4>
+                        <p>99% of requests complete within this time. Useful for high-stakes systems (payments, auth)
+                            where even rare slowness is unacceptable.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-skull"></i> P99.9 (The "Nines")</h4>
+                        <p>Only 1 in 1,000 requests can be slower than this. Used in ultra-reliable systems where
+                            tail latency directly impacts revenue or safety.</p>
+                    </div>
+                </div>
+
+                <h2>5. A Real-World Example</h2>
+
+                <p>
+                    Suppose your API serves 10,000 requests per minute. Your monitoring dashboard shows:
+                </p>
+
+                <pre><code class="language-bash">P50:  18ms
+P95:  200ms
+P99:  850ms</code></pre>
+
+                <p>
+                    What does this tell you?
+                </p>
+
+                <ul>
+                    <li>The <strong>typical user</strong> gets a response in 18ms. That's great.</li>
+                    <li>But <strong>500 users per minute</strong> (5% of 10,000) are waiting 200ms or more.</li>
+                    <li>And <strong>100 users per minute</strong> (1%) are stuck waiting 850ms or more, nearly a full
+                        second. That's a bad experience for real people.</li>
+                </ul>
+
+                <div class="callout callout-info">
+                    <strong>Key Insight:</strong> At scale, your tail latency (P95, P99) affects thousands of real
+                    users, not just theoretical edge cases. A 1% problem with 1,000,000 daily users is 10,000 people
+                    having a bad day.
+                </div>
+
+                <h2>6. What Causes High Tail Latency?</h2>
+
+                <p>
+                    Tail latency spikes can come from many places:
+                </p>
+
+                <ul>
+                    <li><strong>Garbage Collection pauses:</strong> JVM-based services (Java, Kotlin) frequently
+                        experience GC pauses that stall a single request while memory is reclaimed.</li>
+                    <li><strong>Database lock contention:</strong> When many requests compete for the same row or
+                        table lock, some must wait their turn.</li>
+                    <li><strong>Network jitter:</strong> Temporary packet loss or retransmissions in the underlying
+                        network layer.</li>
+                    <li><strong>Cold starts:</strong> Serverless functions or auto-scaled containers that haven't
+                        warmed up yet respond much slower on first invocation.</li>
+                    <li><strong>Resource exhaustion:</strong> Thread pools, connection pools, or CPU being saturated
+                        under high load causes queuing delays.</li>
+                </ul>
+
+                <h2>7. How to Use P95 in Practice</h2>
+
+                <p>
+                    P95 latency is most useful when you tie it to an <strong>SLO (Service Level Objective)</strong>. An
+                    SLO is simply a promise you make about your system's behavior. For example:
+                </p>
+
+                <pre><code class="language-bash"># Example SLO Definition
+"99% of all API requests will complete within 300ms (P99 ≤ 300ms)"
+"95% of payment transactions will complete within 500ms (P95 ≤ 500ms)"</code></pre>
+
+                <p>
+                    Once you define your SLOs, you can set up <strong>alerts</strong> in your monitoring tool
+                    (Prometheus, Datadog, Grafana) to notify you the moment your P95 crosses the threshold. This is
+                    far more actionable than "average latency went up a bit."
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-bell"></i>
+                        <h4>Alert on P95</h4>
+                        <p>Set your alerting thresholds on percentiles, not averages. This catches real user pain
+                            before it becomes an outage.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h4>Track Trends</h4>
+                        <p>Watch how P95 changes over time and across deployments. A rising P95 after a deploy is a
+                            clear signal of a regression.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-layer-group"></i>
+                        <h4>Segment by Endpoint</h4>
+                        <p>Don't just track overall P95. Break it down by endpoint. A single slow route can drag
+                            your whole service's numbers up.</p>
+                    </div>
+                </div>
+
+                <h2>8. Quick Summary</h2>
+
+                <div class="callout callout-info">
+                    <strong>The One-Paragraph Version:</strong><br><br>
+                    P95 latency is the response time that 95% of your requests fall under. If your P95 is 200ms,
+                    then 95 out of every 100 requests finished in 200ms or less, and 5 didn't. The remaining 5%
+                    are your "tail": real users experiencing slowness that averages would never reveal. Tracking
+                    P95 (and P99) gives you honest visibility into your system's worst-case behavior, which is
+                    exactly where performance problems hurt users most.
+                </div>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="#" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>
