@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is DLQ and How I Used It - Doğuhan İlter</title>
+    <meta name="description" content="Dead Letter Queues explained — what they are, why every event-driven system needs them, and how I used the Retry-then-DLT strategy in my Hospital Information System's billing service.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <article class="blog-post">
+
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-07">
+                        <i class="far fa-calendar"></i> Apr 7, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 4 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">What is DLQ and How I Used It</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Kafka</span>
+                    <span class="tag">DLQ</span>
+                    <span class="tag">Resilience</span>
+                    <span class="tag">Event-Driven</span>
+                    <span class="tag">Spring Boot</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+
+                <p class="lead">
+                    Have you ever seen "Resilience" in any system design book? It's a shortcut to say "What happens to our system when things go wrong?" and it is a good question because I promise you, things will definitely go wrong.
+                </p>
+
+                <p>
+                    <strong>The project I am referencing:</strong> <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank">Hospital Information System</a>
+                </p>
+
+                <h2>The Problem with Event-Driven Systems</h2>
+
+                <p>
+                    If you are working with an Event-Driven Design (EDD), you have to make sure that every event is progressing smoothly. But what if it doesn't? What if your consumer crashes mid-processing, or the database is temporarily locked?
+                </p>
+
+                <p>
+                    In a naive implementation, you have two bad options:
+                </p>
+
+                <ul>
+                    <li>Retry forever and block the entire pipeline.</li>
+                    <li>Drop the message and pretend it never happened <em>(it is not a crime unless it is deemed a crime, right?)</em>.</li>
+                </ul>
+
+                <div class="callout callout-danger">
+                    <strong> In a production-grade system, neither is acceptable.</strong> A dropped lab result or a missed billing event is not just a bug; it is a liability.
+                </div>
+
+                <p>
+                    This is exactly the problem that Dead Letter Queues (DLQ) solve.
+                </p>
+
+                <h2>What is a Dead Letter Queue?</h2>
+
+                <p>
+                    A DLQ is a separate Kafka topic that acts as a "safety net" (or a bunker). When a message fails to be processed after a defined number of retries, instead of crashing your consumer or silently discarding the message, you route it to this special topic. The message is not lost; it is parked, waiting for someone to handle it.
+                </p>
+
+                <h2>How I Used It</h2>
+
+                <p>
+                    In my project, the <code>billing-service</code> listens to multiple Kafka topics simultaneously (bed charges, lab orders, inventory consumption, and patient discharges). Any of these can fail for various reasons: a transient database lock, a malformed payload, or a downstream service being temporarily unavailable.
+                </p>
+
+                <p>
+                    Without a DLQ, a single bad <code>PATIENT_DISCHARGED</code> event could poison the entire consumer group and freeze billing for everyone.
+                </p>
+
+                <h2>The Strategy: Retry-then-DLT</h2>
+
+                <p>
+                    The strategy I adopted is called "Retry-then-DLT" (Dead Letter Topic). The flow is straightforward:
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-play-circle"></i>
+                        <h4>1. Attempt</h4>
+                        <p>Attempt to process the message normally.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-redo-alt"></i>
+                        <h4>2. Retry</h4>
+                        <p>On failure, wait and retry up to 3 times with exponential backoff.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-route"></i>
+                        <h4>3. Route to DLT</h4>
+                        <p>If all retries are exhausted, route the message to a <code>*.DLT</code> topic.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-bell"></i>
+                        <h4>4. Alert & Monitor</h4>
+                        <p>Alert or monitor the DLT topic for manual intervention.</p>
+                    </div>
+                </div>
+
+                <pre><code class="language-java">@Bean
+public DefaultErrorHandler errorHandler(KafkaTemplate&lt;String, Object&gt; kafkaTemplate) {
+    // Route to *.DLT topic after all retries are exhausted
+    DeadLetterPublishingRecoverer recoverer = 
+        new DeadLetterPublishingRecoverer(kafkaTemplate);
+
+    // Exponential backoff: 1s -> 2s -> 4s (3 attempts)
+    ExponentialBackOffWithMaxRetries backOff = 
+        new ExponentialBackOffWithMaxRetries(3);
+    backOff.setInitialInterval(1_000);
+    backOff.setMultiplier(2.0);
+
+    return new DefaultErrorHandler(recoverer, backOff);
+}</code></pre>
+
+                <h2>The Trade-offs</h2>
+
+                <p>
+                    As with everything in software engineering, using a DLQ introduces some trade-offs:
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-tasks"></i>
+                        <h4>Operational Overhead</h4>
+                        <p>A DLQ is useless if nobody monitors it. You now have the operational burden of setting up alerts for the DLT, inspecting the failed messages, fixing the underlying issue, and manually replaying the events.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-sort-numeric-down"></i>
+                        <h4>Loss of Strict Ordering</h4>
+                        <p>If a message fails and is sent to the DLQ, but the next message in the partition succeeds, strict message ordering is broken. If your domain logic requires strict sequential processing, you will need more complex solutions to halt the partition entirely.</p>
+                    </div>
+                </div>
+
+                <p>
+                    And there we go! Now your events know what to do if anything goes wrong.
+                </p>
+
+            </div>
+
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=What%20is%20DLQ%20and%20How%20I%20Used%20It" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>

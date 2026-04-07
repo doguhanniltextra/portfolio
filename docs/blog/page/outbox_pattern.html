@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is Outbox Pattern and How I Used It - Doğuhan İlter</title>
+    <meta name="description" content="A deep dive into the Transactional Outbox Pattern — what it is, when to use it, and how I applied it in my Hospital Information System to guarantee reliable messaging between microservices.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <article class="blog-post">
+
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-07">
+                        <i class="far fa-calendar"></i> Apr 7, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 3 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">What is Outbox Pattern and How I Used It</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Microservices</span>
+                    <span class="tag">Outbox Pattern</span>
+                    <span class="tag">Kafka</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Java</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+
+                <p>
+                    Now, we will talk about what the Outbox Pattern is and how I used it in my Hospital Information System project.
+                </p>
+
+                <p>
+                    <strong>The project I mentioned is this:</strong> <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank">Hospital Information System</a>
+                </p>
+
+                <p>
+                    First of all, we need to understand in which cases this pattern is useful. Let's imagine you have a scenario where incoming data must be reliable and consistent; furthermore, you don't have any problem with latency. So, the Outbox Pattern is your new friend.
+                </p>
+
+                <p>
+                    It guarantees that database updates and message publishing happen atomically by storing messages in a local "Outbox" table within the same database transaction, which are then published asynchronously.
+                </p>
+
+                <h2>How I Used It</h2>
+
+                <p>
+                    In my case, when a patient is discharged, I have to make sure that the Billing Service runs and creates a bill for this patient using their data, with no toleration for missing a record due to network failures.
+                </p>
+
+                <p>
+                    Another case is when a doctor places a Lab Order. In this scenario, we must guarantee that the Lab Service is notified the moment an order is created.
+                </p>
+
+                <p>
+                    By using the Outbox Pattern in <code>DoctorLabOrderService.placeOrder()</code>, we save the lab order and the <code>LabOrderPlacedEvent</code> in a single atomic transaction. This prevents the "Dual Write" problem where data is saved in the database but the message fails to send to the broker. This ensures that even if the message broker is temporarily down, the order will eventually be synchronized with the Lab Service, maintaining a reliable workflow for patient diagnostics.
+                </p>
+
+                <h2>The Trade-offs</h2>
+
+                <p>
+                    However, every pattern comes with some trade-offs:
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-code-branch"></i>
+                        <h4>Increased Complexity</h4>
+                        <p>You now have to manage an additional database table (the Outbox) and write extra logic for a background "Publisher" service that handles the message delivery. It is more code to maintain compared to a simple message send.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-clock"></i>
+                        <h4>Polling Overhead & Latency</h4>
+                        <p>Since we use a <code>@Scheduled</code> task to check for new messages every 5 seconds, there is a natural delay before the message reaches the next service. Also, the database is constantly being queried for "PENDING" messages, which adds a small but continuous load on your database.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-copy"></i>
+                        <h4>Idempotency Requirement</h4>
+                        <p>There is a small risk that a message is successfully sent to Kafka, but the system crashes before it can mark the message as "PUBLISHED" in the database. In this case, the message will be sent again. This means all your consumer services (like Billing or Lab) must be idempotent; they must be able to handle receiving the same message twice without creating duplicate records.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=What%20is%20Outbox%20Pattern%20and%20How%20I%20Used%20It" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>

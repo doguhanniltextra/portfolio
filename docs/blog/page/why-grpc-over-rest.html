@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why I Chose gRPC Over REST for Internal Communication - Doğuhan İlter</title>
+    <meta name="description" content="Why I shifted from REST to gRPC for internal microservices communication in my Hospital Information System for better performance and strict contracts.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <article class="blog-post">
+
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-07">
+                        <i class="far fa-calendar"></i> Apr 7, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 4 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Why I Chose gRPC Over REST for Internal Communication</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Microservices</span>
+                    <span class="tag">gRPC</span>
+                    <span class="tag">REST</span>
+                    <span class="tag">Protobuf</span>
+                    <span class="tag">Java</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+
+                <p class="lead">
+                    If you have spent more than five minutes in microservices development, your default answer for service-to-service communication is probably REST. It is simple, human-readable, and Postman makes it look easy. But as my Hospital Information System (HIS) grew, I started asking: "Is 'easy to read' really more important than 'hard to break'?"
+                </p>
+
+                <p>
+                    <strong>The project I am referencing:</strong> <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank">Hospital Information System</a>
+                </p>
+
+                <p>
+                    That is when I decided to shift my internal communication to gRPC.
+                </p>
+
+                <h2>The JSON Guessing Game</h2>
+
+                <p>
+                    To tell the truth, I do not like the JSON guessing game. Data integrity is not a luxury; it is a requirement. When a microservice asks for the availability of anything, it needs to be 100% sure about the data types it receives. With REST, you are essentially playing a guessing game. Did the Doctor service change a field name from <code>doctorId</code> to <code>id</code>? Did they change a date format? And so on.
+                </p>
+
+                <h2>Why gRPC Became My Choice</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-file-contract"></i>
+                        <h4>Protocol Buffers as the Law</h4>
+                        <p>Instead of writing documentation that people might not read, I define my contracts in <code>.proto</code> files. Protobuf is a binary serialization format that enforces a strict schema.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h4>HTTP/2 Performance</h4>
+                        <p>Internal calls need to be fast. gRPC uses HTTP/2, which supports multiplexing (sending multiple requests over a single connection) and header compression.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-magic"></i>
+                        <h4>Type Safety & Auto-generation</h4>
+                        <p>I love writing code, but I hate writing boilerplate (and I use Java...). gRPC generates the client and server stubs for me.</p>
+                    </div>
+                </div>
+
+                <h2>How I Used It</h2>
+
+                <p>
+                    In my case, when a patient is admitted, the <code>admission-service</code> needs to verify both the Patient's status and the Doctor's license. Using gRPC for these calls ensures that these "read" operations are extremely low-latency, allowing the UI to remain responsive while complex entity verification happens in the background.
+                </p>
+
+                <p>
+                    Here is a real example from the project showing how a contract is defined (<code>appointment_event.proto</code>). This acts as the ultimate source of truth for the services, eliminating any guesswork about data types:
+                </p>
+
+<pre><code class="language-protobuf">syntax = "proto3";
+
+package appointment.events;
+option java_multiple_files = true;
+
+message AppointmentEvent {
+  string patientId = 1;
+  string doctorId = 2;
+  float amount = 3;
+  bool paymentStatus = 4;
+}</code></pre>
+
+                <h2>The Honest Trade-offs</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-bug"></i>
+                        <h4>Debugging is Harder</h4>
+                        <p>You cannot just curl a gRPC endpoint or look at the payload in a browser. You need specialized tools like BloomRPC or Postman's gRPC support.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-globe"></i>
+                        <h4>Learning Curve</h4>
+                        <p>Browsers do not support gRPC natively (you need gRPC-web), so it is strictly for "backend-to-backend" communication in my case.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-cogs"></i>
+                        <h4>Boilerplate</h4>
+                        <p>While code generation saves time, you still have to manage <code>.proto</code> files and the build pipeline to generate the classes.</p>
+                    </div>
+                </div>
+
+                <p>
+                    I still use REST for my external API (via the Gateway) because that is what the world speaks. But for the internal "brain" of the Hospital Information System, gRPC is the clear winner. It swapped the "JSON guessing game" for a strict, high-performance contract that makes the system significantly more resilient.
+                </p>
+
+            </div>
+
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Why%20I%20Chose%20gRPC%20Over%20REST%20for%20Internal%20Communication" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-protobuf.min.js"></script>
+</body>
+
+</html>

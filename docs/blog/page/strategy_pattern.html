@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How I Used the Strategy Pattern for Billing - Doğuhan İlter</title>
+    <meta name="description" content="How the Strategy Pattern helped me avoid a mountain of if-else statements when calculating insurance rules in my Hospital Information System.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <article class="blog-post">
+
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-07">
+                        <i class="far fa-calendar"></i> Apr 7, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 4 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">How I Used the Strategy Pattern for Billing</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Design Patterns</span>
+                    <span class="tag">Strategy Pattern</span>
+                    <span class="tag">Java</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Microservices</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+
+                <p class="lead">
+                    If you have ever worked on a billing system, you know the nightmare: every insurance provider has different rules. Some cover 80%, some have fixed discounts, and some cover nothing at all. Before you know it, your code is a mountain of nested <code>if-else</code> or <code>switch</code> statements that are impossible to test and maintain.
+                </p>
+
+                <p>
+                    <strong>The project I am referencing:</strong> <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank">Hospital Information System</a>
+                </p>
+
+                <p>
+                    That is exactly the problem I solved in my Hospital Information System using the Strategy Pattern.
+                </p>
+
+                <h2>The Problem: Infinite Billing Rules</h2>
+
+                <p>
+                    In my <code>billing-service</code>, I had to calculate how much a patient owes versus how much the insurance provider covers. But every patient is different:
+                </p>
+
+                <ul>
+                    <li><strong>State Insurance (SGK):</strong> Covers 80% of the bill.</li>
+                    <li><strong>Private Insurance:</strong> Might have a different percentage or specific discount.</li>
+                    <li><strong>No Insurance:</strong> The patient pays 100%.</li>
+                </ul>
+
+                <p>
+                    In a naive implementation, I would have one giant method with a <code>switch</code> statement for every insurance type. Every time I added a new provider, such as AXA or Mapfre, I would have to modify that same method, risking bugs in existing calculations.
+                </p>
+
+                <h2>The Solution: The Strategy Pattern</h2>
+
+                <p>
+                    The Strategy Pattern allows you to define a family of algorithms, encapsulate each one, and make them interchangeable. It lets the algorithm vary independently from the clients that use it.
+                </p>
+
+                <p>First, I defined a common interface for all insurance strategies:</p>
+
+<pre><code class="language-java">package com.project.billing_service.strategy;
+
+import java.math.BigDecimal;
+
+public interface InsuranceStrategy {
+    InsuranceCalculationResult calculate(BigDecimal amount);
+}</code></pre>
+
+                <p>Then, I created concrete implementations for the specific rules. Here is how the state insurance (SGK) is calculated:</p>
+
+<pre><code class="language-java">package com.project.billing_service.strategy;
+
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+@Component
+public class SgkStrategy implements InsuranceStrategy {
+    @Override
+    public InsuranceCalculationResult calculate(BigDecimal amount) {
+        BigDecimal insuranceOwes = amount.multiply(BigDecimal.valueOf(0.80)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal patientOwes = amount.subtract(insuranceOwes).setScale(2, RoundingMode.HALF_UP);
+        return new InsuranceCalculationResult(patientOwes, insuranceOwes);
+    }
+}</code></pre>
+
+                <p>Finally, I used a Factory class to determine which strategy to inject based on the provider's type or name at runtime:</p>
+
+<pre><code class="language-java">package com.project.billing_service.strategy;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class InsuranceFactory {
+    private final SgkStrategy sgkStrategy;
+    private final AllianzStrategy allianzStrategy;
+    private final NoInsuranceStrategy noInsuranceStrategy;
+
+    public InsuranceFactory(SgkStrategy sgkStrategy, AllianzStrategy allianzStrategy, NoInsuranceStrategy noInsuranceStrategy) {
+        this.sgkStrategy = sgkStrategy;
+        this.allianzStrategy = allianzStrategy;
+        this.noInsuranceStrategy = noInsuranceStrategy;
+    }
+
+    public InsuranceStrategy getStrategy(String providerType, String providerName) {
+        if (providerType != null && providerType.equalsIgnoreCase("NONE")) {
+            return noInsuranceStrategy;
+        }
+        if (providerType != null && providerType.equalsIgnoreCase("SGK")) {
+            return sgkStrategy;
+        }
+        if (providerName != null && providerName.equalsIgnoreCase("allianz")) {
+            return allianzStrategy;
+        }
+        if (providerType != null && providerType.equalsIgnoreCase("PRIVATE")) {
+            return noInsuranceStrategy;
+        }
+        return noInsuranceStrategy;
+    }
+}</code></pre>
+
+                <h2>The Trade-offs</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-project-diagram"></i>
+                        <h4>Class Explosion</h4>
+                        <p>You end up with many small classes instead of one big method. While this is cleaner, it can feel like "too much" for very simple systems.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-layer-group"></i>
+                        <h4>Overhead</h4>
+                        <p>You need a factory to manage these strategies, adding one more layer of abstraction.</p>
+                    </div>
+                </div>
+
+                <p>
+                    The Strategy Pattern turned a potentially messy piece of business logic into a modular, testable, and scalable component. It is a classic example of how a simple design pattern can save you from a future of debugging an "if-else" mess.
+                </p>
+
+            </div>
+
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=How%20I%20Used%20the%20Strategy%20Pattern%20for%20Billing" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
