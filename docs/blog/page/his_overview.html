@@ -140,12 +140,12 @@
 
                     <div class="service-item">
                         <h4><i class="fas fa-boxes"></i> Inventory Service (Port 8088)</h4>
-                        <p>Tracks medical supplies and raises stock alerts. Operates as a pure event consumer — no synchronous API exposure to other services.</p>
+                        <p>Tracks medical supplies and raises stock alerts. Operates as a pure event consumer, no synchronous API exposure to other services.</p>
                     </div>
 
                     <div class="service-item">
                         <h4><i class="fas fa-bell"></i> Notification Service (Port 8090)</h4>
-                        <p>Subscribes to all meaningful domain events (appointments, billing, admissions) and triggers the appropriate notifications. A pure listener — no other service calls it directly.</p>
+                        <p>Subscribes to all meaningful domain events (appointments, billing, admissions) and triggers the appropriate notifications. A pure listener, no other service calls it directly.</p>
                     </div>
                 </div>
 
@@ -240,7 +240,7 @@ outboxRepository.save(OutboxEvent.builder()
                 </p>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" — and the answer is: "It keeps going."
+                    <strong>⚠️ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" and the answer is: "It keeps going."
                 </div>
 
                 <h2>Security Architecture</h2>
@@ -334,7 +334,7 @@ deploy:
                 <h2>The Maven BOM Strategy</h2>
 
                 <p>
-                    With 10 Java services, managing dependency versions across all POMs manually is a maintenance nightmare. The project uses a <strong>Bill of Materials (BOM)</strong> module at the root. Every service imports the BOM and never specifies a version for shared dependencies — the BOM owns all of them:
+                    With 10 Java services, managing dependency versions across all POMs manually is a maintenance nightmare. The project uses a <strong>Bill of Materials (BOM)</strong> module at the root. Every service imports the BOM and never specifies a version for shared dependencies, the BOM owns all of them:
                 </p>
 
 <pre><code class="language-xml">&lt;!-- patient-management-bom/pom.xml --&gt;
