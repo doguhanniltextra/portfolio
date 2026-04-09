@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIS v1.0: A Deep System Design Overview - Doğuhan İlter</title>
+    <meta name="description" content="A deep system design analysis of a production-grade, event-driven Hospital Information System built with Spring Boot, Kafka, PostgreSQL, and Docker.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-09">
+                        <i class="far fa-calendar"></i> April 9, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 12 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">HIS v1.0: A Deep System Design Overview</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Microservices</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Kafka</span>
+                    <span class="tag">PostgreSQL</span>
+                    <span class="tag">Java</span>
+                    <span class="tag">Architecture</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <!-- Lead Paragraph -->
+                <p class="lead">
+                    What started as a patient management experiment grew into a full Hospital Information System. This is a technical overview of what it became; the architecture, the patterns, and the tradeoffs.
+                </p>
+
+                <h2>What Is This System?</h2>
+
+                <p>
+                    The Hospital Information System (HIS) is a <strong>production-grade, event-driven microservices architecture</strong> designed for comprehensive hospital operations management. It's built on <strong>Spring Boot 3.4.4</strong>, <strong>Java 21+</strong>, <strong>Apache Kafka</strong>, <strong>PostgreSQL 15</strong>, and fully containerized with Docker. The codebase is over 91% Java by byte count, the rest being Dockerfiles, Makefiles, and shell scripts.
+                </p>
+
+                <p>
+                    What started as a curiosity about how real-world healthcare and banking software is structured eventually grew into a fully realized distributed system. Let me walk you through the whole thing.
+                </p>
+
+                <h2>The Architecture at a Glance</h2>
+
+                <p>
+                    The system follows an <strong>event-driven microservices</strong> pattern. Every service owns its own schema in a shared PostgreSQL database, communicates asynchronously through Apache Kafka, and is routed through a central API Gateway. Here is the big picture:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-door-open"></i> API Gateway (Port 4004)</h4>
+                        <p>Built with Spring Cloud Gateway and Reactive WebFlux. It is the single entry point for all clients. It validates JWT tokens, routes requests to the correct downstream service, and applies rate limiting via Resilience4j.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-lock"></i> Auth Service (Port 8089)</h4>
+                        <p>Handles user registration, login, and JWT token issuance (HS256). Also manages Role-Based Access Control (RBAC). Every other service validates roles at the method level using <code>@PreAuthorize</code>.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-user-injured"></i> Patient Management (Port 8080)</h4>
+                        <p>Core service for patient records, medical history, and clinical data. Consumes <code>lab-result-completed.v1</code> events from Kafka to keep patient records updated without direct service-to-service calls.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-user-md"></i> Doctor Service (Port 8083)</h4>
+                        <p>Manages doctor profiles, shifts, leave requests, and clinical ordering. Publishes lab order events using the Outbox Pattern for guaranteed delivery, and consumes results when the Lab Service finishes processing.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-flask"></i> Lab Service (Port 8087)</h4>
+                        <p>Full LIMS (Laboratory Information Management System) workflow. Consumes lab orders, processes results, and publishes completion events also through the Outbox Pattern. Dead-letter topics catch failed consumer events.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-calendar-check"></i> Appointment Service (Port 8084)</h4>
+                        <p>Manages scheduling, doctor rostering, and patient appointment availability. Emits <code>appointment-created</code> events picked up by the Notification Service.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-file-invoice-dollar"></i> Billing Service (Port 8081)</h4>
+                        <p>Handles invoice creation, insurance splitting, and payment tracking. Consumes lab order events to auto-generate cost entries without polling any other service's database.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-bed"></i> Admission Service (Port 8086)</h4>
+                        <p>Bed management and inpatient ward logistics. Supports patient admission and discharge workflows, emitting admission events for downstream consumers.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-boxes"></i> Inventory Service (Port 8088)</h4>
+                        <p>Tracks medical supplies and raises stock alerts. Operates as a pure event consumer — no synchronous API exposure to other services.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-bell"></i> Notification Service (Port 8090)</h4>
+                        <p>Subscribes to all meaningful domain events (appointments, billing, admissions) and triggers the appropriate notifications. A pure listener — no other service calls it directly.</p>
+                    </div>
+                </div>
+
+                <h2>The Data Layer: One Database, Many Schemas</h2>
+
+                <p>
+                    This was one of the more deliberate architectural decisions. Instead of running a separate PostgreSQL instance per service (which would be expensive and operationally painful for a solo developer), I used <strong>schema isolation</strong> within a single PostgreSQL database. Each service gets its own schema and its own dedicated database user with minimal privileges:
+                </p>
+
+<pre><code class="language-sql">-- Each service gets its own isolated context
+CREATE SCHEMA patient_schema;
+CREATE USER patient_user WITH ENCRYPTED PASSWORD 'patient_pass_123';
+GRANT ALL PRIVILEGES ON SCHEMA patient_schema TO patient_user;
+
+-- The JDBC connection locks the service to its schema
+jdbc:postgresql://postgresql:5432/patient_db?currentSchema=patient_schema
+</code></pre>
+
+                <p>
+                    This means if the billing service's credentials are ever compromised, the attacker cannot read patient records. The isolation is enforced at the database level, not just at the application level. It's the logical equivalent of a "database per service" without the operational overhead.
+                </p>
+
+                <h2>The Event Bus: Apache Kafka</h2>
+
+                <p>
+                    Kafka runs in KRaft mode (no Zookeeper) at version 3.9.0. All asynchronous communication flows through it. Here is the core topic topology:
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-vial"></i>
+                        <h4>lab-order-placed.v1</h4>
+                        <p>Published by Doctor Service. Consumed by Lab Service and Billing Service.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>lab-result-completed.v1</h4>
+                        <p>Published by Lab Service. Consumed by Doctor Service and Patient Service.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h4>appointment-created</h4>
+                        <p>Published by Appointment Service. Consumed by Notification Service.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-file-medical"></i>
+                        <h4>billing-invoice-created</h4>
+                        <p>Published by Billing Service. Consumed by Notification Service.</p>
+                    </div>
+                </div>
+
+                <p>
+                    Consumer groups are used throughout (<code>lab-order-group</code>, <code>doctor-lab-result-group</code>, <code>billing-lab-order-group</code>, etc.) which means any service can be horizontally scaled by simply adding more instances — Kafka handles the rebalancing automatically.
+                </p>
+
+                <h2>Reliability: The Outbox Pattern</h2>
+
+                <p>
+                    Publishing a Kafka event and saving to a database in the same transaction is the classic Dual Write Problem. If the database write succeeds but Kafka is down, the event is lost. If Kafka succeeds but the database crashes, the event fires for data that was never persisted.
+                </p>
+
+                <p>
+                    The solution I implemented is the <strong>Transactional Outbox Pattern</strong>. Instead of publishing directly to Kafka, the service writes the event to an outbox table in the same database transaction as the business data. A separate relay process reads from the outbox and publishes to Kafka, marking rows as "sent" after successful delivery:
+                </p>
+
+<pre><code class="language-java">// In a single @Transactional block:
+// 1. Save the domain entity
+doctorLabOrderRepository.save(labOrder);
+
+// 2. Save the event to the outbox (same transaction)
+outboxRepository.save(OutboxEvent.builder()
+    .topic("lab-order-placed.v1")
+    .payload(labOrderJson)
+    .status(OutboxStatus.PENDING)
+    .build());
+
+// The relay picks it up and publishes to Kafka separately
+</code></pre>
+
+                <div class="callout callout-info">
+                    <strong>💡 Why This Matters:</strong> The Outbox Pattern guarantees that a business operation and its associated event are atomically consistent. If Kafka is down, events accumulate in the outbox and are published when it recovers. No events are lost, no duplicates from retries without idempotency.
+                </div>
+
+                <h2>Resilience: Dead Letter Queues</h2>
+
+                <p>
+                    Even with reliable event publishing, consumers can fail. A malformed payload, a downstream database error, or an unexpected null can crash a consumer. Without a safety net, that message is either dropped or blocks the partition indefinitely.
+                </p>
+
+                <p>
+                    The system uses <strong>Dead Letter Topics</strong> (DLTs) as the safety net. When a consumer fails after exhausting retries, the failed message is forwarded to a designated dead-letter topic. A separate monitoring process can inspect, replay, or alert on those messages without impacting the live consumer pipeline.
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>⚠️ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" — and the answer is: "It keeps going."
+                </div>
+
+                <h2>Security Architecture</h2>
+
+                <p>
+                    Security is layered at three levels, each enforcing independently:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-network-wired"></i> Layer 1: API Gateway</h4>
+                        <p>All external requests pass through the gateway. JWT tokens are decoded, signatures verified, and claims extracted. Invalid tokens are rejected before any service ever sees the request.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-code"></i> Layer 2: Method-Level Security</h4>
+                        <p>Each service uses <code>@PreAuthorize</code> annotations to enforce role-based access at the business logic level. For example, only a DOCTOR or RECEPTIONIST can admit a patient, and only the owning doctor or an ADMIN can create a lab order.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> Layer 3: Database-Level Isolation</h4>
+                        <p>As described above, each service connects with a user that has privileges only within its own schema. Compromising the application layer of one service cannot expose another service's data.</p>
+                    </div>
+                </div>
+
+<pre><code class="language-java">// Layer 2 in practice
+@PreAuthorize("hasRole('ADMIN') or @securityService.isDoctorOwner(authentication, #doctorId)")
+public CreateLabOrderResponseDto createLabOrder(@PathVariable UUID doctorId, ...) { ... }
+
+@PreAuthorize("hasAnyRole('DOCTOR', 'RECEPTIONIST')")
+public ResponseEntity&lt;Admission&gt; admitPatient(...) { ... }
+</code></pre>
+
+                <h2>Observability Stack</h2>
+
+                <p>
+                    A distributed system without observability is just chaos without a window. The HIS ships with a full observability stack:
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Prometheus</h4>
+                        <p>Scrapes <code>/actuator/prometheus</code> from every service every 15 seconds. Stores 7 days of time-series metrics.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h4>Grafana</h4>
+                        <p>Provisioned dashboards for real-time service monitoring, JVM metrics, and custom business metrics.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-project-diagram"></i>
+                        <h4>Micrometer Tracing</h4>
+                        <p>OpenTelemetry bridge for distributed trace propagation across services. Correlation IDs flow through every log entry.</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-file-alt"></i>
+                        <h4>Logstash + MongoDB</h4>
+                        <p>Logback Kafka Appender ships all service logs to Kafka → Logstash → MongoDB. Searchable audit trail by user, service, and timestamp.</p>
+                    </div>
+                </div>
+
+                <h2>Deployment: Docker Compose with 16 Services</h2>
+
+                <p>
+                    The full system runs with a single <code>make dev-up</code> command via Docker Compose. In total there are 16 containers: the 10 Java microservices, Kafka, PostgreSQL, MongoDB, Logstash, Prometheus, and Grafana. Resource limits are defined per container to avoid a single service consuming the host:
+                </p>
+
+<pre><code class="language-yaml"># Typical Java service constraints
+deploy:
+  resources:
+    limits:
+      cpus: '1.0'
+      memory: 512M
+    reservations:
+      cpus: '0.25'
+      memory: 256M
+
+# Kafka gets more headroom
+deploy:
+  resources:
+    limits:
+      cpus: '1.5'
+      memory: 1G
+</code></pre>
+
+                <p>
+                    Multi-stage Docker builds keep the runtime images lean: a Maven build stage compiles the fat jar, and the runtime stage only contains the JRE and the jar. The Makefile wraps all common operations, so there is no need to remember long Docker commands during development.
+                </p>
+
+                <h2>The Maven BOM Strategy</h2>
+
+                <p>
+                    With 10 Java services, managing dependency versions across all POMs manually is a maintenance nightmare. The project uses a <strong>Bill of Materials (BOM)</strong> module at the root. Every service imports the BOM and never specifies a version for shared dependencies — the BOM owns all of them:
+                </p>
+
+<pre><code class="language-xml">&lt;!-- patient-management-bom/pom.xml --&gt;
+&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;3.4.4&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;!-- JJWT, gRPC, Micrometer, SpringDoc, Resilience4j... --&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+
+                <div class="callout callout-success">
+                    <strong>✅ Result:</strong> Upgrading Spring Boot for all 10 services is a single line change in one file. No drift, no version mismatches, no "works on my service" incidents.
+                </div>
+
+                <h2>What I'd Do Differently</h2>
+
+                <p>
+                    Looking back at the system objectively, a few things stand out as natural next steps rather than regrets:
+                </p>
+
+                <ul>
+                    <li><strong>Kubernetes over Docker Compose:</strong> The resource management, health checks, and auto-scaling capabilities of K8s are the right home for this system. Helm charts would replace the current Docker Compose files.</li>
+                    <li><strong>gRPC for internal calls:</strong> The infrastructure is already in place (Protocol Buffers 4.29.1, gRPC 1.68.0) but not yet activated. Some synchronous inter-service calls would benefit from the schema enforcement and lower overhead of gRPC over REST.</li>
+                    <li><strong>CQRS for analytics:</strong> The current read/write model shares the same schema. Separating them via event sourcing would enable real-time reporting without impacting write latency.</li>
+                    <li><strong>HashiCorp Vault for secrets:</strong> Environment variables in Docker Compose get the job done for development, but a production system should pull secrets from a proper secrets manager with rotation policies.</li>
+                    <li><strong>HIPAA compliance layer:</strong> Healthcare data requires encryption at rest (TDE), data retention policies, and formal access audit trails. MongoDB + Logstash covers audit logging, but the other controls need dedicated attention.</li>
+                </ul>
+
+                <h2>Final Thoughts</h2>
+
+                <p>
+                    When I started this project, my primary question was: "How do real hospital systems work?" The answer I built is event-driven, schema-isolated, observable, and resilient. It is not perfect, but it is an honest reflection of the constraints faced by a solo developer building architecture that mirrors production-grade standards.
+                </p>
+
+                <p>
+                   Patterns in this system such as Outbox, DLQ, RBAC, schema isolation, and BOM dependency management are more than academic exercises. They represent practical solutions to distributed systems problems that I had to understand deeply to implement from scratch. This understanding constitutes the primary outcome of the project.
+                </p>
+
+                <div class="callout callout-success">
+                    <strong> The architecture is well-suited for healthcare operations:</strong> careful data management, audit trails, and high availability are all addressed. With the recommended enhancements (Kubernetes, gRPC, CQRS), it is ready to scale to enterprise-level demands while maintaining security and compliance standards.
+                </div>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Buttons -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Overview%3A%20Hospital%20Information%20System%20Project" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                           and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-xml-doc.min.js"></script>
+</body>
+
+</html>
