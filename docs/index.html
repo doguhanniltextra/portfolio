@@ -101,9 +101,9 @@
             <ul>
                 <li><a href="#about" class="active" aria-current="page">About</a></li>
                 <li><a href="blog/index.html">Blog</a></li>
-                <li><a href="#experience">Experience</a></li>
-
                 <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#experience">Experience</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li><button id="theme-toggle" aria-label="Toggle dark mode" class="theme-toggle"><i class="fas fa-moon"
                             aria-hidden="true"></i></button></li>
@@ -186,6 +186,258 @@
                             <span class="skill-tag">OAuth2</span>
                             <span class="skill-tag">Zero-Trust</span>
                             <span class="skill-tag">AES-256</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Projects -->
+                <section id="projects" class="section fade-in">
+                    <h2> Projects</h2>
+
+                    <!-- Project Navigator -->
+                    <nav class="project-navigator">
+                        <ul>
+                            <li><a href="#project-his" class="active">Hospital System</a></li>
+                            <li><a href="#project-managify">Managify</a></li>
+                            <li><a href="#project-stratusphere">Stratusphere</a></li>
+                            <li><a href="#project-securepay">SecurePay</a></li>
+                            <li><a href="#project-n8n">n8n AI</a></li>
+                        </ul>
+                    </nav>
+
+                    <!-- Hospital Information System -->
+                    <div id="project-his" class="project open">
+                        <div class="project-header">
+                            <div class="project-header-left">
+                                <i class="fas fa-chevron-down project-toggle-icon"></i>
+                                <h3 class="project-title">Hospital Information System</h3>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Visit Hospital Information System on GitHub">
+                                    <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-content-inner">
+                                <div class="project-context">
+                                    A distributed, high-availability healthcare platform designed to manage patient,
+                                    doctor, and
+                                    appointment workflows.
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-item">Java</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Spring Boot</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Kafka</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Kubernetes</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">PostgreSQL</span>
+                                </div>
+                                <div class="project-highlights">
+                                    <strong>Technical Highlights</strong>
+                                    <p>Engineered event-driven communication for 7+ microservices using Apache Kafka.
+                                        Orchestrated
+                                        with Kubernetes (K8s) for robust infrastructure and reliable data management.</p>
+                                </div>
+                                <div class="project-description">
+                                    <ul>
+                                        <li>Distributed Microservices Architecture</li>
+                                        <li>Event-Driven Messaging with Apache Kafka</li>
+                                        <li>Cloud-Native Deployment with Kubernetes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Managify -->
+                    <div id="project-managify" class="project">
+                        <div class="project-header">
+                            <div class="project-header-left">
+                                <i class="fas fa-chevron-down project-toggle-icon"></i>
+                                <h3 class="project-title">Managify</h3>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://github.com/doguhanniltextra/managify-go" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Visit Managify on GitHub">
+                                    <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-content-inner">
+                                <div class="project-context">
+                                    An enterprise-grade project management platform engineered for scalability and high
+                                    performance.
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-item">Go</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Fiber</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">MongoDB</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Terraform</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">AWS ECS</span>
+                                </div>
+                                <div class="project-highlights">
+                                    <strong>Technical Highlights</strong>
+                                    <p>Built a high-throughput backend using the Fiber framework. Implemented granular
+                                        RBAC (Role-Based Access
+                                        Control) and stateless security with JWT.</p>
+                                </div>
+                                <div class="project-description">
+                                    <ul>
+                                        <li>Granular RBAC System</li>
+                                        <li>Infrastructure-as-Code with Terraform</li>
+                                        <li>Containerized Deployment on AWS ECS Fargate</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stratusphere -->
+                    <div id="project-stratusphere" class="project">
+                        <div class="project-header">
+                            <div class="project-header-left">
+                                <i class="fas fa-chevron-down project-toggle-icon"></i>
+                                <h3 class="project-title">Stratusphere</h3>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://github.com/doguhanniltextra/aws-stratusphere-dashboard" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Visit Stratusphere on GitHub">
+                                    <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-content-inner">
+                                <div class="project-context">
+                                    A desktop application that visualizes AWS infrastructure and automatically generates
+                                    Terraform
+                                    code from existing resources.
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-item">Go</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Wails</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">AWS SDK v2</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">D3.js</span>
+                                </div>
+                                <div class="project-highlights">
+                                    <strong>Technical Highlights</strong>
+                                    <p>Leveraged Wails (Go+JS) for native desktop performance. Developed an optimized
+                                        parallel
+                                        resource discovery engine using Goroutines.</p>
+                                </div>
+                                <div class="project-description">
+                                    <ul>
+                                        <li>Interactive AWS Topology Visualization (D3.js)</li>
+                                        <li>Automated Reverse-Engineering to Terraform (HCL)</li>
+                                        <li>Secure AES-256-GCM Credential Storage</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SecurePay -->
+                    <div id="project-securepay" class="project">
+                        <div class="project-header">
+                            <div class="project-header-left">
+                                <i class="fas fa-chevron-down project-toggle-icon"></i>
+                                <h3 class="project-title">SecurePay</h3>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://github.com/doguhanniltextra/securepay" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Visit SecurePay on GitHub">
+                                    <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-content-inner">
+                                <div class="project-context">
+                                    A production-grade microservices architecture demo for secure payment processing using
+                                    zero-trust principles.
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-item">Go</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">SPIFFE/SPIRE</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Kafka</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">OpenTelemetry</span>
+                                </div>
+                                <div class="project-highlights">
+                                    <strong>Technical Highlights</strong>
+                                    <p>Enforced mutual TLS (mTLS) and Zero-Trust security with SPIFFE/SPIRE integration.
+                                        Implemented
+                                        end-to-end distributed tracing with OpenTelemetry.</p>
+                                </div>
+                                <div class="project-description">
+                                    <ul>
+                                        <li>End-to-End Zero-Trust Security (mTLS)</li>
+                                        <li>Distributed Tracing & Observability</li>
+                                        <li>Event-Driven Fraud Detection Logic</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- n8n Article Summary -->
+                    <div id="project-n8n" class="project">
+                        <div class="project-header">
+                            <div class="project-header-left">
+                                <i class="fas fa-chevron-down project-toggle-icon"></i>
+                                <h3 class="project-title">n8n Article Summary</h3>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://github.com/doguhanniltextra/n8n-article-summary" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Visit n8n Article Summary on GitHub">
+                                    <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-content-inner">
+                                <div class="project-context">
+                                    A privacy-first, fully local AI-powered article summarization and Obsidian note-taking
+                                    pipeline.
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-item">n8n</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Go</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">LM Studio</span>
+                                    <span class="tech-divider">|</span>
+                                    <span class="tech-item">Obsidian</span>
+                                </div>
+                                <div class="project-highlights">
+                                    <strong>Technical Highlights</strong>
+                                    <p>Orchestrated n8n workflows with LM Studio (Local LLM) and a Go backend. Engineered a
+                                        highly
+                                        efficient and privacy-oriented local automation pipeline.</p>
+                                </div>
+                                <div class="project-description">
+                                    <ul>
+                                        <li>Privacy-First Local AI Summarization</li>
+                                        <li>Automated Multi-Step Content Pipeline</li>
+                                        <li>Direct Local LLM Interaction via LM Studio</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -435,6 +687,51 @@
 
         document.querySelectorAll('.fade-in').forEach(el => {
             observer.observe(el);
+        });
+
+        // Project Collapsible Logic
+        document.querySelectorAll('.project-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                // Don't toggle if a link was clicked
+                if (e.target.closest('.project-links')) return;
+
+                const project = header.closest('.project');
+                const isOpen = project.classList.contains('open');
+                const projectId = project.id;
+
+                // Close other projects
+                document.querySelectorAll('.project').forEach(p => {
+                    p.classList.remove('open');
+                });
+
+                // Update active nav link
+                document.querySelectorAll('.project-navigator a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + projectId) {
+                        link.classList.add('active');
+                    }
+                });
+
+                if (!isOpen) {
+                    project.classList.add('open');
+                }
+            });
+        });
+
+        // Update nav active state on scroll/click manual handles
+        document.querySelectorAll('.project-navigator a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.project-navigator a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const targetId = this.getAttribute('href').substring(1);
+                const targetProject = document.getElementById(targetId);
+                
+                if (targetProject) {
+                    document.querySelectorAll('.project').forEach(p => p.classList.remove('open'));
+                    targetProject.classList.add('open');
+                }
+            });
         });
     </script>
 </body>
