@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Junior Perspective | Securepay - Doğuhan İlter</title>
+    <meta name="description"
+        content="Securepay project is a basic simulation of how to create a reliable, scalable and maintainable system from my perspective.">
+    <meta name="keywords"
+        content="Backend, Architecture, Securepay, Go, Microservices, Security">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <!-- Adjusted Date and Reading Time based on length -->
+                    <time datetime="2026-04-17">
+                        <i class="far fa-calendar"></i> April 17, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 5 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">A Junior Perspective | Securepay</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Backend</span>
+                    <span class="tag">Architecture</span>
+                    <span class="tag">Microservices</span>
+                    <span class="tag">Security</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Securepay project is a basic simulation of how to create a reliable, scalable and maintainable system from my perspective. I decided to publish a blog about what I've learned from this project.
+                </p>
+
+                <p>
+                    Before explaining my perspective and the toolkit I've used, I want to share the resources I've constantly checked while I created this project.
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>Designing a Payment System by Pragmatic Engineer:</strong><br>
+                        <a href="https://newsletter.pragmaticengineer.com/p/designing-a-payment-system" target="_blank">https://newsletter.pragmaticengineer.com/p/designing-a-payment-system</a><br>
+                        This is very cool and explanatory blog. I usually read this blog to contemplate what kind of architectural decision i should take.
+                    </li>
+                    <li>
+                        <strong>Mastering Terraform by Tinderholt Mark:</strong><br>
+                        This book is very clear and helpful if you want to use Terraform as an infrastructure as code.
+                    </li>
+                    <li>
+                        <strong>Postgresql Internals by Egor Rogov:</strong><br>
+                        I read this book not just for this project, also i am so curious about PostgreSQL's architecture and how it works.
+                    </li>
+                    <li>
+                        <strong><a href="https://zerotohero.dev/go/" target="_blank">https://zerotohero.dev/go/</a></strong><br>
+                        This website has excellent articles about Go programming and best practices.
+                    </li>
+                </ul>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;" />
+
+                <h3>The Perspective and Architectural Decisions:</h3>
+
+                <p>Before creating a new project or adding a new feature, i ask myself these questions:</p>
+
+                <ul>
+                    <li>What problem do you want to solve? (In this case, you should find a problem before attempting to solve it.)</li>
+                    <li>What is the average expectation when you solve this problem?</li>
+                    <li>For this project/feature, what's your decision in CAP theorem? Your new implementation requires Consistency and Partition Tolarence or other combinations?</li>
+                    <li>Did you clarify trade-offs when you choose toolkit do you want to use? Or you just use this toolkit just for "using" them.</li>
+                </ul>
+
+                <p>Around these critical questions, I've decided to go with:</p>
+
+                <ul>
+                    <li>I want to create a project that simulates a virtual wallet functionality and want to establish a secure, scalable and reliable environment.</li>
+                    <li>The average expectation is highly fault-tolarent and strong consistency and strict idempotency. So, we should focus on Consistency and Partition Tolarence in this case.</li>
+                    <li>I use PostgreSQL to ensure consistency via ACID properties. A transaction is treated as an atomic unit; either the entire operation succeeds, or it fails completely. Additionally, I prioritize isolation levels to prevent race conditions.</li>
+                    <li>I use Kafka for asynchronous communication. Implementing a Dead Letter Queue (DLQ) and a retry mechanism is crucial for providing fault tolerance.</li>
+                    <li>I am implement a Zero-Trust architecture where every internal service is responsible for its own security. Every request between internal services is authenticated and encrypted via mutual TLS (mTLS) communication. I also leverage SPIFFE/SPIRE as the control plane to manage service identities and automate certificate issuance.</li>
+                    <li>I leverage Redis as a distributed caching layer to reduce latency and improve system performance.</li>
+                    <li>I use Prometheus and Grafana, a powerful open-source duo for monitoring system health and performance. Additionally, I integrated OpenTelemetry to achieve full observability through distributed tracing and metrics collection.</li>
+                    <li>I use gRPC for inter-service communication to leverage type safety and high performance, taking full advantage of HTTP/2 features such as multiplexing and binary framing.</li>
+                    <li>I use Kubernetes to orchestrate my microservices, ensuring high availability, automated scaling, and seamless deployment across the system.</li>
+                </ul>
+
+                <h4>High Level Architecture</h4>
+
+                <p>In the following section, I outline the high-level architecture by tracing the lifecycle of a 'load money' request. I've broken down the process into three sequential phases to illustrate how the system ensures security, consistency, and reliability.</p>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="image/beyond_the_code_image_1.png" alt="High Level Architecture 1" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="image/beyond_the_code_image_2.png" alt="High Level Architecture 2" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="image/beyond_the_code_image_3.png" alt="High Level Architecture 3" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                </div>
+
+                <h2>Deep Dive: Implementation Details</h2>
+
+                <h3>1. Financial Integrity: Idempotency & ACID Transactions</h3>
+
+                <h4>a. The First Shield: Redis Idempotency-Key</h4>
+
+                <p>Imagine a user clicks the "Pay" button, but due to a slow network, they don't get an immediate response and click "Retry." This results in the same request hitting the backend twice. To prevent duplicate transactions, I implemented the following:</p>
+
+                <ul>
+                    <li><strong>Unique Keys:</strong> The <code>Payment Service</code> expects a unique <code>Idempotency-Key</code> (e.g., a UUID) for every <code>InitiatePayment</code> request.</li>
+                    <li><strong>Early Validation:</strong> As soon as a request arrives via gRPC, and before triggering any business logic or database queries, the service checks <strong>Redis</strong> using <code>GET idempotency:{key}</code>.</li>
+                    <li><strong>Cached Response:</strong> If the key already exists in Redis, the system recognizes that this request was already processed (or is currently <code>PENDING</code>). Instead of re-running the transaction, it immediately returns the previously cached JSON response.</li>
+                    <li><strong>The Result:</strong> This approach protects our database from redundant heavy operations and fundamentally prevents duplicate charges.</li>
+                </ul>
+
+                <h4>b. The Core Truth: PostgreSQL Transactions & "FOR UPDATE" Locking</h4>
+
+                <p>While Idempotency protects the gateway, I handled <strong>Race Condition</strong> risks at the database level using PostgreSQL's locking mechanisms.</p>
+
+                <p>Consider a scenario where two different payment requests for the same account arrive at the exact same millisecond, both trying to spend the last $100. If both read the balance simultaneously and see $100, they might both approve the transaction, leading to a balance error. In the <code>Account Service</code>, I solved this within the <code>ProcessPayment()</code> function:</p>
+
+                <ul>
+                    <li><strong>ACID Transactions:</strong> Every operation starts with <code>db.BeginTx()</code>. If any asynchronous error occurs, the entire process is <strong>rolled back</strong>, ensuring data integrity.</li>
+                    <li><strong>Pessimistic Locking:</strong> Instead of a standard <code>SELECT</code> to check the balance, I use:<br><code>SELECT balance FROM accounts.balances WHERE account_id = $1 FOR UPDATE;</code></li>
+                    <li><strong>How it works:</strong> The <code>FOR UPDATE</code> clause tells PostgreSQL, <em>"I am going to update this row; do not let anyone else read or modify it until I COMMIT."</em> This creates a <strong>Row-Level Lock</strong>. Any concurrent request for the same account must wait until the first transaction finishes. This effectively eliminates the <strong>Lost Update</strong> race condition.</li>
+                    <li><strong>Hybrid Integrity:</strong> Finally, I use <strong>Optimistic Versioning</strong> by incrementing a version column (<code>UPDATE ... SET version = version + 1</code>). This provides an extra layer of <strong>auditability</strong> and ensures a hybrid approach to data consistency.</li>
+                </ul>
+
+                <h3>2. Resilience: Handling Failures with Kafka & DLQ</h3>
+
+                <p>Traditional synchronous architectures (e.g., REST/gRPC chains) suffer from cascading failures: if the Account Service goes down, the Payment Service fails too. To create a highly resilient system, I relied on <strong>Apache Kafka</strong> to decouple operations and introduce fault tolerance.</p>
+
+                <h4>a. Asynchronous Decoupling & The Saga Pattern</h4>
+
+                <p>When a user initiates a payment, the <code>Payment Service</code> doesn't wait for the <code>Account Service</code> to finish the database transaction. Instead:</p>
+
+                <ul>
+                    <li>It persists the payment state as <code>PENDING</code>.</li>
+                    <li>It publishes a <code>PaymentInitiatedEvent</code> to Kafka and immediately returns a <code>200 OK</code> to the user.</li>
+                    <li><strong>Why this matters:</strong> If the <code>Account Service</code> is temporarily down or overwhelmed by a traffic spike, the system doesn't drop the user's request. Kafka acts as a shock absorber, buffering the events. Once the <code>Account Service</code> recovers, it resumes reading from its last committed offset, eventually processing all backlogged payments.</li>
+                    <li><strong>Graceful Failures:</strong> If a business rule fails (e.g., insufficient funds), the Consumer doesn't crash. It simply publishes a <code>PaymentResultEvent</code> with a <code>FAILED</code> status back to Kafka, completing our <strong>Choreography-based Saga Pattern</strong>.</li>
+                </ul>
+
+                <h4>b. Catching the Unpredictable: The Dead Letter Queue (DLQ)</h4>
+
+                <p>While business errors are handled gracefully via events, infrastructure errors (e.g., Database connection lost) or malformed payloads ("poison pills") pose a different threat. If a consumer fails to process a message:</p>
+
+                <ul>
+                    <li>We cannot infinitely retry the same message, as it would block the entire Kafka partition (<strong>head-of-line blocking</strong>).</li>
+                    <li>We cannot simply skip and <code>commit</code> the message, as that would result in silent data loss (a critical failure in FinTech).</li>
+                </ul>
+
+                <p>To solve this, the architecture dictates a <strong>Dead Letter Queue (DLQ)</strong> routing mechanism. If a message repeatedly fails to process after $N$ retries (due to unmarshaling errors or persistent DB timeouts), the consumer acknowledges the message but routes it to a designated <code>payment.dlq</code> topic.</p>
+
+                <p>This DLQ acts as a quarantine zone. It triggers a Prometheus/Grafana alert, allowing engineers to manually inspect the corrupted payload, fix the underlying bug, and then replay the messages from the DLQ without affecting the real-time payment pipeline.</p>
+
+                <h3>3. Identity over Network: Zero-Trust & SPIFFE/SPIRE</h3>
+
+                <p>Traditional microservice architectures often rely on "perimeter security" (the castle-and-moat model). Once a request passes the API Gateway or firewall, internal services implicitly trust each other just because they share the same private subnet. In a modern FinTech environment, this is a dangerous assumption; if an attacker compromises a single minor component, they gain unfettered lateral movement across the entire network.</p>
+
+                <p>To combat this, I designed SecurePay around a strict <strong>Zero-Trust Architecture</strong>. In this model, the network is always assumed to be hostile, and IP addresses are not treated as valid forms of identity.</p>
+
+                <h4>a. Workload Identity with SPIFFE & SPIRE</h4>
+
+                <p>Instead of relying on network boundaries, every single microservice in SecurePay is issued a unique cryptographic identity using the <strong>SPIFFE</strong> (Secure Production Identity Framework for Everyone) standard.</p>
+
+                <p>I deployed <strong>SPIRE</strong> as the control plane to manage these identities. When a service (e.g., <code>Payment Service</code>) boots up in Kubernetes, a local SPIRE Agent node verifies its authenticity (checking its Kubernetes Service Account, namespace, and binary digest) and issues it a short-lived <strong>X.509 SVID</strong> (SPIFFE Verifiable Identity Document).</p>
+
+                <h4>b. Mutual TLS (mTLS) for Inter-Service Communication</h4>
+
+                <p>With these cryptographic identities in place, absolutely no plaintext HTTP traffic is allowed between internal services. All synchronous inter-service communication (such as the API Gateway calling the Payment Service, or Payment checking the Account Service) is built on <strong>gRPC over mTLS</strong> (Mutual TLS).</p>
+
+                <ul>
+                    <li><strong>How it works in the code:</strong> Using the <code>go-spiffe/v2</code> SDK, services continuously fetch and rotate their certificates from the SPIRE agent in the background.</li>
+                    <li><strong>The Handshake:</strong> When the API Gateway tries to communicate with the internal services, both parties present their X.509 certificates to each other. The server verifies that the client is indeed the authorized API Gateway, and the client verifies it is speaking to the genuine backend service.</li>
+                    <li><strong>The Result:</strong> All traffic is heavily encrypted in transit. Furthermore, authentication is tied directly to the <strong>mathematical proof of the workload's identity</strong>, not its IP address. This effectively neutralizes Man-in-the-Middle (MitM) attacks and prevents rogue pods from impersonating critical financial services.</li>
+                </ul>
+
+                <h2>Conclusion:</h2>
+
+                <p>Building SecurePay wasn't just about writing code; it was about adopting a "Reliability First" mindset. Throughout this journey, I learned that:</p>
+                <p>Tools are secondary to principles: A database or a message broker is only as good as the architectural decisions (ACID, CAP, Idempotency) behind them.</p>
+                <p>Security is a process, not a feature: Implementing Zero-Trust taught me that identity must be cryptographic and continuous, not just a firewall rule.</p>
+                <p>Failure is inevitable: Designing for failure with DLQs and Saga patterns is what separates a mere 'toy project' from a system built with a 'production-oriented' mindset</p>
+
+                <h2>Final</h2>
+                <p>As a junior developer, I recognize that there is still much to learn. While this architecture incorporates high-level patterns used in production, it remains a simulation. A production-grade payment system would require addressing further complexities, such as the Transactional Outbox pattern to solve 'dual-write' issues, multi-region disaster recovery, and advanced database sharding.</p>
+                <p>Securepay is not a finished product, but a journey toward understanding how to build systems that people can trust.</p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=A%20Junior%20Perspective%20%7C%20Securepay&url=https://doguhanniltextra.github.io/portfolio/blog/page/what-i-learned.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/what-i-learned.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer specializing in microservices architecture, cloud-native applications,
+                            and distributed systems.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>
