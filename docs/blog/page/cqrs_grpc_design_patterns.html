@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQRS - gRPC - Design Patterns | Patient Management Journey - Doğuhan İlter</title>
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+            
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-20">
+                        <i class="far fa-calendar"></i> April 20, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 22 min read
+                    </span>
+                </div>
+                
+                <h1 class="post-title-main">Microservices, CQRS, and gRPC: My Architectural Learning Journey</h1>
+                
+                <div class="post-tags-header">
+                    <span class="tag">CQRS</span>
+                    <span class="tag">gRPC</span>
+                    <span class="tag">Outbox Pattern</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">PostgreSQL</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                
+                <p class="lead">
+                    Taking a step from monolithic thinking into the world of distributed systems has been one of the biggest challenges in my project journey. In the Patient Management project, what started as simple REST services evolved into a system using CQRS, gRPC, and the Outbox pattern. Here is how I refactored these foundational layers to solve real consistency and performance issues.
+                </p>
+
+                <h2>Moving from REST Postcards to gRPC Stubs</h2>
+                
+                <p>
+                    In my earlier implementation, services talked to each other using <code>RestTemplate</code>. It felt like sending postcards—I had to manually build URLs like <code>baseUrl + "/patients/find/" + id</code>, manage circuit breakers with Resilience4j, and handle JSON parsing at every step.
+                </p>
+
+                <p>
+                    I replaced this with <strong>gRPC over Protobuf</strong>. Instead of "phone calls" where lines could be busy, it’s more like a direct radio connection. By defining our service contracts in <code>.proto</code> files, I could generate type-safe Java stubs that handle connections, retries, and deadlines natively.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Simplification:</strong> Switching to gRPC allowed me to delete entire configuration classes like <code>RestTemplateConfig.java</code> and <code>RestTemplateAddresses.java</code>. The code became cleaner and much more reliable.
+                </div>
+
+                <h2>Automating CQRS with AOP</h2>
+
+                <p>
+                    When my database started slowing down due to expensive JOINs on tables receiving constant updates, I decided to implement <strong>CQRS (Command Query Responsibility Segregation)</strong>. The goal was simple: route all writes to a "Master" DB and all reads to a "Replica."
+                </p>
+
+                <p>
+                    To make this automatic, I used Spring AOP. I created a <code>DataSourceAspect</code> that intercepts any method call in a <code>.query</code> or <code>.command</code> package. If a method is marked as <code>@Transactional(readOnly = true)</code>, the aspect automatically switches the <code>ThreadLocal</code> context to the read replica.
+                </p>
+
+                <pre><code class="language-java">
+@Aspect
+@Component
+public class DataSourceAspect {
+    @Around("execution(* com.project.*.query.*Service.*(..))")
+    public Object routeToReplica(ProceedingJoinPoint joinPoint) throws Throwable {
+        DataSourceContextHolder.set(DbType.READ); // Switches to doctor-read-db
+        try { return joinPoint.proceed(); }
+        finally { DataSourceContextHolder.clear(); }
+    }
+}
+                </code></pre>
+
+                <h2>Keeping Data in Sync: The "Gold Standard"</h2>
+
+                <p>
+                    One question I had was: how do we keep the Read model (DoctorSummary, PatientSummary) updated without slow cross-service messaging?
+                </p>
+
+                <p>
+                    I implemented an <strong>Internal Event Pipeline</strong>. When a change happens on the write side, I use Spring's <code>ApplicationEventPublisher</code> to trigger a sync. The key is using <code>@TransactionalEventListener(phase = AFTER_COMMIT)</code>. This ensures the read-model is only updated if the main database update actually succeeds.
+                </p>
+
+                <p>
+                    This "Gold Standard" keeps our "Flattened" tables fast and join-free while maintaining perfect consistency within the service lifecycle.
+                </p>
+
+                <h2>Solving the Dual-Write Problem</h2>
+
+                <p>
+                    A big risk in microservices is the "Dual-Write." If you save data to your database and then try to send a Kafka message, one might succeed while the other fails. This leads to data corruption across the system.
+                </p>
+
+                <p>
+                    I solved this by implementing the <strong>Transactional Outbox Pattern</strong>. Now, my service writes the event into a local <code>outbox_events</code> table in the <em>same</em> transaction as the business data. A background relay worker then polls this table and ensures the message eventually reaches Kafka.
+                </p>
+
+                <h2>Saga Orchestration and Compensation</h2>
+
+                <p>
+                    For complex flows like creating an appointment, which involves multiple services, I used an <strong>Orchestrated Saga</strong>. The <code>CreateAppointmentSaga</code> act as a state machine. It manages steps like validating the patient, checking the doctor's availability, and finally increasing the patient count.
+                </p>
+
+                <p>
+                    A critical lesson I learned here was to move network-heavy gRPC calls <strong>outside</strong> of the database transactions. This protects our database connections from being held open while waiting for a slow network response. If a later step fails, the saga triggers "Compensation Logic" to revert the previous changes.
+                </p>
+
+                <h2>Better Together: The Support Service</h2>
+
+                <p>
+                    Sometimes microservices can be <em>too</em> separated. I noticed my Lab and Inventory services were constantly talking to each other over the network, causing lag. I refactored them into a single <strong>Support Service</strong> with a shared schema.
+                </p>
+
+                <p>
+                    By adding a <strong>Redis Second-Level Cache</strong> for these domains, I was able to speed up catalog lookups significantly, proving that sometimes, consolidation is just as important as separation.
+                </p>
+
+                <h2>Watching the System</h2>
+
+                <p>
+                    Finally, I learned that you can't fix what you can't see. I set up <strong>Prometheus and Grafana</strong> to watch the project's pulse. I mainly focus on:
+                </p>
+
+                <ul>
+                    <li><strong>Kafka Lag:</strong> To see if our outbox relay is keeping up.</li>
+                    <li><strong>HikariCP Pool Health:</strong> To ensure we aren't running out of database connections.</li>
+                    <li><strong>Docker Networking:</strong> Ensuring all services can reach each other via the global network.</li>
+                </ul>
+
+                <h2>Closing Thoughts</h2>
+
+                <div class="callout callout-success">
+                    <strong>✅ Evolution:</strong> This architectural journey transformed my collection of services into a much more stable and observable ecosystem. It was a great lesson in choosing the right patterns to solve real distributed challenges.
+                </div>
+
+                <p>
+                    Being a junior developer doesn't mean we can't tackle complex patterns; it just means we have to be careful, humble, and always ready to refactor when we find a better way. This project has been an incredible foundation for my ongoing learning in the backend world.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Junior Backend Developer learning the ropes of microservices and software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-protobuf.min.js"></script>
+</body>
+
+</html>
