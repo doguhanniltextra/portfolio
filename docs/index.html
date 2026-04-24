@@ -106,8 +106,6 @@
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li><button id="theme-toggle" aria-label="Toggle dark mode" class="theme-toggle"><i class="fas fa-moon"
-                            aria-hidden="true"></i></button></li>
             </ul>
         </div>
     </nav>
@@ -369,37 +367,6 @@
     </div>
 
     <script>
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.classList.add('dark-mode');
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            themeToggle.setAttribute('aria-label', 'Toggle light mode');
-        }
-
-        // Toggle theme on button click
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-
-            if (body.classList.contains('dark-mode')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                themeToggle.setAttribute('aria-label', 'Toggle light mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                themeToggle.setAttribute('aria-label', 'Toggle dark mode');
-                localStorage.setItem('theme', 'light');
-            }
-        });
-
         // Smooth scrolling for navigation links
         document.querySelectorAll('.nav a').forEach(link => {
             link.addEventListener('click', function (e) {
