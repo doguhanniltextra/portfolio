@@ -28,7 +28,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JHFHDZRLP"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-6JHFHDZRLP');
     </script>
@@ -116,32 +116,36 @@
         <div class="main-content">
             <main id="main-content" class="content" role="main">
 
-                <!-- About -->
+
+
+
                 <section id="about" class="section fade-in">
                     <h2>About Me</h2>
                     <div class="about-narrative">
                         <p>
-                            I am a developer who enjoys building reliable backend systems. My primary focus is on
-                            <span class="about-highlight">architecting distributed services</span> using
-                            <strong>Go</strong> and <strong>Java</strong>, and I find
-                            satisfaction in designing efficient communication patterns with <strong>gRPC</strong> and
-                            <strong>Kafka</strong>.
+                            I'm a backend engineer drawn to the harder problems that surface when
+                            services stop trusting each other, databases diverge, or a single failure
+                            spreads further than it should. My work centers on
+                            <span class="about-highlight">distributed systems</span> built with
+                            <strong>Go</strong> and <strong>Java</strong>, where good architecture
+                            mostly means anticipating what will eventually break.
                         </p>
                         <p>
-                            Beyond application logic, I value <span class="about-highlight">Infrastructure as
-                                Code</span> because it ensures environments are reproducible and secure. I use
-                            <strong>Terraform</strong> on <strong>AWS</strong> to manage
-                            complex infrastructure with the same rigor as I apply to my code.
+                            That mindset carried into how I think about infrastructure. I treat
+                            <span class="about-highlight">cloud environments</span> the same way I
+                            treat code: reproducible, version-controlled, and auditable. Working with
+                            <strong>AWS</strong> and <strong>Terraform</strong> pushed me to reason
+                            beyond the application layer and understand the full system I'm deploying into.
                         </p>
                         <p>
-                            I also like working on <span class="about-highlight">native tools</span>. Building
-                            cross-platform desktop applications with <strong>Go</strong> and <strong>Wails</strong>
-                            offers a different set of challenges that I appreciate
-                            solving. Currently, I am reading about <strong>Kubernetes</strong>
-                            internals and exploring new ways to improve system reliability.
+                            Right now I'm deepening my understanding of
+                            <span class="about-highlight">design patterns, software architectures,
+                                and cloud services</span>, building a foundation that goes beyond
+                            getting things to work and toward understanding why they work.
                         </p>
                     </div>
                 </section>
+
 
                 <!-- Skills -->
                 <section id="skills" class="section fade-in">
@@ -166,11 +170,20 @@
                             <span class="skill-tag">GitHub Actions</span>
                         </div>
                     </div>
-
+                    <div class="skill-category">
+                        <h4>Database</h4>
+                        <div class="skills-list">
+                            <span class="skill-tag">PostgreSQL<span>
+                                    <span class="skill-tag">MongoDB</span>
+                                    <span class="skill-tag">Redis</span>
+                        </div>
+                    </div>
                     <div class="skill-category">
                         <h4>Backend Architecture</h4>
                         <div class="skills-list">
                             <span class="skill-tag">Microservices</span>
+                            <span class="skill-tag">CQRS</span>
+                            <span class="skill-tag">Transactional Outbox Pattern</span>
                             <span class="skill-tag">REST API</span>
                             <span class="skill-tag">gRPC</span>
                             <span class="skill-tag">Kafka</span>
@@ -188,9 +201,19 @@
                             <span class="skill-tag">AES-256</span>
                         </div>
                     </div>
+
+                    <div class="skill-category">
+                        <h4>Observability</h4>
+                        <div class="skills-list">
+                            <span class="skill-tag">Prometheus</span>
+                            <span class="skill-tag">Grafana</span>
+                            <span class="skill-tag">k6</span>
+
+                        </div>
+                    </div>
                 </section>
 
-        
+
                 <!-- Experience -->
                 <section id="experience" class="section fade-in">
                     <h2>Experience</h2>
@@ -286,6 +309,7 @@
                         <li><i class="fas fa-map-marker-alt"></i> Istanbul, Turkey</li>
                         <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/"
                                 target="_blank">LinkedIn Profile</a></li>
+
                     </ul>
                 </section>
 
@@ -297,7 +321,7 @@
                     <div class="education-item">
                         <div class="edu-degree">Associate Degree</div>
                         <div class="edu-school">Gedik University</div>
-                        <div class="edu-location">Istanbul, Pendik • Completed</div>
+                        <div class="edu-location">Istanbul, Pendik • 2023 - 2025</div>
                     </div>
                 </section>
 
@@ -469,13 +493,13 @@
 
         // Update nav active state on scroll/click manual handles
         document.querySelectorAll('.project-navigator a').forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function (e) {
                 document.querySelectorAll('.project-navigator a').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 const targetId = this.getAttribute('href').substring(1);
                 const targetProject = document.getElementById(targetId);
-                
+
                 if (targetProject) {
                     document.querySelectorAll('.project').forEach(p => p.classList.remove('open'));
                     targetProject.classList.add('open');
