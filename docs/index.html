@@ -26,6 +26,7 @@
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JHFHDZRLP"></script>
+    <script src="blog/posts-data.js"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -146,10 +147,27 @@
                     </div>
                 </section>
 
+                <section id="latest-posts" class="section fade-in">
+                    <div class="latest-posts-header">
+                        <div>
+                            <h2>Latest From The Blog</h2>
+                            <p class="latest-posts-intro">The newest writing is pulled from the blog page automatically,
+                                so fresh posts show up here without manual duplication.</p>
+                        </div>
+                        <a href="blog/index.html" class="latest-posts-link">View all posts</a>
+                    </div>
+                    <div class="latest-posts-grid" id="latest-posts-grid">
+                        <div class="latest-posts-empty latest-posts-loading">
+                            <h3>Loading latest posts</h3>
+                            <p>The homepage is preparing the newest articles for this section.</p>
+                        </div>
+                    </div>
+                </section>
+
 
                 <!-- Skills -->
                 <section id="skills" class="section fade-in">
-                    <h3>Technical Skills</h3>
+                    <h2>Technical Skills</h2>
 
                     <div class="skill-category">
                         <h4>Languages</h4>
@@ -173,9 +191,9 @@
                     <div class="skill-category">
                         <h4>Database</h4>
                         <div class="skills-list">
-                            <span class="skill-tag">PostgreSQL<span>
-                                    <span class="skill-tag">MongoDB</span>
-                                    <span class="skill-tag">Redis</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">MongoDB</span>
+                            <span class="skill-tag">Redis</span>
                         </div>
                     </div>
                     <div class="skill-category">
@@ -317,7 +335,7 @@
 
                 <!-- Education -->
                 <section class="section fade-in">
-                    <h3>Education</h3>
+                    <h2>Education</h2>
                     <div class="education-item">
                         <div class="edu-degree">Associate Degree</div>
                         <div class="edu-school">Gedik University</div>
@@ -327,7 +345,7 @@
 
                 <!-- Languages -->
                 <section class="section fade-in">
-                    <h3>Languages</h3>
+                    <h2>Languages</h2>
                     <div class="about-text">
                         <p><strong>Turkish:</strong> Native</p>
                         <p><strong>English:</strong> Proficiency</p>
@@ -461,6 +479,51 @@
         document.querySelectorAll('.fade-in').forEach(el => {
             observer.observe(el);
         });
+
+        function loadLatestPosts() {
+            const latestPostsGrid = document.getElementById('latest-posts-grid');
+
+            if (!latestPostsGrid) {
+                return;
+            }
+
+            const posts = Array.isArray(window.BLOG_POSTS) ? window.BLOG_POSTS.slice(0, 2) : [];
+
+            if (!posts.length) {
+                latestPostsGrid.innerHTML = `
+                    <div class="latest-posts-empty">
+                        <h3>No blog posts found yet</h3>
+                        <p>The blog section is ready, but there are no published articles to show here yet.</p>
+                        <a href="blog/index.html" class="latest-posts-empty-link">Visit the blog</a>
+                    </div>
+                `;
+                return;
+            }
+
+            latestPostsGrid.innerHTML = posts.map((post) => {
+                const tags = (post.tags || [])
+                    .slice(0, 3)
+                    .map((tag) => `<span class="latest-post-tag">${tag}</span>`)
+                    .join('');
+
+                return `
+                    <article class="latest-post-card">
+                        <div class="latest-post-meta">
+                            <span>${post.date || ''}</span>
+                            <span>${post.readingTime || ''}</span>
+                        </div>
+                        <h3 class="latest-post-title">
+                            <a href="blog/${(post.href || '').replace('./', '')}">${post.title || 'Untitled post'}</a>
+                        </h3>
+                        <p class="latest-post-excerpt">${post.excerpt || ''}</p>
+                        <div class="latest-post-tags">${tags}</div>
+                        <a href="blog/${(post.href || '').replace('./', '')}" class="latest-post-read-more">Read article</a>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        loadLatestPosts();
 
         // Project Collapsible Logic
         document.querySelectorAll('.project-header').forEach(header => {
