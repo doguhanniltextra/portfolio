@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ledger Project and What I Learned - Doguhan Ilter</title>
+    <meta name="description"
+        content="A deep dive into the Ledger project: building a modular monolithic financial ledger system using Clean Architecture, Transactional Outbox, and Pessimistic Locking.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doguhan Ilter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-27">
+                        <i class="far fa-calendar"></i> April 27, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 8 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">The Ledger Project and What I Learned</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Clean Architecture</span>
+                    <span class="tag">Fintech</span>
+                    <span class="tag">System Design</span>
+                    <span class="tag">Java</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                <p class="lead">
+                    If you read any blogs of mine, i assume that you already understood how obsessed i am with system
+                    design and design patterns but it doesn't mean i know every single thing around that study. So, in
+                    one of my shiny days, i was busy with reading a book named Clean Architecture: A Craftsman's Guide
+                    to Software Structure and Design by Robert Cecil Martin.
+                </p>
+
+                <p>
+                    He was talking about what does clean architecture mean actually and why this is important for a
+                    developer. After finishing the book, i was like "This is awesome but probably i forget all this
+                    information if i don't create any project about this architecture."
+                </p>
+
+                <p>
+                    Thanks to Uncle Bob, i have created the Ledger project and i'm excited to share what i've learned.
+                </p>
+
+                <p>
+                    The Ledger project is a modular monolithic financial ledger system designed for atomic transactions,
+                    consistent double-entry accounting, and high-concurrency reliability. It simulates real-world
+                    banking operations where data integrity and race conditions are the primary concerns. By
+                    implementing double-entry bookkeeping and pessimistic locking, it ensures that not a single cent is
+                    lost, even under concurrent load.
+                </p>
+
+                <p>
+                    While reading Clean Architecture, Uncle Bob’s principle that 'Details (DB, UI, Frameworks) should
+                    not dictate our business rules' really stuck with me. In this project, I treated PostgreSQL, Kafka,
+                    and Redis as mere 'tools' or 'details.' The core business logic doesn't even know they exist, it
+                    only communicates through ports. This separation of concerns gave me an incredible sense of
+                    flexibility and confidence in the system's stability.
+                </p>
+
+                <h2>Transactional Outbox Pattern</h2>
+
+                <p>
+                    I also implemented Transactional Outbox Pattern, ensured reliable event delivery to Apache Kafka by
+                    using an Outbox Pattern. It means i enabled saving the event in the same database transaction as the
+                    business logic, i guaranteed that events are never lost, even during network partitions.
+                </p>
+
+                <h2>Optimistic/Pessimistic Locking</h2>
+
+                <p>
+                    And another thing i want to share with you is Optimistic/Pessimistic Locking. Let's imagine there
+                    are multiple users try to transfer money from the same account at the same time, how do we prevent
+                    the "Double Spending" problem? This is where locking mechanisms come in.
+                </p>
+
+                <ol>
+                    <li><strong>Optimistic Locking:</strong> Optimistic locking assumes that conflicts are rare, It uses
+                        a @Version column in the database. When a transaction commits, it checks if the version has
+                        changed. It usually has better performance in low-contention scenarios because there are no
+                        database-level locks.</li>
+                    <li><strong>Pessimistic Locking:</strong> If you "Safety First!" then this is for you. Pessimistic
+                        locking assumes conflicts will happen. It uses SELECT ... FOR UPDATE to lock the account record
+                        as soon as transaction starts. No other transaction can even read that record for update until
+                        the first one is finished. It guarantees consistency.</li>
+                </ol>
+
+                <p>
+                    It shouldn't be a surprise why I've chosen Pessimistic Locking. In a financial system, consistency
+                    is non-negotiable. No need for explaining why this one, we are talking about someone's money...
+                </p>
+
+                <h2>Deep Dive into Clean Architecture: Why and How?</h2>
+
+                <p>
+                    Why did I go through the trouble of separating everything into so many layers? Isn't it
+                    "over-engineering"? After building the Ledger project, my answer is a big no!
+                </p>
+
+                <p>
+                    First, we should understand what "Core Design" is. The design is built around the Dependency Rule
+                    which is source code dependencies must point only inward, toward high-level policies.
+                </p>
+
+                <p>
+                    In the Ledger project, this looks like a set of contentric circles:
+                </p>
+
+                <ul>
+                    <li><strong>Entities (The Heart):</strong> Account, Transaction, and Entry. These contain the core
+                        financial rules, they don't have any idea about Spring, JPA, or Kafka.</li>
+                    <li><strong>Use Cases (The Brain):</strong> ExecutreTransferUseCase, CreateAccountUseCase: These
+                        coordinate the flow of data to and from entitites.</li>
+                    <li><strong>Interface Adapters (The Translators):</strong> This is where our Controllers and
+                        Persistence Adapters live. They translate data from the outside into a format the Use Cases
+                        understand.</li>
+                    <li><strong>Frameworks & Drivers (The Tools):</strong> Spring Boot, PostgreSQL, Kafka. Tese are at
+                        the outrmost edge, they are "details" that can be swapped.</li>
+                </ul>
+
+                <p>
+                    So, why did i use it for Ledger?
+                </p>
+
+                <ul>
+                    <li><strong>Screaming Architecture:</strong> When you look at the package structure, it "screams"
+                        Fintech/Ledger, Not SpringBootApplication. You see Transfer, Account and Bookkeeping before you
+                        see any technical details.</li>
+                    <li><strong>Testability without Borders:</strong> I can test the entire money transfer logic using
+                        simpe Unit Tests and Mocks. I don't need to start a database or a web server to verify that my
+                        accounting rules are correct.</li>
+                    <li><strong>Protecting the Business Value:</strong> In a financial system, the business rule are the
+                        most valuable part. Clean Architecture acts as a shield, protecting these rules from being
+                        pullted by technical changes in libraries or frameworks.</li>
+                </ul>
+
+                <p>
+                    To clarify what are the benefits of Clean Architecture, i have created a table for you:
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Traditional Layered (LA)</th>
+                                <th>Clean Architecture (CA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dependency D.</strong></td>
+                                <td>Top-down (UI -> Service -> DB)</td>
+                                <td>Inward (Adapters -> Use Cases -> Entities)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Logic</strong></td>
+                                <td>Often coupled with DB/Frameworks</td>
+                                <td>Completely isolated in the core</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Swap</strong></td>
+                                <td>Hard; logic depends on the DB schema</td>
+                                <td>Easy; DB is just a "detail" adapter</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Testability</strong></td>
+                                <td>Requires DB/Spring context (Slow)</td>
+                                <td>Pure Unit Tests (Fast & Independent)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Screaming Design</strong></td>
+                                <td>Shows "Spring/Web" structure</td>
+                                <td>Shows "Business/Domain" intent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maintenance</strong></td>
+                                <td>Changes in DB ripple through all layers</td>
+                                <td>Changes in DB only affect its adapter</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Initial Effort</strong></td>
+                                <td>Low (Fast to start)</td>
+                                <td>Medium (Requires more boilerplate)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <p>
+                    Is it excellent, isn't it? Yes i feel same. I'm still learning every day and this project was a
+                    milestone for me to understand the concept. Thanks for joining me on this deep dive.
+                </p>
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doguhan Ilter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software
+                            architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+
+</html>

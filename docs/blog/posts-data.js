@@ -1,5 +1,13 @@
 window.BLOG_POSTS = [
     {
+        title: "The Ledger Project and What I Learned",
+        href: "./page/the_ledger_project.html",
+        date: "April 27, 2026",
+        readingTime: "8 min read",
+        excerpt: "The Ledger project is a modular monolithic financial ledger system designed for atomic transactions, consistent double-entry accounting, and high-concurrency reliability. By implementing double-entry bookkeeping and pessimistic locking, it ensures that not a single cent is lost.",
+        tags: ["Clean Architecture", "Fintech", "System Design", "Java"]
+    },
+    {
         title: "CQRS - gRPC - Design Patterns | Patient Management Feature",
         href: "./page/cqrs_grpc_design_patterns.html",
         date: "April 20, 2026",
