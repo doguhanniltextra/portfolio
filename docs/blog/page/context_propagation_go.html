@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Propagation in Go: What I Learned From a Missed PR - Doğuhan İlter</title>
+    <meta name="description"
+        content="How I learned Go context propagation from scratch while trying to contribute to an open-source project, and what happens when you miss the PR but keep the knowledge.">
+    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="profile-img">
+                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+            </div>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <div class="title">Backend Developer</div>
+            <div class="location">Istanbul, Turkey</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html">About</a></li>
+                <li><a href="../../index.html#projects">Projects</a></li>
+                <li><a href="../../index.html#experience">Experience</a></li>
+                <li><a href="../../index.html#skills">Skills</a></li>
+                <li><a href="../index.html" class="active">Blog</a></li>
+                <li><a href="../../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-04-30">
+                        <i class="far fa-calendar"></i> Apr 30, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 6 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Context Propagation in Go: What I Learned From a Missed PR</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Go</span>
+                    <span class="tag">Context</span>
+                    <span class="tag">REST API</span>
+                    <span class="tag">Open Source</span>
+                    <span class="tag">Backend</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    I created this blog by pulling together my notes on Context propagation. Before deep diving into it,
+                    I just want to share the story behind this blog, because the "how I got here" part is probably the
+                    most relatable thing I've written.
+                </p>
+
+                <!-- Story -->
+                <p>
+                    2 months ago, I was trying to contribute to an open-source project that is under heavy maintenance,
+                    and they usually use the Golang programming language. The issue I picked up was
+                    <em>"Adding Context propagation for the REST API"</em> and I've just realized the term
+                    "Context propagation" is very familiar to me but I had no idea why and how to implement this thing.
+                </p>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTZjYW5jbDhwZnJobmJ3dnVwNjZhc3hjcDM4dHdydngxbHFnYnpjZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Z5xk7fGO5FjjTElnpT/giphy.gif"
+                        alt="Confused dog" style="border-radius: 12px; max-width: 360px; width: 100%;" />
+                </div>
+
+                <p>
+                    So, I've just done tons of research about Context Propagation for three weeks and unfortunately,
+                    I missed the PR and someone solved the problem.
+                </p>
+
+                <p>
+                    But all this research really worked when I decided to create this blog.
+                </p>
+
+                <!-- Section 1 -->
+                <h2>What does "Propagation" mean?</h2>
+
+                <p>
+                    If you are not a native English speaker just like me, then you might wonder what "Propagation"
+                    actually means.
+                </p>
+
+                <p>
+                    Propagation is the act of spreading, multiplying, or transmitting something, such as plants,
+                    organisms, ideas, or physical waves, to a broader area or higher number.
+                </p>
+
+                <p>
+                    To make it clearer, just imagine light, sound, or radio waves traveling through a medium; that
+                    journey is propagation.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>In our case:</strong> We should pass a context through each layer of the application, from
+                    the HTTP handler all the way down to the database query.
+                </div>
+
+                <!-- Section 2 -->
+                <h2>Context in Go</h2>
+
+                <p>
+                    <code>context.Context</code> is a standard way to manage the lifecycle of an operation in Go.
+                    It acts as a "carrier" that moves through your functions, telling them when they should stop working
+                    (cancellation / timeouts) or providing them with specific metadata they need (request-scoped
+                    values).
+                </p>
+
+                <p>
+                    Imagine a user sends an HTTP request, but somehow cancels it halfway. Without context, your database
+                    query is still running in the background because it doesn't have any idea whether the process is
+                    canceled or not. Context lets you propagate that cancellation signal all the way down.
+                </p>
+
+                <p>
+                    The Golang documentation says: <em>"The Context should be the first parameter, typically named
+                        ctx."</em>
+                </p>
+
+                <pre><code class="language-go">func GetUser(ctx context.Context, id string) (*User, error) {
+    // ctx carries the cancellation signal
+}</code></pre>
+
+                <p>Also there are multiple ways to create a context and it depends on your needs:</p>
+
+                <ul>
+                    <li><code>context.Background()</code>: The root context. Use this when you don't have a parent
+                        context yet, typically at the entry point like <code>main()</code> or an HTTP handler.</li>
+                    <li><code>context.WithCancel(ctx)</code>: Returns a child context and a <code>cancel()</code>
+                        function. When you call <code>cancel()</code>, it signals all downstream operations to stop.
+                        Perfect for manual control.</li>
+                    <li><code>context.WithTimeout(ctx, duration)</code>: Automatically cancels the context after the
+                        given duration. Great for database queries or external API calls where you don't want to wait
+                        forever.</li>
+                    <li><code>context.WithValue(ctx, key, value)</code>: Attaches a key-value pair to the context.
+                        Useful for passing request-scoped data (like a user ID or trace ID) without adding extra
+                        function parameters.</li>
+                </ul>
+
+                <!-- Section 3 -->
+                <h2>Context Propagation in a REST API</h2>
+
+                <p>
+                    Now that we know what context is, let's talk about how propagation actually works in a real REST
+                    API.
+                </p>
+
+                <p>
+                    Here's the thing: every incoming HTTP request in Go already carries a context. You don't need to
+                    create one from scratch. It lives right inside the request object and you can grab it with
+                    <code>r.Context()</code>.
+                </p>
+
+                <p>So the idea is simple: take that context from the HTTP handler and pass it all the way down through
+                    your layers.</p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-arrow-right"></i> HTTP Handler</h4>
+                        <p>The entry point. Grabs the context from the incoming request via <code>r.Context()</code> and
+                            passes it to the service layer.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-arrow-right"></i> Service Layer</h4>
+                        <p>Business logic lives here. Receives <code>ctx</code> as its first parameter and passes it
+                            straight down to the repository.</p>
+                    </div>
+                    <div class="service-item">
+                        <h4><i class="fas fa-arrow-right"></i> Repository Layer</h4>
+                        <p>Where <code>ctx</code> does the real work, passed directly into database calls like
+                            <code>QueryRowContext</code>.</p>
+                    </div>
+                </div>
+
+                <p>Each layer just receives the context as its first parameter and passes it to the next one. That's it.
+                    The context travels like a signal through your entire application stack.</p>
+
+                <p>Here's what that looks like in code:</p>
+
+                <pre><code class="language-go">// Handler layer - this is where the journey starts
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context() // grab the context from the request
+    id := chi.URLParam(r, "id")
+
+    user, err := h.userService.GetUser(ctx, id)
+    // ...
+}
+
+// Service layer - receives ctx and passes it down
+func (s *UserService) GetUser(ctx context.Context, id string) (*User, error) {
+    return s.userRepo.FindByID(ctx, id)
+}
+
+// Repository layer - this is where ctx actually does the work
+func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error) {
+    row := r.db.QueryRowContext(ctx, "SELECT * FROM users WHERE id = $1", id)
+    // ...
+}</code></pre>
+
+                <div class="callout callout-info">
+                    <strong>Notice:</strong> The repository uses <code>QueryRowContext</code> instead of
+                    <code>QueryRow</code>. That one small change means if the user cancels their HTTP request, the
+                    database query gets cancelled too, no wasted resources running in the background.
+                </div>
+
+                <!-- Section 4 -->
+                <h2>Before &amp; After</h2>
+
+                <p>
+                    I think the best way to really see the impact is a side-by-side comparison. This is essentially
+                    what the open-source project needed, the functions existed, they just weren't context-aware.
+                </p>
+
+                <p><strong>Before (no context):</strong></p>
+
+                <pre><code class="language-go">func (s *UserService) GetUser(id string) (*User, error) {
+    return s.userRepo.FindByID(id)
+}
+
+func (r *UserRepository) FindByID(id string) (*User, error) {
+    row := r.db.QueryRow("SELECT * FROM users WHERE id = $1", id)
+    // ...
+}</code></pre>
+
+                <p><strong>After (with context):</strong></p>
+
+                <pre><code class="language-go">func (s *UserService) GetUser(ctx context.Context, id string) (*User, error) {
+    return s.userRepo.FindByID(ctx, id)
+}
+
+func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error) {
+    row := r.db.QueryRowContext(ctx, "SELECT * FROM users WHERE id = $1", id)
+    // ...
+}</code></pre>
+
+                <p>
+                    The changes are minimal: <code>ctx context.Context</code> as the first parameter, and
+                    <code>QueryRow</code>
+                    becomes <code>QueryRowContext</code>. But the impact is huge. Your application is now
+                    cancellation-aware from top to bottom.
+                </p>
+
+                <!-- Section 5 -->
+                <h2>What I Learned</h2>
+
+                <p>
+                    Honestly, missing that PR hurt a little. But looking back, I think I got the better deal.
+                </p>
+
+                <p>
+                    If I had just submitted the fix without truly understanding it, I would have moved on. Instead,
+                    I spent three weeks digging into how context actually works and now I feel like I genuinely own
+                    this knowledge rather than just copying a pattern.
+                </p>
+
+                <div class="callout callout-success">
+                    <strong>The biggest takeaway:</strong> Context propagation is not a complex feature. It's a
+                    discipline. It's the habit of asking <em>"does this function know it can be cancelled?"</em> for
+                    every layer you write.
+                </div>
+
+                <p>
+                    If you're working on a Go project and your service or repository functions don't take a
+                    <code>ctx</code>
+                    parameter, that's worth fixing. It's a small change with a big safety net.
+                </p>
+
+                <p>
+                    And if you miss a PR because of it, well, at least you'll have a blog post.
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Context%20Propagation%20in%20Go%3A%20What%20I%20Learned%20From%20a%20Missed%20PR"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <div class="author-info">
+                        <h4>Doğuhan İlter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software
+                            architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+</body>
+
+</html>

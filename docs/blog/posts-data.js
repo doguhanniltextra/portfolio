@@ -1,5 +1,13 @@
 window.BLOG_POSTS = [
     {
+        title: "Context Propagation in Go: What I Learned From a Missed PR",
+        href: "./page/context_propagation_go.html",
+        date: "April 30, 2026",
+        readingTime: "6 min read",
+        excerpt: "I picked up an open-source issue about adding Context propagation to a REST API, spent three weeks researching it and then missed the PR. Here's everything I learned anyway.",
+        tags: ["Go", "Context", "REST API", "Open Source", "Backend"]
+    },
+    {
         title: "The Ledger Project and What I Learned",
         href: "./page/the_ledger_project.html",
         date: "April 27, 2026",
