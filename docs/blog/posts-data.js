@@ -136,14 +136,6 @@ window.BLOG_POSTS = [
         tags: ["AWS", "Cloud Architecture", "DevOps", "Best Practices"]
     },
     {
-        title: "Self maintenance and self care for engineers.",
-        href: "./page/self_maintenance_and_self_care_0.html",
-        date: "December 4, 2025",
-        readingTime: "4 min read",
-        excerpt: "Have you ever felt that burnout is creeping in, and you're struggling to keep up with the demands of your engineering career? This article explores the distinction between self-maintenance and self-care.",
-        tags: ["Self-care", "Mindset", "Productivity"]
-    },
-    {
         title: "Building a Microservices Architecture: My Patient Management Journey",
         href: "./page/patient_management_blog_0.html",
         date: "November 1, 2025",
