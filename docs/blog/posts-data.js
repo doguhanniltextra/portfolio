@@ -150,13 +150,5 @@ window.BLOG_POSTS = [
         readingTime: "4 min read",
         excerpt: "The story behind designing and implementing a microservices-based patient management system using Spring Boot, PostgreSQL, Kafka and more.",
         tags: ["Spring Boot", "Microservices", "PostgreSQL", "Kafka"]
-    },
-    {
-        title: "Baby Steps About ...Ops",
-        href: "./page/dataops_blog_0.html",
-        date: "November 21, 2025",
-        readingTime: "4 min read",
-        excerpt: "So, let me tell you my new experience about DataOps and what I have learned in a short time.",
-        tags: ["DataOps", "DevOps", "Automation", "CI/CD"]
     }
 ];
