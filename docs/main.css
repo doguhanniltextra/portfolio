@@ -96,6 +96,17 @@ button:focus {
     border-bottom: 3px solid var(--accent-primary);
 }
 
+.nav a[href="blog/index.html"] {
+    background: #1a3a6b;
+    color: white !important;
+    padding: 18px 30px;
+}
+
+.nav a[href="blog/index.html"]:hover {
+    background: #2e538b;
+
+}
+
 .profile-img {
     width: 120px;
     height: 120px;
