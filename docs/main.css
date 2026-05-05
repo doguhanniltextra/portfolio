@@ -36,10 +36,13 @@
 body {
     font-family: 'Times New Roman', Georgia, serif;
     line-height: 1.7;
+    font-size: 18px;
     color: var(--text-primary);
     background: var(--bg-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+
 
 /* Skip Link for Accessibility */
 .skip-link {
@@ -583,7 +586,8 @@ button:focus {
 /* Collapsible Project Card */
 .project {
     background: var(--bg-secondary);
-    padding: 0; /* Changed from 30px to handle collapsible content padding */
+    padding: 0;
+    /* Changed from 30px to handle collapsible content padding */
     border: 1px solid var(--border-primary);
     border-left: 4px solid var(--accent-primary);
     margin-bottom: 25px;
@@ -599,7 +603,8 @@ button:focus {
     padding: 25px 30px;
     cursor: pointer;
     transition: background-color 0.2s;
-    border-bottom: none; /* Initially none, added when open */
+    border-bottom: none;
+    /* Initially none, added when open */
 }
 
 .project-header:hover {
@@ -648,7 +653,8 @@ button:focus {
 }
 
 .project.open .project-body {
-    max-height: 1000px; /* Large enough to fit content */
+    max-height: 1000px;
+    /* Large enough to fit content */
     opacity: 1;
 }
 
