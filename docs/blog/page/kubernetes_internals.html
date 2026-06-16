@@ -1,17 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kubernetes Internals: Resource Management & Kernel Interaction - Doğuhan İlter</title>
+    <title>Kubernetes Internals: Resource Management & Kernel Interaction - DoÄŸuhan Ä°lter</title>
     <meta name="description"
         content="Deep dive into how Kubernetes translates YAML definitions into Linux kernel instructions, covering OOM killer, CPU throttling, scheduling algorithms, and eviction policies.">
     <meta name="keywords"
         content="Kubernetes, Linux Kernel, OOM Killer, CPU Throttling, CFS, Resource Management, Container Orchestration, DevOps, Cloud Native">
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
     <link rel="stylesheet" href="../blog.css" />
@@ -24,9 +22,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -42,12 +40,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -107,8 +100,8 @@
                 </p>
 
                 <div class="callout callout-info">
-                    <strong>💡 Key Insight:</strong> The QoS class is automatically determined by Kubernetes based on
-                    your resource configuration—you don't set it explicitly.
+                    <strong>ğŸ’¡ Key Insight:</strong> The QoS class is automatically determined by Kubernetes based on
+                    your resource configurationâ€”you don't set it explicitly.
                 </div>
 
                 <h3>QoS Classes Explained</h3>
@@ -152,7 +145,7 @@
                 </ol>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Deep Dive Note:</strong> If a container exceeds its own Limit (not the Node's limit),
+                    <strong>âš ï¸ Deep Dive Note:</strong> If a container exceeds its own Limit (not the Node's limit),
                     the cgroup memory controller kills it immediately, regardless of the node's overall status. This is
                     a <strong>Cgroup OOM</strong>, not a <strong>Node OOM</strong>.
                 </div>
@@ -170,7 +163,7 @@
                 <p>The CFS manages CPU allocation using two key settings in the cgroup:</p>
 
                 <ul>
-                    <li><code>cpu.cfs_period_us</code>: The accounting period (usually 100ms or 100,000µs)</li>
+                    <li><code>cpu.cfs_period_us</code>: The accounting period (usually 100ms or 100,000Âµs)</li>
                     <li><code>cpu.cfs_quota_us</code>: The amount of time a process is allowed to run within that
                         period</li>
                 </ul>
@@ -196,7 +189,7 @@
                 </div>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ The Latency Trap:</strong> This "stop-start" behavior causes tail latency. Your
+                    <strong>âš ï¸ The Latency Trap:</strong> This "stop-start" behavior causes tail latency. Your
                     application isn't slow because of code; it's slow because the Kernel is actively preventing it from
                     running 75% of the time. This is monitored via the
                     <code>container_cpu_cfs_throttled_periods_total</code> metric.
@@ -317,7 +310,7 @@
                             <code>eviction-soft-grace-period: 1m30s</code>
                         </p>
                         <p><strong>Behavior:</strong> If the threshold is breached, Kubelet waits for the grace period.
-                            If it persists, it terminates pods gracefully (SIGTERM → wait → SIGKILL).</p>
+                            If it persists, it terminates pods gracefully (SIGTERM â†’ wait â†’ SIGKILL).</p>
                     </div>
 
                     <div class="feature-box">
@@ -340,8 +333,8 @@
                 </ol>
 
                 <div class="callout callout-success">
-                    <strong>✅ Key Takeaway:</strong> This logic ensures that pods sticking to their Service Level
-                    Agreements (SLAs)—i.e., staying within requests—are the last to be touched.
+                    <strong>âœ… Key Takeaway:</strong> This logic ensures that pods sticking to their Service Level
+                    Agreements (SLAs)â€”i.e., staying within requestsâ€”are the last to be touched.
                 </div>
 
                 <h2>Practical Implications</h2>
@@ -379,8 +372,8 @@
                 <p>
                     Understanding how Kubernetes interacts with the Linux kernel is crucial for building reliable,
                     performant containerized applications. The abstractions provided by Kubernetes YAML are powerful,
-                    but knowing what happens under the hood—from OOM scores to CFS throttling to scheduler
-                    predicates—enables you to make informed decisions about resource allocation and troubleshoot
+                    but knowing what happens under the hoodâ€”from OOM scores to CFS throttling to scheduler
+                    predicatesâ€”enables you to make informed decisions about resource allocation and troubleshoot
                     production issues effectively.
                 </p>
 
@@ -412,9 +405,9 @@
 
                 <!-- Author Section -->
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Backend Developer specializing in microservices architecture, cloud-native applications,
                             and distributed systems.</p>
                         <div class="author-social">

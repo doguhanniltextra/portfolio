@@ -5,28 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Doğuhan İlter - Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes. Based in Everything here started with one question: why..">
+        content="Doğuhan İlter's Blogs - Thoughts on everything I find interesting.">
     <meta name="keywords"
-        content="Backend Developer, Microservices, Spring Boot, Java, Go, Docker, Kubernetes, PostgreSQL, Istanbul">
+        content="Doğuhan İlter, Blogs">
     <meta name="author" content="Doğuhan İlter">
-    <meta property="og:title" content="Doğuhan İlter - Backend Developer">
+    <meta property="og:title" content="Doğuhan İlter - Blogs">
     <meta property="og:description"
-        content="Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes.">
+        content="Thoughts on everything I find interesting.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Doğuhan İlter - Backend Developer">
+    <meta name="twitter:title" content="Doğuhan İlter - Blogs">
     <meta name="twitter:description"
-        content="Backend Developer specializing in microservices architecture, Spring Boot, Go, Docker, and Kubernetes.">
-    <title>Doğuhan İlter - Backend Developer</title>
+        content="Thoughts on everything I find interesting.">
+    <title>Doğuhan İlter - Blogs</title>
     <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/">
-    <link rel="icon" type="image/png" href="./public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./main.css" />
-    <meta name="google-site-verification" content="V7pgg2w1uwdTz9gAXNUIQ65ETEyamTtmpWjhxbOV4uE" />
+    <link rel="stylesheet" href="./blog/blog.css" />
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JHFHDZRLP"></script>
-    <script src="blog/posts-data.js"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -38,36 +36,19 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Doğuhan İlter",
-      "jobTitle": "Backend Developer",
+      "@type": "Blog",
+      "name": "Doğuhan İlter - Blogs",
+      "description": "Thoughts on everything I find interesting",
       "url": "https://doguhanniltextra.github.io/portfolio/",
-      "sameAs": [
-        "https://www.linkedin.com/in/doguhan-ilter/",
-        "https://github.com/doguhanniltextra"
-      ],
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Istanbul",
-        "addressCountry": "Turkey"
-      },
-      "alumniOf": {
-        "@type": "EducationalOrganization",
-        "name": "Istanbul Gedik University"
-      },
-      "knowsAbout": [
-        "Java",
-        "Spring Boot",
-        "Go",
-        "Microservices",
-        "Docker",
-        "Kubernetes",
-        "PostgreSQL",
-        "MySQL",
-        "Apache Kafka",
-        "AWS"
-      ],
-      "email": "doguhannilt@email.com"
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      }
     }
     </script>
 </head>
@@ -76,9 +57,6 @@
     <!-- Header -->
     <header class="header" role="banner">
         <div class="container">
-            <div class="profile-img">
-                <img src="./public/dogupiksel.png" alt="Doğuhan İlter profile photo" />
-            </div>
             <h1>Doğuhan İlter</h1>
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links" role="navigation" aria-label="Social media links">
@@ -94,271 +72,708 @@
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav class="nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <ul>
-                <li><a href="#about" class="active" aria-current="page">About</a></li>
-                <li><a href="blog/index.html">Blog</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#experience">Experience</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
+    <!-- Blog Content -->
     <div class="container">
-        <div class="main-content">
-            <main id="main-content" class="content" role="main">
-
-
-
-
-                <section id="about" class="section fade-in">
-                    <h2>About Me</h2>
-                    <div class="about-narrative">
-                        <p>I bridge the gap between bulletproof system reliability and operational speed. My expertise lies in architecting Java-based backend services that guarantee zero data loss and prevent race conditions in complex environments. Simultaneously, I develop Go-based internal tools and desktop applications that replace hours of manual frustration with a single command. I focus on ensuring that while the systems remain consistent, the teams building them remain fast.</p>
-                    </div>
-                </section>
-
-                <section id="latest-posts" class="section fade-in">
-                    <div class="latest-posts-header">
-                        <div>
-                            <h2>Latest From The Blog</h2>
-                            <p class="latest-posts-intro">The newest writing is pulled from the blog page automatically,
-                                so fresh posts show up here without manual duplication.</p>
-                        </div>
-                        <a href="blog/index.html" class="latest-posts-link">View all posts</a>
-                    </div>
-                    <div class="latest-posts-grid" id="latest-posts-grid">
-                        <div class="latest-posts-empty latest-posts-loading">
-                            <h3>Loading latest posts</h3>
-                            <p>The homepage is preparing the newest articles for this section.</p>
-                        </div>
-                    </div>
-                </section>
-
-
-                <!-- Skills -->
-                <section id="skills" class="section fade-in">
-                    <h2>Technical Skills</h2>
-
-                    <div class="skill-category">
-                        <h4>Languages</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">Go (Golang)</span>
-                            <span class="skill-tag">Java</span>
-                            <span class="skill-tag">SQL</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <h4>Cloud & DevOps</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">AWS (VPC, ECS, IAM)</span>
-                            <span class="skill-tag">Terraform</span>
-                            <span class="skill-tag">Docker</span>
-                            <span class="skill-tag">Kubernetes</span>
-                            <span class="skill-tag">GitHub Actions</span>
-                        </div>
-                    </div>
-                    <div class="skill-category">
-                        <h4>Database</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">PostgreSQL</span>
-                            <span class="skill-tag">MongoDB</span>
-                            <span class="skill-tag">Redis</span>
-                        </div>
-                    </div>
-                    <div class="skill-category">
-                        <h4>Backend Architecture</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">Microservices</span>
-                            <span class="skill-tag">CQRS</span>
-                            <span class="skill-tag">Transactional Outbox Pattern</span>
-                            <span class="skill-tag">REST API</span>
-                            <span class="skill-tag">gRPC</span>
-                            <span class="skill-tag">Kafka</span>
-                            <span class="skill-tag">Event-Driven Architecture</span>
-                            <span class="skill-tag">Spring Boot</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <h4>Security</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">SPIFFE/SPIRE</span>
-                            <span class="skill-tag">OAuth2</span>
-                            <span class="skill-tag">Zero-Trust</span>
-                            <span class="skill-tag">AES-256</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <h4>Observability</h4>
-                        <div class="skills-list">
-                            <span class="skill-tag">Prometheus</span>
-                            <span class="skill-tag">Grafana</span>
-                            <span class="skill-tag">k6</span>
-
-                        </div>
-                    </div>
-                </section>
-
-
-                <!-- Experience -->
-                <section id="experience" class="section fade-in">
-                    <h2>Experience</h2>
-
-                    <div class="experience-item">
-                        <div class="exp-header">
-                            <div>
-                                <div class="exp-title">Backend Developer</div>
-                                <div class="exp-company">Qoex Teknoloji</div>
-                                <div style="color: #666; font-size: 0.95rem;">Everything here started with one question: why.</div>
-                            </div>
-                            <div class="exp-period">2025</div>
-                        </div>
-                        <div class="exp-description">
-                            <ul>
-                                <li>Architected the backend for a B2B authorization platform, designing a data-intensive microservice ecosystem of 9+ services that enforced access policies across 20+ roles and 100+ scopes.</li>
-                                <li> Eliminated token replay and identity corruption across distributed services by engineering a runtime database cross-referencing mechanism that verified token integrity on every protected route, preventing duplicate or stale authorization decisions.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                </section>
-
-
-                <!-- Achievements -->
-             <section class="section fade-in">
-    <h2>Achievements</h2>
-
-    <div class="achievement">
-        <div class="achievement-title">SPIKE</div>
-        <div class="achievement-desc">
-            Implemented policy encryption at the SQLite persistence layer for VMware's SPIKE secrets manager.
-            Encrypted SPIFFE ID pattern, path pattern, and permissions fields using AES-GCM with a randomly
-            generated nonce per operation, stored alongside the ciphertext. Refactored the upsert schema accordingly.
+        <div class="blog-header">
+            <h2>Blogs</h2>
+            <p class="blog-subtitle">Thoughts on everything I find interesting</p>
         </div>
-    </div>
 
-    <div class="achievement">
-        <div class="achievement-title">ActiveMemory/ctx</div>
-        <div class="achievement-desc">
-            Resolved a Markdown parsing bug in this Go-based CLI tool that caused new entries to be silently
-            written inside hidden HTML comments. Implemented a custom boundary-detection algorithm, refactored
-            the insertion logic, and fortified the fix with extensive table-driven unit and regression tests.
-        </div>
-    </div>
-</section>
+        <div class="blog-layout">
+            <!-- Main Blog Posts -->
+            <main class="blog-main" id="main-content" role="main">
+                <div class="filter-status" aria-live="polite" hidden>
+                    <span class="filter-status-text"></span>
+                    <button type="button" class="clear-filter-btn">Clear filter</button>
+                </div>
+                <div class="empty-filter-state" aria-live="polite" hidden>
+                    <h3>No posts found</h3>
+                    <p>There are no blog posts matching this filter yet. Try another tag or clear the current filter.</p>
+                </div>
+
+                <!-- Post - Context Propagation in Go -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 30, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/context_propagation_go.html">Context Propagation in Go: What I Learned From a Missed PR</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        I picked up an open-source issue about adding Context propagation to a REST API, spent three weeks researching it and then missed the PR. Here's everything I learned anyway.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 6 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Go</span>
+                            <span class="tag">Context</span>
+                            <span class="tag">REST API</span>
+                            <span class="tag">Open Source</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/context_propagation_go.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - The Ledger Project -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 27, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/the_ledger_project.html">The Ledger Project and What I Learned</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        The Ledger project is a modular monolithic financial ledger system designed for atomic transactions, consistent double-entry accounting, and high-concurrency reliability. By implementing double-entry bookkeeping and pessimistic locking, it ensures that not a single cent is lost.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 8 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Clean Architecture</span>
+                            <span class="tag">Fintech</span>
+                            <span class="tag">System Design</span>
+                            <span class="tag">Java</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/the_ledger_project.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - CQRS/gRPC/Saga -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 20, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/cqrs_grpc_design_patterns.html">CQRS - gRPC - Design Patterns | Patient Management Feature</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Transitioning from a monolithic mindset to microservices was a journey of solving real architectural challenges. This post explores my implementation of CQRS, gRPC, and the Outbox pattern in the Patient Management project.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 20 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">CQRS</span>
+                            <span class="tag">gRPC</span>
+                            <span class="tag">Saga Pattern</span>
+                            <span class="tag">Architecture</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/cqrs_grpc_design_patterns.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Securepay Overview -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 17, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/securepay-overview.html">A Junior Perspective | Securepay</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Securepay project is a basic simulation of how to create a reliable, scalable and maintainable system from my perspective. I decided to publish a blog about what I've learned from this project.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Backend</span>
+                            <span class="tag">Architecture</span>
+                            <span class="tag">Microservices</span>
+                            <span class="tag">Security</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/securepay-overview.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - HIS Overview -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 9, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/his_overview.html">HIS v1.0: A Deep System Design Overview</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        A deep system design analysis of a production-grade, event-driven Hospital Information System. Covers the full microservices topology, schema isolation, Outbox Pattern, Dead Letter Queues, three-layer security, and the full observability stack.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 12 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Microservices</span>
+                            <span class="tag">Spring Boot</span>
+                            <span class="tag">Kafka</span>
+                            <span class="tag">Architecture</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/his_overview.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Strategy Pattern -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 7, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/strategy_pattern.html">Strategy Pattern</a>
+                    </h3>
+                    <p class="post-excerpt">
+                         If you have ever worked on a billing system, you know the nightmare: every insurance provider has different rules. Some cover 80%, some have fixed discounts, and some cover nothing at all.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Microservices</span>
+                            <span class="tag">Strategy Pattern</span>
+                            <span class="tag">Algorithm</span>
+                            <span class="tag">Spring Boot</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/strategy_pattern.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Why gRPC over REST -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 7, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/why-grpc-over-rest.html">Why gRPC over REST</a>
+                    </h3>
+                    <p class="post-excerpt">
+                         If you have spent more than five minutes in microservices development, 
+                         your default answer for service-to-service communication is probably REST. 
+                         It is simple, human-readable, and Postman makes it look easy. But as my Hospital Information System (HIS) grew, 
+                         I started asking: "Is 'easy to read' really more important than 'hard to break'?"
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Microservices</span>
+                            <span class="tag">gRPC</span>
+                            <span class="tag">REST</span>
+                            <span class="tag">Spring Boot</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/why-grpc-over-rest.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - DLQ -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 7, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/dlq_pattern.html">What is DLQ and How I Used It</a>
+                    </h3>
+                    <p class="post-excerpt">
+                         Have you ever seen "Resilience" in any system design book? It's a shortcut to say 
+                         "What happens to our system when things go wrong?" and it is a good question because 
+                         I promise you, things will definitely go wrong.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Microservices</span>
+                            <span class="tag">DLQ</span>
+                            <span class="tag">Kafka</span>
+                            <span class="tag">Spring Boot</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/dlq_pattern.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Outbox Pattern -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> April 7, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/outbox_pattern.html">What is Outbox Pattern and How I Used It</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        A deep dive into the Transactional Outbox Pattern. What it is, when to use it, and how I
+                        applied it in my Hospital Information System to guarantee reliable, atomic messaging between
+                        microservices without the Dual Write Problem.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Microservices</span>
+                            <span class="tag">Outbox Pattern</span>
+                            <span class="tag">Kafka</span>
+                            <span class="tag">Spring Boot</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/outbox_pattern.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - P95 Latency -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 27, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/p95_latency.html">P95 Latency Explained: What It Is and Why It Matters</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Average latency is almost always a lie. P95 latency tells you a much more honest story.
+                        Learn what the 95th percentile means, why averages mislead you, and how to use percentile
+                        metrics to understand your system's real-world performance.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Performance</span>
+                            <span class="tag">Observability</span>
+                            <span class="tag">Backend</span>
+                            <span class="tag">SRE</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/p95_latency.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - SPIFFE/SPIRE Deep Dive -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 18, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/spiffe_spire_deep_dive.html">Lessons from the Trenches: What I Learned
+                            Implementing SPIFFE/SPIRE in SecurePay</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Zero-Trust isn't just a buzzword. Here's a brief explanation of what I've learned about workload
+                        identity, SPIFFE/SPIRE architecture, and handling mTLS at scale while building the SecurePay
+                        project.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Security</span>
+                            <span class="tag">Zero Trust</span>
+                            <span class="tag">SPIFFE</span>
+                            <span class="tag">Cloud Native</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/spiffe_spire_deep_dive.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - SecurePay Architecture -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 18, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/securepay_architecture.html">Engineering SecurePay: A Deep Dive into Zero-Trust,
+                            Event-Driven Fintech Architecture</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Pulling back the curtain on the architectural journey of building SecurePay, a high-performance,
+                        polyglot payment platform. Explore Zero-Trust security with SPIFFE/SPIRE, event-driven
+                        orchestration with Kafka, and cloud-native infrastructure on AWS.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 10 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Go</span>
+                            <span class="tag">Zero Trust</span>
+                            <span class="tag">Kafka</span>
+                            <span class="tag">AWS</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/securepay_architecture.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Cloudflare Tunnel -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 15, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/cloudflare_tunnel.html">Cloudflare Tunnel: Secure Infrastructure Connectivity
+                            Without Public IP</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Discover how Cloudflare Tunnel provides a secure way to connect your resources to Cloudflare
+                        without exposing public IP addresses. Learn about outbound-only connections, attack surface
+                        reduction, and why it's essential for modern infrastructure security.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 7 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Cloudflare</span>
+                            <span class="tag">Security</span>
+                            <span class="tag">DevOps</span>
+                            <span class="tag">Zero Trust</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/cloudflare_tunnel.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - PostgreSQL Internals -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 14, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/postgresql_internals.html">PostgreSQL Internals: Understanding Database
+                            Architecture &amp; MVCC</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Deep dive into PostgreSQL's internal architecture covering PGDATA, database clusters, system
+                        catalogs,
+                        schemas, tablespaces, and the Postmaster process. Explore Multi-Version Concurrency Control
+                        (MVCC)
+                        with transaction IDs, isolation levels, and how PostgreSQL achieves high concurrency without
+                        blocking readers.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">PostgreSQL</span>
+                            <span class="tag">Database Internals</span>
+                            <span class="tag">MVCC</span>
+                            <span class="tag">Transaction Isolation</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/postgresql_internals.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Kubernetes Internals -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 11, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/kubernetes_internals.html">Kubernetes Internals: Resource Management &amp; Kernel
+                            Interaction</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Deep dive into how Kubernetes translates YAML definitions into Linux kernel instructions.
+                        Explore the OOM killer mechanism, CPU throttling with CFS, scheduler filtering and scoring
+                        logic,
+                        and kubelet eviction policies. Learn what really happens under the hood when you set resource
+                        requests and limits.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 12 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Kubernetes</span>
+                            <span class="tag">Linux Kernel</span>
+                            <span class="tag">Container Orchestration</span>
+                            <span class="tag">DevOps</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/kubernetes_internals.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Kubernetes Hands-On -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 11, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/kubernetes_resource_management_hands_on.html">Kubernetes Resource Management:
+                            Hands-On Practice</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        Ready to get your hands dirty? This practical guide walks you through simple exercises to
+                        understand how resource requests and limits work in real scenarios. Learn by doing with
+                        5 beginner-friendly exercises covering QoS classes, memory pressure, CPU throttling, and
+                        resource quotas.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 6 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Kubernetes</span>
+                            <span class="tag">Hands-On</span>
+                            <span class="tag">Tutorial</span>
+                            <span class="tag">DevOps</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/kubernetes_resource_management_hands_on.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - AWS Well-Architected Framework -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> February 6, 2026
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/aws_well_architected_framework.html">AWS Well-Architected Framework</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        A comprehensive guide to AWS Well-Architected Framework covering all six pillars: Operational
+                        Excellence,
+                        Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. Learn the
+                        essential
+                        design principles and best practices for building robust cloud solutions.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 8 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">AWS</span>
+                            <span class="tag">Cloud Architecture</span>
+                            <span class="tag">DevOps</span>
+                            <span class="tag">Best Practices</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/aws_well_architected_framework.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
+                <!-- Post - Patient Management -->
+                <article class="blog-post-card">
+                    <time class="post-date">
+                        <i class="far fa-calendar"></i> November 1, 2025
+                    </time>
+                    <h3 class="post-title">
+                        <a href="./blog/page/patient_management_blog_0.html">Building a Microservices Architecture: My
+                            Patient
+                            Management Journey</a>
+                    </h3>
+                    <p class="post-excerpt">
+                        The story behind designing and implementing a microservices-based patient management system
+                        using Spring
+                        Boot, PostgreSQL, Kafka and more.
+                    </p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> 4 min read</span>
+                        <div class="post-tags">
+                            <span class="tag">Spring Boot</span>
+                            <span class="tag">Microservices</span>
+                            <span class="tag">PostgreSQL</span>
+                            <span class="tag">Kafka</span>
+                        </div>
+                    </div>
+                    <a href="./blog/page/patient_management_blog_0.html" class="read-more">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                </article>
+
             </main>
 
             <!-- Sidebar -->
-            <aside class="sidebar">
-                <!-- Contact -->
-                <section id="contact" class="section fade-in">
-                    <h3>Contact Information</h3>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-envelope"></i> <a
-                                href="mailto:doguhannilt@gmail.com">doguhannilt@gmail.com</a>
+            <aside class="blog-sidebar">
+
+                <!-- Reading Picks -->
+                <div class="sidebar-widget">
+                    <h3>Reading Picks</h3>
+                    <ul class="reading-picks-list">
+                        <li class="reading-pick-item">
+                            <span class="reading-pick-label">Longest article</span>
+                            <a href="#" class="reading-pick-link" data-pick="longest"></a>
+                            <span class="reading-pick-meta"></span>
                         </li>
-                        <li><i class="fas fa-phone"></i> Upon Request</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Istanbul/Turkey.</li>
-                        <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/doguhan-ilter/"
-                                target="_blank">LinkedIn Profile</a></li>
-
+                        <li class="reading-pick-item">
+                            <span class="reading-pick-label">Shortest article</span>
+                            <a href="#" class="reading-pick-link" data-pick="shortest"></a>
+                            <span class="reading-pick-meta"></span>
+                        </li>
                     </ul>
-                </section>
+                </div>
 
-
-
-                <!-- Education -->
-                <section class="section fade-in">
-                    <h2>Education</h2>
-                    <div class="education-item">
-                        <div class="edu-degree">Associate Degree</div>
-                        <div class="edu-school">Istanbul Gedik University</div>
-                        <div class="edu-location">Istanbul, Pendik • 2023 - 2025</div>
+                <!-- Popular Tags -->
+                <div class="sidebar-widget">
+                    <h3>Popular Tags</h3>
+                    <div class="tag-cloud">
+                        <button type="button" class="cloud-tag" data-tag="AWS">AWS</button>
+                        <button type="button" class="cloud-tag" data-tag="Spring Boot">Spring Boot</button>
+                        <button type="button" class="cloud-tag" data-tag="Microservices">Microservices</button>
+                        <button type="button" class="cloud-tag" data-tag="Architecture">Architecture</button>
+                        <button type="button" class="cloud-tag" data-tag="Kubernetes">Kubernetes</button>
+                        <button type="button" class="cloud-tag" data-tag="PostgreSQL">PostgreSQL</button>
+                        <button type="button" class="cloud-tag" data-tag="Kafka">Kafka</button>
+                        <button type="button" class="cloud-tag" data-tag="Go">Go</button>
+                        <button type="button" class="cloud-tag" data-tag="Security">Security</button>
+                        <button type="button" class="cloud-tag" data-tag="Zero Trust">Zero Trust</button>
+                        <button type="button" class="cloud-tag" data-tag="DevOps">DevOps</button>
                     </div>
-                </section>
-
-                <!-- Languages -->
-                <section class="section fade-in">
-                    <h2>Languages</h2>
-                    <div class="about-text">
-                        <p><strong>Turkish:</strong> Native</p>
-                        <p><strong>English:</strong> Proficiency</p>
-                    </div>
-                </section>
+                </div>
 
             </aside>
         </div>
     </div>
 
     <script>
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('.nav a').forEach(link => {
-            link.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
+        const blogCards = Array.from(document.querySelectorAll('.blog-post-card'));
+        const popularTagButtons = Array.from(document.querySelectorAll('.cloud-tag'));
+        const filterStatus = document.querySelector('.filter-status');
+        const filterStatusText = document.querySelector('.filter-status-text');
+        const clearFilterButton = document.querySelector('.clear-filter-btn');
+        const emptyFilterState = document.querySelector('.empty-filter-state');
 
-                // Eğer external link veya blog linkiyse normal davransın
-                if (!href.startsWith('#')) {
-                    return; // Blog linki için preventDefault yapma
+        function getCardTags(card) {
+            return Array.from(card.querySelectorAll('.post-tags .tag')).map((tag) =>
+                tag.textContent.trim().toLowerCase()
+            );
+        }
+
+        function getReadingTimeInMinutes(card) {
+            const readingTimeText = card.querySelector('.reading-time')?.textContent ?? '';
+            const match = readingTimeText.match(/(\d+)/);
+            return match ? Number(match[1]) : 0;
+        }
+
+        function populateReadingPicks() {
+            const readingPicks = Array.from(document.querySelectorAll('.reading-pick-link'));
+
+            if (!readingPicks.length || !blogCards.length) {
+                return;
+            }
+
+            const cardsWithMetadata = blogCards
+                .map((card) => {
+                    const titleLink = card.querySelector('.post-title a');
+                    const minutes = getReadingTimeInMinutes(card);
+
+                    if (!titleLink || !minutes) {
+                        return null;
+                    }
+
+                    return {
+                        title: titleLink.textContent.trim(),
+                        href: titleLink.getAttribute('href'),
+                        minutes,
+                    };
+                })
+                .filter(Boolean);
+
+            if (!cardsWithMetadata.length) {
+                return;
+            }
+
+            const longest = cardsWithMetadata.reduce((current, item) =>
+                item.minutes > current.minutes ? item : current
+            );
+            const shortest = cardsWithMetadata.reduce((current, item) =>
+                item.minutes < current.minutes ? item : current
+            );
+
+            readingPicks.forEach((link) => {
+                const pickType = link.dataset.pick;
+                const selectedItem = pickType === 'longest' ? longest : shortest;
+                const meta = link.parentElement?.querySelector('.reading-pick-meta');
+
+                if (!selectedItem) {
+                    return;
                 }
 
-                // Sadece # ile başlayan linkler için smooth scroll
-                e.preventDefault();
+                link.href = selectedItem.href;
+                link.textContent = selectedItem.title;
 
-                // Remove active class and aria-current from all links
-                document.querySelectorAll('.nav a').forEach(l => {
-                    l.classList.remove('active');
-                    l.removeAttribute('aria-current');
-                });
-
-                // Add active class and aria-current to clicked link
-                this.classList.add('active');
-                this.setAttribute('aria-current', 'page');
-
-                // Get target section
-                const target = document.querySelector(href);
-                if (target) {
-                    const offsetTop = target.offsetTop - 70;
-                    window.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
+                if (meta) {
+                    meta.textContent = `${selectedItem.minutes} min read`;
                 }
+            });
+        }
+
+        function updateTagButtonState(activeTag) {
+            popularTagButtons.forEach((button) => {
+                const isActive = button.dataset.tag.toLowerCase() === activeTag;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-pressed', String(isActive));
+            });
+        }
+
+        function applyTagFilter(tagName) {
+            const normalizedTag = tagName.toLowerCase();
+            let visibleCount = 0;
+
+            blogCards.forEach((card) => {
+                const matches = getCardTags(card).includes(normalizedTag);
+                card.hidden = !matches;
+
+                if (matches) {
+                    visibleCount += 1;
+                }
+            });
+
+            updateTagButtonState(normalizedTag);
+
+            if (filterStatus && filterStatusText) {
+                filterStatus.hidden = false;
+                filterStatusText.textContent = `Showing ${visibleCount} post${visibleCount === 1 ? '' : 's'} for "${tagName}"`;
+            }
+
+            if (emptyFilterState) {
+                emptyFilterState.hidden = visibleCount !== 0;
+            }
+        }
+
+        function clearTagFilter() {
+            blogCards.forEach((card) => {
+                card.hidden = false;
+            });
+
+            popularTagButtons.forEach((button) => {
+                button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
+            });
+
+            if (filterStatus && filterStatusText) {
+                filterStatus.hidden = true;
+                filterStatusText.textContent = '';
+            }
+
+            if (emptyFilterState) {
+                emptyFilterState.hidden = true;
+            }
+        }
+
+        popularTagButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', 'false');
+
+            button.addEventListener('click', () => {
+                const selectedTag = button.dataset.tag;
+                const isAlreadyActive = button.classList.contains('active');
+
+                if (!selectedTag) {
+                    return;
+                }
+
+                if (isAlreadyActive) {
+                    clearTagFilter();
+                    return;
+                }
+
+                applyTagFilter(selectedTag);
             });
         });
 
-        // Update active nav link based on scroll position
-        window.addEventListener('scroll', function () {
-            const sections = document.querySelectorAll('.section[id]');
-            const navLinks = document.querySelectorAll('.nav a');
-
-            let current = '';
-
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop - 100;
-                if (scrollY >= sectionTop) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                link.removeAttribute('aria-current');
-                const href = link.getAttribute('href');
-                // Sadece anchor linkler için active class ekle
-                if (href === '#' + current) {
-                    link.classList.add('active');
-                    link.setAttribute('aria-current', 'page');
-                }
-            });
-        });
+        clearFilterButton?.addEventListener('click', clearTagFilter);
+        populateReadingPicks();
 
         // Fade in animation on scroll
         const observerOptions = {
@@ -377,96 +792,6 @@
 
         document.querySelectorAll('.fade-in').forEach(el => {
             observer.observe(el);
-        });
-
-        function loadLatestPosts() {
-            const latestPostsGrid = document.getElementById('latest-posts-grid');
-
-            if (!latestPostsGrid) {
-                return;
-            }
-
-            const posts = Array.isArray(window.BLOG_POSTS) ? window.BLOG_POSTS.slice(0, 2) : [];
-
-            if (!posts.length) {
-                latestPostsGrid.innerHTML = `
-                    <div class="latest-posts-empty">
-                        <h3>No blog posts found yet</h3>
-                        <p>The blog section is ready, but there are no published articles to show here yet.</p>
-                        <a href="blog/index.html" class="latest-posts-empty-link">Visit the blog</a>
-                    </div>
-                `;
-                return;
-            }
-
-            latestPostsGrid.innerHTML = posts.map((post) => {
-                const tags = (post.tags || [])
-                    .slice(0, 3)
-                    .map((tag) => `<span class="latest-post-tag">${tag}</span>`)
-                    .join('');
-
-                return `
-                    <article class="latest-post-card">
-                        <div class="latest-post-meta">
-                            <span>${post.date || ''}</span>
-                            <span>${post.readingTime || ''}</span>
-                        </div>
-                        <h3 class="latest-post-title">
-                            <a href="blog/${(post.href || '').replace('./', '')}">${post.title || 'Untitled post'}</a>
-                        </h3>
-                        <p class="latest-post-excerpt">${post.excerpt || ''}</p>
-                        <div class="latest-post-tags">${tags}</div>
-                        <a href="blog/${(post.href || '').replace('./', '')}" class="latest-post-read-more">Read article</a>
-                    </article>
-                `;
-            }).join('');
-        }
-
-        loadLatestPosts();
-
-        // Project Collapsible Logic
-        document.querySelectorAll('.project-header').forEach(header => {
-            header.addEventListener('click', (e) => {
-                // Don't toggle if a link was clicked
-                if (e.target.closest('.project-links')) return;
-
-                const project = header.closest('.project');
-                const isOpen = project.classList.contains('open');
-                const projectId = project.id;
-
-                // Close other projects
-                document.querySelectorAll('.project').forEach(p => {
-                    p.classList.remove('open');
-                });
-
-                // Update active nav link
-                document.querySelectorAll('.project-navigator a').forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === '#' + projectId) {
-                        link.classList.add('active');
-                    }
-                });
-
-                if (!isOpen) {
-                    project.classList.add('open');
-                }
-            });
-        });
-
-        // Update nav active state on scroll/click manual handles
-        document.querySelectorAll('.project-navigator a').forEach(link => {
-            link.addEventListener('click', function (e) {
-                document.querySelectorAll('.project-navigator a').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-
-                const targetId = this.getAttribute('href').substring(1);
-                const targetProject = document.getElementById(targetId);
-
-                if (targetProject) {
-                    document.querySelectorAll('.project').forEach(p => p.classList.remove('open'));
-                    targetProject.classList.add('open');
-                }
-            });
         });
     </script>
 </body>

@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIS v1.0: A Deep System Design Overview - Doğuhan İlter</title>
+    <title>HIS v1.0: A Deep System Design Overview - DoÄŸuhan Ä°lter</title>
     <meta name="description" content="A deep system design analysis of a production-grade, event-driven Hospital Information System built with Spring Boot, Kafka, PostgreSQL, and Docker.">
-    <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
@@ -19,9 +18,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -36,12 +35,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -198,7 +192,7 @@ jdbc:postgresql://postgresql:5432/patient_db?currentSchema=patient_schema
                 </div>
 
                 <p>
-                    Consumer groups are used throughout (<code>lab-order-group</code>, <code>doctor-lab-result-group</code>, <code>billing-lab-order-group</code>, etc.) which means any service can be horizontally scaled by simply adding more instances — Kafka handles the rebalancing automatically.
+                    Consumer groups are used throughout (<code>lab-order-group</code>, <code>doctor-lab-result-group</code>, <code>billing-lab-order-group</code>, etc.) which means any service can be horizontally scaled by simply adding more instances â€” Kafka handles the rebalancing automatically.
                 </p>
 
                 <h2>Reliability: The Outbox Pattern</h2>
@@ -226,7 +220,7 @@ outboxRepository.save(OutboxEvent.builder()
 </code></pre>
 
                 <div class="callout callout-info">
-                    <strong>💡 Why This Matters:</strong> The Outbox Pattern guarantees that a business operation and its associated event are atomically consistent. If Kafka is down, events accumulate in the outbox and are published when it recovers. No events are lost, no duplicates from retries without idempotency.
+                    <strong>ğŸ’¡ Why This Matters:</strong> The Outbox Pattern guarantees that a business operation and its associated event are atomically consistent. If Kafka is down, events accumulate in the outbox and are published when it recovers. No events are lost, no duplicates from retries without idempotency.
                 </div>
 
                 <h2>Resilience: Dead Letter Queues</h2>
@@ -240,7 +234,7 @@ outboxRepository.save(OutboxEvent.builder()
                 </p>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" and the answer is: "It keeps going."
+                    <strong>âš ï¸ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" and the answer is: "It keeps going."
                 </div>
 
                 <h2>Security Architecture</h2>
@@ -299,7 +293,7 @@ public ResponseEntity&lt;Admission&gt; admitPatient(...) { ... }
                     <div class="feature-box">
                         <i class="fas fa-file-alt"></i>
                         <h4>Logstash + MongoDB</h4>
-                        <p>Logback Kafka Appender ships all service logs to Kafka → Logstash → MongoDB. Searchable audit trail by user, service, and timestamp.</p>
+                        <p>Logback Kafka Appender ships all service logs to Kafka â†’ Logstash â†’ MongoDB. Searchable audit trail by user, service, and timestamp.</p>
                     </div>
                 </div>
 
@@ -353,7 +347,7 @@ deploy:
 </code></pre>
 
                 <div class="callout callout-success">
-                    <strong>✅ Result:</strong> Upgrading Spring Boot for all 10 services is a single line change in one file. No drift, no version mismatches, no "works on my service" incidents.
+                    <strong>âœ… Result:</strong> Upgrading Spring Boot for all 10 services is a single line change in one file. No drift, no version mismatches, no "works on my service" incidents.
                 </div>
 
                 <h2>What I'd Do Differently</h2>
@@ -404,9 +398,9 @@ deploy:
 
                 <!-- Author Section -->
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Backend Developer specializing in microservices architecture, cloud-native applications,
                            and distributed systems.</p>
                         <div class="author-social">

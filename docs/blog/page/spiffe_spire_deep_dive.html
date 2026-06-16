@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lessons from the Trenches: What I Learned Implementing SPIFFE/SPIRE in SecurePay - Doğuhan İlter</title>
-    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <title>Lessons from the Trenches: What I Learned Implementing SPIFFE/SPIRE in SecurePay - DoÄŸuhan Ä°lter</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
@@ -18,9 +17,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -36,12 +35,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -77,7 +71,7 @@
             <div class="post-content">
 
                 <p class="lead">
-                    Implementing Zero-Trust isn't just about following standards—it's about hardware-bound identity,
+                    Implementing Zero-Trust isn't just about following standardsâ€”it's about hardware-bound identity,
                     kernel-level validation, and the reality of cross-language gRPC. Here is a brief explanation of what
                     I've learned using SPIFFE/SPIRE on the SecurePay project.
                 </p>
@@ -91,7 +85,7 @@
                 </p>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ The Dilemma:</strong> To access the Vault to get your secret, you need a token (Secret
+                    <strong>âš ï¸ The Dilemma:</strong> To access the Vault to get your secret, you need a token (Secret
                     Zero). Where do you store that token? If you bake it into the image or environment, you've just
                     moved the same vulnerability to a different layer.
                 </div>
@@ -124,7 +118,7 @@
                     <div class="service-item">
                         <h4><i class="fas fa-plug"></i> Workload API</h4>
                         <p>A local Unix Domain Socket that workloads call to ask: <em>"Who am I?"</em>. No passwords
-                            needed—the identity is based on process attributes.</p>
+                            neededâ€”the identity is based on process attributes.</p>
                     </div>
                 </div>
 
@@ -167,7 +161,7 @@
                 </ol>
 
                 <div class="callout callout-info">
-                    <strong>💡 Technical Insight:</strong> The application doesn't need to know anything about
+                    <strong>ğŸ’¡ Technical Insight:</strong> The application doesn't need to know anything about
                     certificates. It just asks the local socket, and SPIRE handles the cryptographic heavy lifting.
                 </div>
 
@@ -209,7 +203,7 @@ spire-server entry create \
                 </p>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Challenge 1: The "Trust Domain Mismatch" Ghost</strong>
+                    <strong>âš ï¸ Challenge 1: The "Trust Domain Mismatch" Ghost</strong>
                     <p><strong>Mistake:</strong> When reinstalling SPIRE via Helm after a failed attempt, the SPIRE
                         Server would crash with a <code>trust domain mismatch</code> because Minikube's
                         <code>hostpath-provisioner</code> was retaining the SPIRE Server's database files.</p>
@@ -219,7 +213,7 @@ spire-server entry create \
                 <pre><code class="language-bash">minikube ssh 'sudo rm -rf /tmp/hostpath-provisioner/spire/spire-data-spire-server-0'</code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Challenge 2: SVID Selector Conflicts (WSL to K8s Migration)</strong>
+                    <strong>âš ï¸ Challenge 2: SVID Selector Conflicts (WSL to K8s Migration)</strong>
                     <p><strong>Mistake:</strong> In the initial local setup (WSL without K8s), we used Unix-based
                         selectors like <code>unix:uid</code>. When moving to Kubernetes, these became unstable as Pod
                         UIDs are dynamic.</p>
@@ -229,7 +223,7 @@ spire-server entry create \
                 </div>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Challenge 3: Duplicate Registration Crashes</strong>
+                    <strong>âš ï¸ Challenge 3: Duplicate Registration Crashes</strong>
                     <p><strong>Mistake:</strong> Automation scripts for <code>spire-server entry create</code> would
                         fail with an "Already Exists" error if run twice, stopping the idempotent deployment pipeline.
                     </p>
@@ -244,7 +238,7 @@ fi
                 </code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Challenge 4: The "Invisible" Agent Socket</strong>
+                    <strong>âš ï¸ Challenge 4: The "Invisible" Agent Socket</strong>
                     <p><strong>Mistake:</strong> Services were throwing <code>connection refused</code> errors because
                         the SDK couldn't find the SPIRE Agent socket.</p>
                     <p><strong>Solution:</strong> Standardized the environment variable
@@ -253,7 +247,7 @@ fi
                 </div>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Challenge 5: Polyglot mTLS: The Java vs Go Handshake</strong>
+                    <strong>âš ï¸ Challenge 5: Polyglot mTLS: The Java vs Go Handshake</strong>
                     <p><strong>Mistake:</strong> Go services communicated perfectly, but the Java-based Notification
                         Service failed due to strict TrustBundle propagation requirements.</p>
                     <p><strong>Solution:</strong> Deployed a <strong>SPIRE Sidecar Helper</strong> that automatically
@@ -279,9 +273,9 @@ fi
                 </div>
 
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Backend Developer specializing in microservices architecture, cloud-native applications,
                             and distributed systems.</p>
                         <div class="author-social">

@@ -1,13 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Engineering SecurePay: A Deep Dive into Zero-Trust, Event-Driven Fintech Architecture - Doğuhan İlter</title>
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <title>Engineering SecurePay: A Deep Dive into Zero-Trust, Event-Driven Fintech Architecture - DoÄŸuhan Ä°lter</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
     <link rel="stylesheet" href="../blog.css" />
@@ -19,9 +17,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -36,12 +34,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -80,13 +73,13 @@
                 </p>
 
                 <p>
-                    Today, I’m pulling back the curtain on the architectural journey of building SecurePay—a project that traverses the landscape of Zero-Trust security, Distributed Systems, and Infrastructure as Code.
+                    Today, Iâ€™m pulling back the curtain on the architectural journey of building SecurePayâ€”a project that traverses the landscape of Zero-Trust security, Distributed Systems, and Infrastructure as Code.
                 </p>
 
                 <h2>1. The Architectural Blueprint: Beyond the Perimeter</h2>
                 
                 <p>
-                    Traditional security models rely on a "walled garden" approach—once you're inside the network, you're trusted. In SecurePay, we operate on a <strong>Zero-Trust</strong> principle. We don't trust the network, and we don't trust the IP addresses.
+                    Traditional security models rely on a "walled garden" approachâ€”once you're inside the network, you're trusted. In SecurePay, we operate on a <strong>Zero-Trust</strong> principle. We don't trust the network, and we don't trust the IP addresses.
                 </p>
 
                 <h3>The Stack at a Glance:</h3>
@@ -120,12 +113,12 @@
                 
                 <ol>
                     <li><strong>Workload Attestation:</strong> When a Pod starts in Kubernetes, the <strong>SPIRE Agent</strong> identifies it based on its Kubernetes ServiceAccount and Namespace.</li>
-                    <li><strong>SVID Issuance:</strong> The SPIRE Server issues a short-lived <strong>SVID (SPIFFE Verifiable Identity Document)</strong>—an X.509 certificate.</li>
+                    <li><strong>SVID Issuance:</strong> The SPIRE Server issues a short-lived <strong>SVID (SPIFFE Verifiable Identity Document)</strong>â€”an X.509 certificate.</li>
                     <li><strong>Automatic Rotation:</strong> These certificates are rotated every few hours automatically. There are no passwords to leak and no certificates to manually manage.</li>
                 </ol>
 
                 <div class="callout callout-info">
-                    <strong>💡 Technical Detail:</strong> When the Payment Service calls the Account Service via gRPC, they perform a <strong>Mutual TLS (mTLS)</strong> handshake using these SVIDs. If a service doesn't have a valid SVID matching the trust policy, the connection is rejected at the transport layer.
+                    <strong>ğŸ’¡ Technical Detail:</strong> When the Payment Service calls the Account Service via gRPC, they perform a <strong>Mutual TLS (mTLS)</strong> handshake using these SVIDs. If a service doesn't have a valid SVID matching the trust policy, the connection is rejected at the transport layer.
                 </div>
 
                 <h2>3. Orchestrating the "Happy Path": The Payment Lifecycle</h2>
@@ -171,7 +164,7 @@
                 <p>In a microservices world, debugging "The request is slow" is impossible without distributed tracing.</p>
 
                 <div class="callout callout-success">
-                    <strong>✅ Implementation:</strong> Using <strong>OpenTelemetry (OTel)</strong>, I implemented manual and automatic instrumentation where every request carries a <code>trace_id</code> through the entire stack—from API Gateway to Kafka consumers.
+                    <strong>âœ… Implementation:</strong> Using <strong>OpenTelemetry (OTel)</strong>, I implemented manual and automatic instrumentation where every request carries a <code>trace_id</code> through the entire stackâ€”from API Gateway to Kafka consumers.
                 </div>
 
                 <h2>6. Engineering Challenges & Victories</h2>
@@ -208,9 +201,9 @@
                 </div>
 
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Backend Developer specializing in microservices architecture, cloud-native applications, 
                            and distributed systems.</p>
                         <div class="author-social">

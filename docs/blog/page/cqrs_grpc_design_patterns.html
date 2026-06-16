@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CQRS - gRPC - Design Patterns | Patient Management Journey - Doğuhan İlter</title>
-    <link rel="icon" type="image/png" href="../../public/favicon.png">
+    <title>CQRS - gRPC - Design Patterns | Patient Management Journey - DoÄŸuhan Ä°lter</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
@@ -18,9 +17,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -35,12 +34,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -85,15 +79,15 @@
                 <h2>Moving from REST Postcards to gRPC Stubs</h2>
                 
                 <p>
-                    In my earlier implementation, services talked to each other using <code>RestTemplate</code>. It felt like sending postcards—I had to manually build URLs like <code>baseUrl + "/patients/find/" + id</code>, manage circuit breakers with Resilience4j, and handle JSON parsing at every step.
+                    In my earlier implementation, services talked to each other using <code>RestTemplate</code>. It felt like sending postcardsâ€”I had to manually build URLs like <code>baseUrl + "/patients/find/" + id</code>, manage circuit breakers with Resilience4j, and handle JSON parsing at every step.
                 </p>
 
                 <p>
-                    I replaced this with <strong>gRPC over Protobuf</strong>. Instead of "phone calls" where lines could be busy, it’s more like a direct radio connection. By defining our service contracts in <code>.proto</code> files, I could generate type-safe Java stubs that handle connections, retries, and deadlines natively.
+                    I replaced this with <strong>gRPC over Protobuf</strong>. Instead of "phone calls" where lines could be busy, itâ€™s more like a direct radio connection. By defining our service contracts in <code>.proto</code> files, I could generate type-safe Java stubs that handle connections, retries, and deadlines natively.
                 </p>
 
                 <div class="callout callout-info">
-                    <strong>💡 Simplification:</strong> Switching to gRPC allowed me to delete entire configuration classes like <code>RestTemplateConfig.java</code> and <code>RestTemplateAddresses.java</code>. The code became cleaner and much more reliable.
+                    <strong>ğŸ’¡ Simplification:</strong> Switching to gRPC allowed me to delete entire configuration classes like <code>RestTemplateConfig.java</code> and <code>RestTemplateAddresses.java</code>. The code became cleaner and much more reliable.
                 </div>
 
                 <h2>Automating CQRS with AOP</h2>
@@ -178,7 +172,7 @@ public class DataSourceAspect {
                 <h2>Closing Thoughts</h2>
 
                 <div class="callout callout-success">
-                    <strong>✅ Evolution:</strong> This architectural journey transformed my collection of services into a much more stable and observable ecosystem. It was a great lesson in choosing the right patterns to solve real distributed challenges.
+                    <strong>âœ… Evolution:</strong> This architectural journey transformed my collection of services into a much more stable and observable ecosystem. It was a great lesson in choosing the right patterns to solve real distributed challenges.
                 </div>
 
                 <p>
@@ -191,9 +185,9 @@ public class DataSourceAspect {
             <footer class="post-footer">
                 
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Junior Backend Developer learning the ropes of microservices and software architecture.</p>
                         <div class="author-social">
                             <a href="https://github.com/doguhanniltextra" target="_blank">

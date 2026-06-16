@@ -1,17 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kubernetes Resource Management: Hands-On Practice - Doğuhan İlter</title>
+    <title>Kubernetes Resource Management: Hands-On Practice - DoÄŸuhan Ä°lter</title>
     <meta name="description"
         content="A practical, hands-on guide to understanding Kubernetes resource requests and limits. Learn by doing with simple examples and real-world scenarios.">
     <meta name="keywords"
         content="Kubernetes, Resource Management, Hands-On, Tutorial, Container Resources, Kubernetes Tutorial, DevOps Practice">
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="../../public/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../main.css" />
     <link rel="stylesheet" href="../blog.css" />
@@ -24,9 +22,9 @@
     <header class="header">
         <div class="container">
             <div class="profile-img">
-                <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" />
+                <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" />
             </div>
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doğuhan İlter</a></h1>
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">DoÄŸuhan Ä°lter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -42,12 +40,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html">About</a></li>
-                <li><a href="../../index.html#projects">Projects</a></li>
-                <li><a href="../../index.html#experience">Experience</a></li>
-                <li><a href="../../index.html#skills">Skills</a></li>
-                <li><a href="../index.html" class="active">Blog</a></li>
-                <li><a href="../../index.html#contact">Contact</a></li>
+                <li><a href="../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -83,11 +76,11 @@
                 <p class="lead">
                     Ready to get your hands dirty with Kubernetes resource management? This practical guide will walk
                     you through simple exercises to understand how requests and limits work in real scenarios. No
-                    complex theory—just practical examples you can run right now.
+                    complex theoryâ€”just practical examples you can run right now.
                 </p>
 
                 <div class="callout callout-info">
-                    <strong>📋 Prerequisites:</strong> You'll need a Kubernetes cluster (Minikube, kind, or any cloud
+                    <strong>ğŸ“‹ Prerequisites:</strong> You'll need a Kubernetes cluster (Minikube, kind, or any cloud
                     provider). Basic kubectl knowledge is helpful but not required.
                 </div>
 
@@ -116,7 +109,7 @@ spec:
         cpu: "500m"</code></pre>
 
                 <div class="callout callout-info">
-                    <strong>💡 What does this mean?</strong>
+                    <strong>ğŸ’¡ What does this mean?</strong>
                     <ul>
                         <li><strong>requests.memory: "64Mi"</strong> - Kubernetes will find a node with at least 64MB
                             free</li>
@@ -140,7 +133,7 @@ kubectl get pods
 kubectl describe pod simple-app</code></pre>
 
                 <p>Look for the <code>QoS Class</code> in the output. It should say <strong>Burstable</strong> because
-                    requests ≠ limits.</p>
+                    requests â‰  limits.</p>
 
                 <h2>Exercise 2: Understanding QoS Classes</h2>
 
@@ -207,11 +200,11 @@ kubectl describe pod burstable-pod | grep "QoS Class"
 kubectl describe pod besteffort-pod | grep "QoS Class"</code></pre>
 
                 <div class="callout callout-success">
-                    <strong>✅ Expected Results:</strong>
+                    <strong>âœ… Expected Results:</strong>
                     <ul>
-                        <li>guaranteed-pod → QoS Class: <strong>Guaranteed</strong></li>
-                        <li>burstable-pod → QoS Class: <strong>Burstable</strong></li>
-                        <li>besteffort-pod → QoS Class: <strong>BestEffort</strong></li>
+                        <li>guaranteed-pod â†’ QoS Class: <strong>Guaranteed</strong></li>
+                        <li>burstable-pod â†’ QoS Class: <strong>Burstable</strong></li>
+                        <li>besteffort-pod â†’ QoS Class: <strong>BestEffort</strong></li>
                     </ul>
                 </div>
 
@@ -238,7 +231,7 @@ spec:
     args: ["--vm", "1", "--vm-bytes", "150M", "--vm-hang", "1"]</code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ What's happening here?</strong> This pod is trying to allocate 150MB of memory, but its
+                    <strong>âš ï¸ What's happening here?</strong> This pod is trying to allocate 150MB of memory, but its
                     limit is only 100MB. Let's see what Kubernetes does!
                 </div>
 
@@ -320,7 +313,7 @@ kubectl run big-pod --image=nginx \
 kubectl describe resourcequota compute-quota -n limited-namespace</code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>⚠️ Quota Exceeded!</strong> The pod requests more CPU than the namespace allows. This is
+                    <strong>âš ï¸ Quota Exceeded!</strong> The pod requests more CPU than the namespace allows. This is
                     how you protect your cluster from runaway resource consumption.
                 </div>
 
@@ -368,7 +361,7 @@ kubectl delete namespace limited-namespace</code></pre>
                 </p>
 
                 <div class="callout callout-success">
-                    <strong>🎉 Congratulations!</strong> You've completed the hands-on exercises. You now understand
+                    <strong>ğŸ‰ Congratulations!</strong> You've completed the hands-on exercises. You now understand
                     how to configure resource requests and limits, recognize QoS classes, and predict pod behavior
                     under resource pressure.
                 </div>
@@ -395,9 +388,9 @@ kubectl delete namespace limited-namespace</code></pre>
 
                 <!-- Author Section -->
                 <div class="author-section">
-                    <img src="../../public/dogupiksel.png" alt="Doğuhan İlter" class="author-img">
+                    <img src="../../public/dogupiksel.png" alt="DoÄŸuhan Ä°lter" class="author-img">
                     <div class="author-info">
-                        <h4>Doğuhan İlter</h4>
+                        <h4>DoÄŸuhan Ä°lter</h4>
                         <p>Backend Developer specializing in microservices architecture, cloud-native applications,
                             and distributed systems.</p>
                         <div class="author-social">
