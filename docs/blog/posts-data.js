@@ -1,5 +1,13 @@
 window.BLOG_POSTS = [
     {
+        title: "TCP'den HTTP'ye: Bir Veri Paketinin Yolculuğu",
+        href: "./page/tcp_to_http.html",
+        date: "August 10, 2026",
+        readingTime: "15 min read",
+        excerpt: "Bir butona tıklıyoruz, yarım saniye sonra ekranda veri beliriyor. Ama o yarım saniyede tam olarak ne oluyor? TCP'nin three-way handshake'inden HTTP'nin request-response döngüsüne, bir veri paketinin internet üzerindeki yolculuğunu katman katman inceliyoruz.",
+        tags: ["TCP", "HTTP", "Networking", "Backend", "Go"]
+    },
+    {
         title: "Context Propagation in Go: What I Learned From a Missed PR",
         href: "./page/context_propagation_go.html",
         date: "April 30, 2026",

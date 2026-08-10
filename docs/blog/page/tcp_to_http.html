@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP'den HTTP'ye: Bir Veri Paketinin Yolculuğu - Doguhan Ilter</title>
+    <meta name="description" content="Bir butona tıkladığınızda arka planda neler olduğunu hiç merak ettiniz mi? TCP'den HTTP'ye, bir veri paketinin internet üzerindeki yolculuğunu katman katman inceliyoruz.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+      
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-08-10">
+                        <i class="far fa-calendar"></i> Aug 10, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 15 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">TCP'den HTTP'ye: Bir Veri Paketinin Yolculuğu</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">TCP</span>
+                    <span class="tag">HTTP</span>
+                    <span class="tag">Networking</span>
+                    <span class="tag">Backend</span>
+                    <span class="tag">Go</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Hepimiz öyle ya da böyle bir şekilde REST API kullanıyoruz. Yüzeyde REST API yazsa da altında yatan teknoloji yadsınamaz bir şekilde TCP/IP. Bir butona tıklıyoruz, yarım saniye sonra ekranda veri beliriyor ancak o yarım saniyede tam olarak neler olduğunu hiç düşündünüz mü?
+                </p>
+
+                <p>
+                    Cihazınızda çalışan işletim sistemi, kullandığınız tarayıcı, aradaki NAT, load balancer, load balancer'a ulaşana kadar araya giren router, switch, firewall ve son olarak sunucu, tüm bunları haberleştiren network katmanları... Bunların her biri kendi içinde karmaşık sistemler barındırıyor ancak ben bu yazıda sadece TCP ve HTTP katmanlarına odaklanacağım çünkü bunların üstüne çoğu zaman fazla düşünmüyoruz.
+                </p>
+
+                <p>
+                    Hiyerarşik bir şekilde TCP'den HTTP'ye bu veri akışının nasıl gerçekleştiğini, her bir katmanda neler olduğunu ve bu katmanların nasıl bir araya geldiğini ele alacağız.
+                </p>
+
+                <h2>TCP/IP Modeli - Tam Olarak Neredeyiz?</h2>
+
+                <p>
+                    Öncelikle TCP ve HTTP'ye geçmeden, TCP/IP modeli ile bu iki katmanın nerede bulunduğunu anlamamız gerekiyor. Bunu anlamadan aslında halihazırda soyut olan bir şeyi daha da soyutlaştırıp iyice kafaları karıştırabiliriz. Gelin bu katmanlara bir göz atalım.
+                </p>
+
+                <p>
+                    Hepimiz OSI modelini duymuşuzdur ancak TCP/IP modeli OSI'nin pratik bir karşılığıdır. OSI 7 katmandan oluşurken, TCP/IP 4 katmandan oluşur.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-layer-group"></i>
+                        <h4>OSI Modeli (7 Katman)</h4>
+                        <p>1- Physical Layer<br>2- Data Link Layer<br>3- Network Layer<br>4- Transport Layer<br>5- Session Layer<br>6- Presentation Layer<br>7- Application Layer</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-network-wired"></i>
+                        <h4>TCP/IP Modeli (4 Katman)</h4>
+                        <p>1- Network Access Layer<br>2- Internet Layer<br>3- Transport Layer<br>4- Application Layer</p>
+                    </div>
+                </div>
+
+                <p>
+                    Bu yazıda yalnızca Transport ve Application katmanlarına odaklanacağız; Network Access ve Internet katmanlarını kapsam dışında bırakıyoruz.
+                </p>
+
+                <p>
+                    TCP/IP modelinde Application kısmında HTTP ve DNS gibi protokoller yer alır. Bu katman aslında OSI'deki 5, 6, 7. katmanların birleşiminden oluşur.
+                </p>
+
+                <p>
+                    Aynı şekilde TCP/IP modelinde Transport katmanı, OSI'deki Transport katmanının karşılığıdır ve burada TCP ve UDP gibi protokoller yer alır.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Not:</strong> Aslında HTTP'yi anlamak için TCP'yi, TCP'yi anlamak için IP'yi, IP'yi anlamak için Ethernet'i anlamamız gerekiyor. Genellikle bizler bu katmanların üstünde soyutlama katmanları oluşturuyoruz. Bu yazıda TCP/IP modelini referans alacağız; gerektiğinde OSI modeliyle karşılıklarına da değineceğiz.
+                </div>
+
+                <h2>TCP: Transport Katmanı</h2>
+
+                <p>
+                    En baştan özeti vermek gerekirse, TCP, iki endpoint arasında connection kurup byte'ları güvenilir, sıralı ve kontrollü şekilde taşıyan bir transport-layer protokolüdür.
+                </p>
+
+                <p>
+                    Bu özet üzerinden gitmek istiyorum, burada TCP üzerinde bazı iddialar var; güvenilir, sıralı ve kontrollü.
+                </p>
+
+                <p>
+                    Bu kavramlar tam olarak neye işaret ediyor? Bunu anlamak için aslında TCP'nin nasıl iletişime geçtiğini, üç yollu el sıkışmayı (three-way handshake) ve segmentları anlamamız gerekiyor. Ardından, verinin güvenli bir şekilde teslim edilip edilmediğini anlamak için acknowledge'ları, timeout'u ve overflow kontrolünü, verinin sıralı teslim edilmesini sağlamak için sequence'ları anlamamız gerekiyor. Son olarak da, connection'ın nasıl kurulup sonlandırıldığını, flow control'u, congestion control'u, error control'u anlamış olacağız. Bu sayede TCP'yi oldukça derinlemesine öğrenmiş olacağız. Sonrasında ise HTTP'nin nasıl çalıştığını TCP üzerinden görmüş olacağız.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Not:</strong> Biliyorum çok fazla kavram var, ancak bunların hepsini sırayla ele alacağız ve açıkçası beni asıl heyecanlandıran durum ise, bu kadar karmaşık olan teknolojinin milisaniyeler içinde network üzerinde nasıl çalıştığı.
+                </div>
+
+                <h3>TCP: Bağlantı Kurma - Three-Way Handshake</h3>
+
+                <p>
+                    TCP protokolü connection-oriented bir protokolüdür yani bazı açılardan paranoyak diyebiliriz. Bağlantı kurmadan kör bir şekilde veri göndermeyi kabul etmiyor. İlk önce iletişim kuracağı cihazla bir bağlantı kuruyor, bu bağlantı sırasında bazı parametreleri konuşuyor, sonrasında veriyi gönderiyor. Bu sayede, TCP bağlantısı her iki tarafta da gerçekten var oluyor, veri göndermek için hazırlar ve veri almak için hazırlar.
+                </p>
+
+                <p>
+                    İletişim kurma aşamasında Three-Way Handshake denilen 3 aşamalı bir süreç gerçekleşiyor:
+                </p>
+
+                <ol>
+                    <li><strong>SYN (Synchronize):</strong> İlk olarak, veri göndermek isteyen taraf (client) karşı tarafa (server) bir SYN paketi gönderir. Bu paket, bağlantı kurmak istediğini belirtir.</li>
+                    <li><strong>SYN-ACK (Synchronize-Acknowledge):</strong> SYN paketi alan taraf, bağlantıyı kabul eder ve bir SYN-ACK paketi gönderir. Bu paket, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
+                    <li><strong>ACK (Acknowledge):</strong> SYN-ACK paketi alan taraf, bağlantıyı kabul eder ve bir ACK paketi gönderir. Bu paket, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
+                </ol>
+
+                <p>
+                    Peki neden isimleri özellikle SYN ve ACK? Aslında bu isimlendirmeler, TCP paketlerinin header'larında yer alan bazı bayraklardan geliyor. Bu bayraklar, paketlerin ne tür bir paket olduğunu belirtiyor.
+                </p>
+
+                <p>
+                    Bayrak demişken ona da ufak bir girmek istiyorum, her TCP paketi minimum 20 byte'lık bir header içerir. Bu header; port numaraları, sıra numaraları, pencere boyutu ve bayraklar gibi birbirinden farklı alanlar barındırır. Bayraklar bu alanlardan yalnızca biridir.
+                </p>
+
+                <h4>SYN, SYN-ACK ve ACK Paketlerinin İçeriği</h4>
+
+                <p>
+                    Öncelikle bu 3 paket türü de TCP paketi olduğu için, 20 byte'lık bir header içerir.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Dipnot:</strong> Neden minimum 20 byte? Çünkü sabit alanların toplamı (port numaraları, sequence, acknowledgment, flags, window size, checksum, urgent pointer) 20 byte'a ulaşır. Options alanı eklenirse bu değer artabilir, Payload ise verinin kendisidir.
+                </div>
+
+                <p>
+                    Bu header'ın içinde port numaraları, sequence ve acknowledge numaraları gibi bilgiler bulunur. Bunlardan detaylı bahsedeceğiz.
+                </p>
+
+                <p>TCP header'ının yapısı şöyle:</p>
+
+                <div style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: rgba(99,102,241,0.15); border-bottom: 2px solid rgba(99,102,241,0.3);">
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">Field</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">Boyut</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">Açıklama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><code>Source Port</code></td>
+                                <td style="padding: 0.65rem 1rem;">2 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Gönderenin port numarası</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><code>Destination Port</code></td>
+                                <td style="padding: 0.65rem 1rem;">2 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Alıcının port numarası</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><code>Sequence Number</code></td>
+                                <td style="padding: 0.65rem 1rem;">4 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Gönderenin byte pozisyonu</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><code>Acknowledgment Nr</code></td>
+                                <td style="padding: 0.65rem 1rem;">4 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Beklenen bir sonraki byte</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><code>Header Length</code></td>
+                                <td style="padding: 0.65rem 1rem;">4 bits</td>
+                                <td style="padding: 0.65rem 1rem;">Header'ın uzunluğu</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><code>Flags</code></td>
+                                <td style="padding: 0.65rem 1rem;">9 bits</td>
+                                <td style="padding: 0.65rem 1rem;">SYN, ACK, FIN, RST...</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><code>Window Size</code></td>
+                                <td style="padding: 0.65rem 1rem;">2 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Alınabilecek max veri miktarı</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><code>Checksum</code></td>
+                                <td style="padding: 0.65rem 1rem;">2 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Hata kontrolü</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><code>Urgent Pointer</code></td>
+                                <td style="padding: 0.65rem 1rem;">2 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Acil veri işaretçisi</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><code>Options</code></td>
+                                <td style="padding: 0.65rem 1rem;">0-40 bytes</td>
+                                <td style="padding: 0.65rem 1rem;">Ek parametreler (isteğe bağlı)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.65rem 1rem;"><code>Payload</code></td>
+                                <td style="padding: 0.65rem 1rem;">Değişken</td>
+                                <td style="padding: 0.65rem 1rem;">Asıl veri</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Üç paket türü de aynı TCP header yapısını kullanır; farkları yalnızca bazı field'ların değerlerinde yatıyor. Handshake sürecinde asıl önem taşıyan üç alan şunlar: <strong>Flags</strong>, <strong>Sequence Number</strong> ve <strong>Acknowledgment Number</strong>.
+                </p>
+
+                <div style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: rgba(99,102,241,0.15); border-bottom: 2px solid rgba(99,102,241,0.3);">
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);"></th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">SYN</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">SYN-ACK</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--accent, #818cf8);">ACK</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><strong>SYN flag</strong></td>
+                                <td style="padding: 0.65rem 1rem;">1</td>
+                                <td style="padding: 0.65rem 1rem;">1</td>
+                                <td style="padding: 0.65rem 1rem;">0</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><strong>ACK flag</strong></td>
+                                <td style="padding: 0.65rem 1rem;">0</td>
+                                <td style="padding: 0.65rem 1rem;">1</td>
+                                <td style="padding: 0.65rem 1rem;">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                                <td style="padding: 0.65rem 1rem;"><strong>Seq Number</strong></td>
+                                <td style="padding: 0.65rem 1rem;">1000 (client ISN)</td>
+                                <td style="padding: 0.65rem 1rem;">5000 (server ISN)</td>
+                                <td style="padding: 0.65rem 1rem;">1001</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
+                                <td style="padding: 0.65rem 1rem;"><strong>Ack Number</strong></td>
+                                <td style="padding: 0.65rem 1rem;">0 (anlamsız)</td>
+                                <td style="padding: 0.65rem 1rem;">1001 (ISN+1)</td>
+                                <td style="padding: 0.65rem 1rem;">5001 (ISN+1)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.65rem 1rem;"><strong>Payload</strong></td>
+                                <td style="padding: 0.65rem 1rem;">Yok</td>
+                                <td style="padding: 0.65rem 1rem;">Yok</td>
+                                <td style="padding: 0.65rem 1rem;">Olabilir</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>TCP Header Alanları Ve Kısa Açıklamaları</h3>
+
+                <p>
+                    Az önce gördüğümüz TCP Header'da birçok parametre var ve bunların her birini detaylı açıklamaktansa akılda kalıcı olması açısından ana başlıklar altında incelemek istiyorum:
+                </p>
+
+                <ol>
+                    <li><strong>Source Port ve Destination Port:</strong> Gönderenin ve alıcının port numaralarını belirtir. Port numarası, hangi uygulamanın veriyi alacağını belirtir. Örneğin 80, 8080, 443 portları web tarayıcıları tarafından kullanılırken, 25, 465 portları e-posta uygulamaları tarafından kullanılır.</li>
+                    <li><strong>Sequence Number:</strong> Gönderenin başlangıç byte pozisyonudur. Her iki taraf bağlantı başında rastgele bir ISN (Initial Sequence Number) seçer. Bu rastgelelik kasıtlıdır — eski bağlantılardan kalan paketlerin yeni bağlantıyla karışmaması için.</li>
+                    <li><strong>Acknowledgment Number:</strong> Beklenen bir sonraki byte'ı belirtir. Her zaman alınan Seq Number + 1 değerini taşır.</li>
+                    <li><strong>Header Length:</strong> Header'ın uzunluğunu belirtir. Bu alan 4 bit uzunluğundadır ve 0 ile 15 arasında değer alabilir. Bu değer, header'ın toplam uzunluğunu byte cinsinden ifade eder.</li>
+                    <li><strong>Flags:</strong> SYN, ACK, FIN, RST gibi bayrakları içerir. SYN bayrağı "bağlantı başlatmak istiyorum", ACK bayrağı ise "bir önceki paketi aldım" anlamına gelir.</li>
+                    <li><strong>Window Size:</strong> Alınabilecek max veri miktarını belirtir. Bu alan, alıcının ne kadar veriyi tek seferde alabileceğini belirtir. Bu değer, alıcının tampon belleğinin (buffer) ne kadar büyük olduğunu gösterir.</li>
+                    <li><strong>Checksum:</strong> Hata kontrolü yapar. Bu alan, verinin bütünlüğünü kontrol etmek için kullanılır. Veri üzerinde yapılan matematiksel bir işlem sonucunda elde edilen değerdir.</li>
+                    <li><strong>Urgent Pointer:</strong> Acil veri işaretçisi. Bu alan, acil veriyi işaret eder. Bu veri, hemen işlenmelidir.</li>
+                    <li><strong>Options:</strong> Ek parametreler (isteğe bağlı). Bu alan, isteğe bağlı parametreleri içerir. Bu parametreler, header'da bulunmayabilir.</li>
+                    <li><strong>Payload:</strong> Asıl veri.</li>
+                </ol>
+
+                <h3>TCP: Reliable Delivery - Güvenilir Teslimat</h3>
+
+                <p>
+                    TCP'nin en önemli özelliklerinden biri güvenilir teslimattır. TCP, verinin karşı tarafa hatasız ve sırası bozulmadan ulaşmasını garanti eder. Bu özelliği sağlamak için kullandığı üstteki başlıklarda da bahsettiğim iki önemli mekanizma vardır: <strong>Sequence Numbers</strong> ve <strong>Acknowledgments</strong>.
+                </p>
+
+                <p>
+                    Bunların yanı sıra TCP, <strong>Timeout</strong> ve <strong>Error Control</strong> gibi mekanizmaları kullanarak verinin güvenli bir şekilde teslim edilmesini sağlar. Bunları da detaylıca işleyeceğiz.
+                </p>
+
+                <p>Somutlaştırmak adına bir senaryo inceleyelim:</p>
+
+                <div class="callout callout-info">
+                    <strong>Senaryo:</strong> Diyelim ki 3000 byte'lık bir veri gönderiyorsun. TCP bunu 3 ayrı segmente böldü: 1000, 1001-2000, 2001-3000. İkinci segment kayboldu. Bu durumda ne olacak?
+                </div>
+
+                <p>
+                    Segment yani paketler, soruda da görüldüğü gibi parçalanma durumunda sıra numaraları sayesinde birleştirilirler. ACK mekanizması ise paketlerin karşı tarafa ulaşıp ulaşmadığını kontrol etmek için kullanılır. Timeout + Retransmission mekanizması sayesinde ise kaybolan paketler tekrar gönderilir.
+                </p>
+
+                <p>
+                    Peki aynı soruyu genişletirsek ve Server tarafı "Benim buffer'ım doldu, artık doydum yavaşlaman gerek" derse ne olacak? İşte burada Window Size devreye giriyor.
+                </p>
+
+                <p>
+                    Window Size, alıcının ne kadar veriyi tek seferde alabileceğini belirtir. Bu değer, alıcının tampon belleğinin (buffer) ne kadar büyük olduğunu gösterir. Gönderici, Window Size'ı aşmadan veri gönderir.
+                </p>
+
+                <p>Bu yapıyı daha da somutlaştırırsak veri gönderimi hiyerarşik olarak şu şekilde olur:</p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-play-circle"></i> 1. Başrol Oyuncuları: Server ve Client</h4>
+                        <p>Client 3000 byte'lık bir veri göndermek istiyor. Three-way handshake tamamlandı, bağlantı kuruldu. Server ise dinliyor, Receive buffer boyutu = 4000 byte (Window Size = 4000). İkisi de gayet hazır gözüküyor.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exchange-alt"></i> 2. Asıl Show Başlıyor: Veri Gönderimi (Data Transfer)</h4>
+                        <p>
+                            Başarılı Three-way handshake sonrası Client 1000 byte'lık veri gönderir. Server, bu 1000 byte'ı alır, Receive buffer'da saklar ve bir ACK paketi gönderir. ACK, 1001. byte'ı beklediğini belirtir. Client, Server'dan ACK alır almaz 2000 byte'lık bir veri daha gönderir. Server, 2000 byte'ı alır, buffer'da birleştirir ve 3001. byte'ı beklediğini belirten bir ACK gönderir. Client, son 1000 byte'ı gönderir. Server, 1001., 2001. ve 3001. byte'ları sırasıyla buffer'a ekleyip 4001. byte'ı beklediğini bildirir.
+                        </p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-exclamation-triangle"></i> 3. Peki Ya Bir Paket Kaybolursa?</h4>
+                        <p>Senaryomuzda Client 2000 byte'lık ikinci segmenti gönderdiğinde paket kayboldu. Server, 2001. byte'ı beklemeye devam eder ancak bu segment hiç ulaşmaz. Client tarafında ise belirli bir süre ACK gelmez, bu süre dolunca timeout yaşanır ve Client kayıp segmenti tekrar gönderir. Bu mekanizma veri kaybını önler ve güvenilir teslimatı sağlar.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-database"></i> 4. Peki Ya Server'ın Buffer'ı Dolarsa?</h4>
+                        <p>Buffer dolarsa, Server yeni veri kabul etmez ve Window Size 0 olur. Bu durumda Client veriyi göndermeyi bırakır ve Server'dan gelen ACK'ları bekler. ACK gelmeye başlayınca Window Size artar ve veri akışı devam eder.</p>
+                    </div>
+                </div>
+
+                <h2>TCP: Connection Termination - Bağlantı Sonlandırma</h2>
+
+                <p>
+                    Yazının en başında söylediğim gibi TCP biraz paranoyak bir hale sahiptir, evden çıkarken kapıyı kilitler, geri dönüp "Acaba kilitledim mi?" diye kontrol eder, sonra tekrar çıkar. Bağlantı sonlandırma aşaması da bu paranoyanın bir sonucudur. Aslında mantıklı bir şüphedir, çünkü veri paketleri internet üzerinde kaybolabildiği gibi, aynı zamanda bağlantı da kopabilir. Bu nedenle, bağlantı sonlandırma aşaması da oldukça detaylı ve dikkatli bir şekilde gerçekleştirilir.
+                </p>
+
+                <p>Bağlantı sonlandırma 4 yönlü bir süreçtir:</p>
+
+                <p>
+                    Bu süreçte FIN ve ACK paketleri kullanılır. FIN bayrağı "artık veri göndermeyeceğim, bağlantıyı kapatmak istiyorum" anlamına gelir. ACK bayrağı ise karşı tarafın FIN'ini aldığını onaylar. Her iki taraf da kendi FIN'ini gönderip karşılıklı ACK aldığında bağlantı tamamen sonlandırılır.
+                </p>
+
+                <h2>HTTP: Application Layer</h2>
+
+                <p>
+                    TCP'yi tanıdıktan sonra HTTP'nin ne olduğunu ve nasıl çalıştığını anlamak daha kolay olacaktır. HTTP, TCP'nin üzerine kurulu bir protokoldür. TCP, veriyi taşırken, HTTP verinin ne olduğunu belirtir. Bu ikisi birlikte çalışarak güvenli ve düzenli veri transferi sağlarlar.
+                </p>
+
+                <p>
+                    HTTP'yi en iyi bir sözleşme olarak düşünebiliriz. TCP byte'ları taşır ancak bu byte'ların ne anlama geldiği sorusuna cevap vermez. HTTP ise bu soruyu cevaplar: Client ne istiyor, server ne döndürüyor?
+                </p>
+
+                <p>
+                    HTTP, her zaman bir istek-cevap çiftinden oluşur. Client bir Request gönderirken Server da bir Response döner. Bu döngü, bağlantı kapatılana kadar devam eder.
+                </p>
+
+                <p>HTTP'nin Request yapısı ise:</p>
+
+<pre><code class="language-http">GET /index.html HTTP/1.1
+Host: example.com
+Accept: text/html
+User-Agent: Mozilla/5.0</code></pre>
+
+                <p>HTTP'nin Response yapısı ise:</p>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+
+&lt;html&gt;...&lt;/html&gt;</code></pre>
+
+                <p>
+                    Tıpkı bir mektup gibi: önce ne istediğini yazar, sonra ne tür bir içerik beklediğini belirtirsin ve en sonda asıl mesajını eklersin. Headers ile body arasındaki o boş satır küçük ama kritik, HTTP'de bu satır olmadan nerede header'ın bittiği, nerede body'nin başladığı bilinmez.
+                </p>
+
+                <p>
+                    HTTP/1.0'da her request-response döngüsü bağlantıyı kapatırdı, yani her istek için yeni bir TCP three-way handshake gerekiyordu. HTTP/1.1 bu sorunu <code>Connection: Keep-Alive</code> header'ı ile çözdü ve aynı TCP bağlantısı üzerinden birden fazla istek gönderilebilir hale geldi.
+                </p>
+
+                <p>Peki TCP ile birleştiği yer tam olarak neresi?</p>
+
+                <p>
+                    Bu HTTP mesajları aslında TCP'nin Payload kısmına yerleştirilir. Yani TCP, HTTP'nin Application Layer protokolünü taşır. Bu şekilde, HTTP, TCP'nin güvenilir teslimatından faydalanır ve verinin karşı tarafa hatasız ve sırası bozulmadan ulaşmasını sağlar. Bu sayede bizler de güvenli bir şekilde internet üzerinde gezinir, e-posta göndeririz.
+                </p>
+
+                <h2>TCP'ten HTTP'ye: Büyük Resim</h2>
+
+                <p>
+                    İşte bu iki protokolün bir araya gelmesiyle internet üzerinde nasıl güvenli ve düzenli bir veri transferi sağlandığını özetlemek gerekirse:
+                </p>
+
+                <div class="architecture-list">
+                    <div class="service-item">
+                        <h4><i class="fas fa-globe"></i> 1. Bağlantı İsteği</h4>
+                        <p>Tarayıcı adres çubuğuna <code>example.com</code> yazıp Enter'a basıyorsun. Tarayıcı, <code>example.com</code>'un IP adresini DNS üzerinden öğreniyor ve 80 numaralı porta TCP bağlantısı açmak istiyor. Henüz HTTP'den haber yok; sahne TCP'ye ait.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-handshake"></i> 2. Three-Way Handshake</h4>
+<pre><code class="language-bash">Tarayıcı  ──SYN──────────────────►  Sunucu
+Tarayıcı  ◄──────────SYN-ACK──────  Sunucu
+Tarayıcı  ──ACK──────────────────►  Sunucu</code></pre>
+                        <p>Her iki taraf ISN'lerini paylaştı ve pencere boyutlarını belirledi. Bağlantı kuruldu. TCP işini yaptı, şimdi sıra HTTP'de.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-arrow-right"></i> 3. HTTP Request TCP Payload'ına Giriyor</h4>
+                        <p>Tarayıcı bir HTTP isteği oluşturuyor:</p>
+<pre><code class="language-http">GET /index.html HTTP/1.1
+Host: example.com
+Accept: text/html
+User-Agent: Mozilla/5.0</code></pre>
+                        <p>Bu metin, bir TCP segmentinin Payload alanına yazılıyor ve sunucuya iletiliyor. TCP bu verinin bir HTTP isteği olduğunu bilmiyor; onu byte dizisi olarak taşıyor, ACK alıyor ve işi bitiyor.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-server"></i> 4. Sunucu İşliyor ve HTTP Response Gönderiyor</h4>
+                        <p>Sunucu TCP segmentini alıyor, Payload'dan HTTP isteğini çıkarıyor ve işliyor. Ardından kendi HTTP yanıtını oluşturuyor:</p>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+
+&lt;html&gt;...&lt;/html&gt;</code></pre>
+                        <p>Bu yanıt da yine TCP segmentinin Payload'ına yerleştiriliyor ve tarayıcıya gönderiliyor. TCP katmanı sıralamayı ve bütünlüğü garanti ediyor; HTTP katmanı ise gelen byte'ları parse edip sayfayı render ediyor.</p>
+                    </div>
+
+                    <div class="service-item">
+                        <h4><i class="fas fa-times-circle"></i> 5. Bağlantı Kapanıyor (ya da Açık Kalıyor)</h4>
+                        <p>HTTP/1.1 ile birlikte <code>Connection: Keep-Alive</code> varsayılan olarak aktif olduğundan aynı TCP bağlantısı üzerinden başka istekler de gönderilebilir. İşler bitince four-way handshake ile bağlantı nazikçe kapatılıyor.</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-success">
+                    <strong>Sonuç:</strong> Ekrana yansıyan o sayfa, milyonlarca kez tekrar eden bu döngünün sonucudur. TCP kurar, HTTP konuşur, TCP kapatır. Ve sen hiçbirini fark etmezsin.
+                </div>
+
+                <h2>Raw TCP ile HTTP İsteği Göndermek - Pratik</h2>
+
+                <p>
+                    Bu kadar uzun teorik yazıdan sonra ufak bir kod kısmı koymak istedim. Golang dilini kullanarak raw bir TCP bağlantısı kurup, HTTP isteği göndereceğiz. Ardından da response'u alacağız.
+                </p>
+
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"io"
+	"net"
+)
+
+func main() {
+	conn, err := net.DialTimeout("tcp", "google.com:80", 5*time.Second)
+	if err != nil {
+		fmt.Println("Hata:", err)
+		return
+	}
+	defer conn.Close()
+
+	// HTTP Request
+	request := "GET / HTTP/1.1\r\nHost: google.com\r\nConnection: close\r\n\r\n"
+	_, err = conn.Write([]byte(request))
+	if err != nil {
+		fmt.Println("Hata:", err)
+		return
+	}
+
+	// Response okuma
+	body, err := io.ReadAll(conn)
+	if err != nil {
+		fmt.Println("Hata:", err)
+		return
+	}
+
+	fmt.Println(string(body))
+}</code></pre>
+
+                <p><code>Run: go run main.go</code></p>
+
+                <p>
+                    Google'a HTTP/1.1 ile istek attığımızda ne gelir? Google, HTTP isteklerini HTTPS'e yönlendirdiği için 301 Moved Permanently yanıtı döner:
+                </p>
+
+<pre><code class="language-http">HTTP/1.1 301 Moved Permanently
+Location: https://www.google.com/
+Content-Type: text/html; charset=UTF-8
+Content-Length: 220
+Date: ...
+
+&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv="content-type" ...&gt;
+&lt;TITLE&gt;301 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;...</code></pre>
+
+                <p>
+                    Bu tam olarak beklenen davranış. Google sana "Ben artık HTTPS'teyim, 80 portuna gelme" diyor.
+                </p>
+
+                <p>Peki aynı şeyi <code>net/http</code> ile yapsaydık:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+)
+
+func main() {
+	resp, err := http.Get("http://google.com")
+	if err != nil {
+		fmt.Println("Hata:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println(resp.Status)
+	fmt.Println(string(body))
+}</code></pre>
+
+                <p>
+                    Daha kısa, daha temiz. Ama arka planda aynı şey oluyor: TCP bağlantısı açılıyor, HTTP metni Payload'a yazılıyor, response okunuyor. <code>net/http</code> bunu senin için gizliyor; raw TCP versiyonu ise her adımı göz önüne seriyor.
+                </p>
+
+                <div class="callout callout-success">
+                    <strong>Çıkarım:</strong> İşte bu yazıda anlatmak istediğim şey tam olarak buydu. REST API çağırırken aslında ne yaptığını bilmek, bizi daha iyi bir yazılımcı yapacağına inanıyorum.
+                </div>
+
+                <h2>Bir Adım Ötesi: HTTPS</h2>
+
+                <p>
+                    TCP, veriyi güvenilir biçimde taşır; kayıp olmaz, sıra bozulmaz. Ancak şifrelemez. Yani ağı dinleyen biri TCP segmentlerini yakalasa, içindeki HTTP metnini düz olarak okuyabilir.
+                </p>
+
+                <p>
+                    Bu sorunu çözmek için HTTPS devreye girer. HTTPS aslında HTTP değil, HTTP + TLS (Transport Layer Security) demektir. TLS, TCP ile HTTP arasına oturur. TCP bağlantısı kurulduktan sonra bir TLS handshake yapılır ve bundan itibaren tüm HTTP mesajları şifrelenmiş olarak taşınır. Yani TCP byte taşımaya devam eder, ama bu sefer byte'lar şifreli gelir.
+                </p>
+
+                <h2>Kaynaklar</h2>
+
+                <p>Bu yazıyı yazarken faydalandığım bazı kaynaklar:</p>
+
+                <ul>
+                    <li><a href="https://www.amazon.com/TCP-Illustrated-Protocols-Volume-Addison-Wesley/dp/0201633469" target="_blank">TCP/IP Illustrated (W. Richard Stevens)</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=FknTw9bJsXM" target="_blank">From TCP to HTTP | Full Course By @ThePrimeagen</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=xdQ9sgpkrX8" target="_blank">TCP Fundamentals Part 1 // TCP/IP Explained with Wireshark</a></li>
+                </ul>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=TCP%27den%20HTTP%27ye%3A%20Bir%20Veri%20Paketinin%20Yolculu%C4%9Fu" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+</body>
+
+</html>
