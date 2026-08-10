@@ -146,23 +146,23 @@
                 </p>
 
                 <ol>
-                    <li><strong>SYN (Synchronize):</strong> İlk olarak, veri göndermek isteyen taraf (client) karşı tarafa (server) bir SYN paketi gönderir. Bu paket, bağlantı kurmak istediğini belirtir.</li>
-                    <li><strong>SYN-ACK (Synchronize-Acknowledge):</strong> SYN paketi alan taraf, bağlantıyı kabul eder ve bir SYN-ACK paketi gönderir. Bu paket, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
-                    <li><strong>ACK (Acknowledge):</strong> SYN-ACK paketi alan taraf, bağlantıyı kabul eder ve bir ACK paketi gönderir. Bu paket, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
+                    <li><strong>SYN (Synchronize):</strong> İlk olarak, veri göndermek isteyen taraf (client) karşı tarafa (server) bir SYN segmenti gönderir. Bu segment, bağlantı kurmak istediğini belirtir.</li>
+                    <li><strong>SYN-ACK (Synchronize-Acknowledge):</strong> SYN segmentini alan taraf, bağlantıyı kabul eder ve bir SYN-ACK segmenti gönderir. Bu segment, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
+                    <li><strong>ACK (Acknowledge):</strong> SYN-ACK segmentini alan taraf, bağlantıyı kabul eder ve bir ACK segmenti gönderir. Bu segment, bağlantıyı kabul ettiğini ve veriyi almak için hazır olduğunu belirtir.</li>
                 </ol>
 
                 <p>
-                    Peki neden isimleri özellikle SYN ve ACK? Aslında bu isimlendirmeler, TCP paketlerinin header'larında yer alan bazı bayraklardan geliyor. Bu bayraklar, paketlerin ne tür bir paket olduğunu belirtiyor.
+                    Peki neden isimleri özellikle SYN ve ACK? Aslında bu isimlendirmeler, TCP segmentlerinin header'larında yer alan bazı bayraklardan geliyor. Bu bayraklar, segmentin ne tür bir segment olduğunu belirtiyor.
                 </p>
 
                 <p>
-                    Bayrak demişken ona da ufak bir girmek istiyorum, her TCP paketi minimum 20 byte'lık bir header içerir. Bu header; port numaraları, sıra numaraları, pencere boyutu ve bayraklar gibi birbirinden farklı alanlar barındırır. Bayraklar bu alanlardan yalnızca biridir.
+                    Bayrak demişken ona da ufak bir girmek istiyorum, her TCP segmenti minimum 20 byte'lık bir header içerir. Bu header; port numaraları, sıra numaraları, pencere boyutu ve bayraklar gibi birbirinden farklı alanlar barındırır. Bayraklar bu alanlardan yalnızca biridir.
                 </p>
 
-                <h4>SYN, SYN-ACK ve ACK Paketlerinin İçeriği</h4>
+                <h4>SYN, SYN-ACK ve ACK Segmentlerinin İçeriği</h4>
 
                 <p>
-                    Öncelikle bu 3 paket türü de TCP paketi olduğu için, 20 byte'lık bir header içerir.
+                    Öncelikle bu 3 tür de TCP segmenti olduğu için, 20 byte'lık bir header içerir.
                 </p>
 
                 <div class="callout callout-info">
@@ -206,9 +206,9 @@
                                 <td style="padding: 0.65rem 1rem;">Beklenen bir sonraki byte</td>
                             </tr>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
-                                <td style="padding: 0.65rem 1rem;"><code>Header Length</code></td>
+                                <td style="padding: 0.65rem 1rem;"><code>Data Offset</code></td>
                                 <td style="padding: 0.65rem 1rem;">4 bits</td>
-                                <td style="padding: 0.65rem 1rem;">Header'ın uzunluğu</td>
+                                <td style="padding: 0.65rem 1rem;">Header uzunluğu (32-bit word)</td>
                             </tr>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);">
                                 <td style="padding: 0.65rem 1rem;"><code>Flags</code></td>
@@ -245,7 +245,7 @@
                 </div>
 
                 <p>
-                    Üç paket türü de aynı TCP header yapısını kullanır; farkları yalnızca bazı field'ların değerlerinde yatıyor. Handshake sürecinde asıl önem taşıyan üç alan şunlar: <strong>Flags</strong>, <strong>Sequence Number</strong> ve <strong>Acknowledgment Number</strong>.
+                    Üç segment türü de aynı TCP header yapısını kullanır; farkları yalnızca bazı field'ların değerlerinde yatıyor. Handshake sürecinde asıl önem taşıyan üç alan şunlar: <strong>Flags</strong>, <strong>Sequence Number</strong> ve <strong>Acknowledgment Number</strong>.
                 </p>
 
                 <div style="overflow-x: auto; margin: 1.5rem 0;">
@@ -303,8 +303,8 @@
                     <li><strong>Source Port ve Destination Port:</strong> Gönderenin ve alıcının port numaralarını belirtir. Port numarası, hangi uygulamanın veriyi alacağını belirtir. Örneğin 80, 8080, 443 portları web tarayıcıları tarafından kullanılırken, 25, 465 portları e-posta uygulamaları tarafından kullanılır.</li>
                     <li><strong>Sequence Number:</strong> Gönderenin başlangıç byte pozisyonudur. Her iki taraf bağlantı başında rastgele bir ISN (Initial Sequence Number) seçer. Bu rastgelelik kasıtlıdır — eski bağlantılardan kalan paketlerin yeni bağlantıyla karışmaması için.</li>
                     <li><strong>Acknowledgment Number:</strong> Beklenen bir sonraki byte'ı belirtir. Her zaman alınan Seq Number + 1 değerini taşır.</li>
-                    <li><strong>Header Length:</strong> Header'ın uzunluğunu belirtir. Bu alan 4 bit uzunluğundadır ve 0 ile 15 arasında değer alabilir. Bu değer, header'ın toplam uzunluğunu byte cinsinden ifade eder.</li>
-                    <li><strong>Flags:</strong> SYN, ACK, FIN, RST gibi bayrakları içerir. SYN bayrağı "bağlantı başlatmak istiyorum", ACK bayrağı ise "bir önceki paketi aldım" anlamına gelir.</li>
+                    <li><strong>Data Offset (Header Length):</strong> TCP header'ının 32-bit word cinsinden uzunluğunu belirtir. Bu alan 4 bit uzunluğundadır. Örneğin değer 5 ise, 5 x 4 = 20 byte'lık minimum header uzunluğunu ifade eder. Bu aynı zamanda verinin nerede başladığını (offset) gösterir.</li>
+                    <li><strong>Flags:</strong> SYN, ACK, FIN, RST gibi bayrakları içerir. SYN bayrağı "bağlantı başlatmak istiyorum", ACK bayrağı ise "bir önceki segmenti aldım" anlamına gelir.</li>
                     <li><strong>Window Size:</strong> Alınabilecek max veri miktarını belirtir. Bu alan, alıcının ne kadar veriyi tek seferde alabileceğini belirtir. Bu değer, alıcının tampon belleğinin (buffer) ne kadar büyük olduğunu gösterir.</li>
                     <li><strong>Checksum:</strong> Hata kontrolü yapar. Bu alan, verinin bütünlüğünü kontrol etmek için kullanılır. Veri üzerinde yapılan matematiksel bir işlem sonucunda elde edilen değerdir.</li>
                     <li><strong>Urgent Pointer:</strong> Acil veri işaretçisi. Bu alan, acil veriyi işaret eder. Bu veri, hemen işlenmelidir.</li>
@@ -329,7 +329,7 @@
                 </div>
 
                 <p>
-                    Segment yani paketler, soruda da görüldüğü gibi parçalanma durumunda sıra numaraları sayesinde birleştirilirler. ACK mekanizması ise paketlerin karşı tarafa ulaşıp ulaşmadığını kontrol etmek için kullanılır. Timeout + Retransmission mekanizması sayesinde ise kaybolan paketler tekrar gönderilir.
+                    Segmentler, soruda da görüldüğü gibi parçalanma durumunda sıra numaraları sayesinde birleştirilirler. ACK mekanizması ise segmentlerin karşı tarafa ulaşıp ulaşmadığını kontrol etmek için kullanılır. Timeout + Retransmission mekanizması sayesinde ise kaybolan segmentler tekrar gönderilir.
                 </p>
 
                 <p>
@@ -351,12 +351,12 @@
                     <div class="service-item">
                         <h4><i class="fas fa-exchange-alt"></i> 2. Asıl Show Başlıyor: Veri Gönderimi (Data Transfer)</h4>
                         <p>
-                            Başarılı Three-way handshake sonrası Client 1000 byte'lık veri gönderir. Server, bu 1000 byte'ı alır, Receive buffer'da saklar ve bir ACK paketi gönderir. ACK, 1001. byte'ı beklediğini belirtir. Client, Server'dan ACK alır almaz 2000 byte'lık bir veri daha gönderir. Server, 2000 byte'ı alır, buffer'da birleştirir ve 3001. byte'ı beklediğini belirten bir ACK gönderir. Client, son 1000 byte'ı gönderir. Server, 1001., 2001. ve 3001. byte'ları sırasıyla buffer'a ekleyip 4001. byte'ı beklediğini bildirir.
+                            Başarılı Three-way handshake sonrası Client 1000 byte'lık veri gönderir. Server, bu 1000 byte'ı alır, Receive buffer'da saklar ve bir ACK segmenti gönderir. ACK, 1001. byte'ı beklediğini belirtir. Client, Server'dan ACK alır almaz 2000 byte'lık bir veri daha gönderir. Server, 2000 byte'ı alır, buffer'da birleştirir ve 3001. byte'ı beklediğini belirten bir ACK gönderir. Client, son 1000 byte'ı gönderir. Server, 1001., 2001. ve 3001. byte'ları sırasıyla buffer'a ekleyip 4001. byte'ı beklediğini bildirir.
                         </p>
                     </div>
 
                     <div class="service-item">
-                        <h4><i class="fas fa-exclamation-triangle"></i> 3. Peki Ya Bir Paket Kaybolursa?</h4>
+                        <h4><i class="fas fa-exclamation-triangle"></i> 3. Peki Ya Bir Segment Kaybolursa?</h4>
                         <p>Senaryomuzda Client 2000 byte'lık ikinci segmenti gönderdiğinde paket kayboldu. Server, 2001. byte'ı beklemeye devam eder ancak bu segment hiç ulaşmaz. Client tarafında ise belirli bir süre ACK gelmez, bu süre dolunca timeout yaşanır ve Client kayıp segmenti tekrar gönderir. Bu mekanizma veri kaybını önler ve güvenilir teslimatı sağlar.</p>
                     </div>
 
@@ -369,13 +369,13 @@
                 <h2>TCP: Connection Termination - Bağlantı Sonlandırma</h2>
 
                 <p>
-                    Yazının en başında söylediğim gibi TCP biraz paranoyak bir hale sahiptir, evden çıkarken kapıyı kilitler, geri dönüp "Acaba kilitledim mi?" diye kontrol eder, sonra tekrar çıkar. Bağlantı sonlandırma aşaması da bu paranoyanın bir sonucudur. Aslında mantıklı bir şüphedir, çünkü veri paketleri internet üzerinde kaybolabildiği gibi, aynı zamanda bağlantı da kopabilir. Bu nedenle, bağlantı sonlandırma aşaması da oldukça detaylı ve dikkatli bir şekilde gerçekleştirilir.
+                    Yazının en başında söylediğim gibi TCP biraz paranoyak bir hale sahiptir, evden çıkarken kapıyı kilitler, geri dönüp "Acaba kilitledim mi?" diye kontrol eder, sonra tekrar çıkar. Bağlantı sonlandırma aşaması da bu paranoyanın bir sonucudur. Aslında mantıklı bir şüphedir, çünkü segmentler ağ üzerinde kaybolabildiği gibi, aynı zamanda bağlantı da kopabilir. Bu nedenle, bağlantı sonlandırma aşaması da oldukça detaylı ve dikkatli bir şekilde gerçekleştirilir.
                 </p>
 
                 <p>Bağlantı sonlandırma 4 yönlü bir süreçtir:</p>
 
                 <p>
-                    Bu süreçte FIN ve ACK paketleri kullanılır. FIN bayrağı "artık veri göndermeyeceğim, bağlantıyı kapatmak istiyorum" anlamına gelir. ACK bayrağı ise karşı tarafın FIN'ini aldığını onaylar. Her iki taraf da kendi FIN'ini gönderip karşılıklı ACK aldığında bağlantı tamamen sonlandırılır.
+                    Bu süreçte FIN ve ACK segmentleri kullanılır. FIN bayrağı "artık veri göndermeyeceğim, bağlantıyı kapatmak istiyorum" anlamına gelir. ACK bayrağı ise karşı tarafın FIN'ini aldığını onaylar. Her iki taraf da kendi FIN'ini gönderip karşılıklı ACK aldığında bağlantı tamamen sonlandırılır.
                 </p>
 
                 <h2>HTTP: Application Layer</h2>
