@@ -1,5 +1,13 @@
 window.BLOG_POSTS = [
     {
+        title: "SpendSync: Kurumsal Harcama Platformu Mimari Notları ve Trade-off'lar",
+        href: "./page/spend_sync_trade_off.html",
+        date: "August 26, 2026",
+        readingTime: "15 min read",
+        excerpt: "Kurumsal düzeyde Tedarik ve Harcama Yönetim Platformu SpendSync'in mimari kararları: Modüler monolith, ThreadLocal ile multi-tenant izolasyonu, Redis Sliding Window Rate Limiter, Pessimistic Lock ile double-spending önleme, 3-Way Matching ve Testcontainers.",
+        tags: ["Java", "Spring Boot", "Modular Monolith", "Redis", "PostgreSQL"]
+    },
+    {
         title: "TCP'den HTTP'ye: Bir Veri Paketinin Yolculuğu",
         href: "./page/tcp_to_http.html",
         date: "August 10, 2026",

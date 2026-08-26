@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendSync: Architectural Notes and Trade-offs in an Enterprise Spend Platform - Doguhan Ilter</title>
+    <meta name="description" content="Architectural decisions behind SpendSync: Modular Monolith, Multi-Tenant isolation with ThreadLocal, Redis ZSET Sliding Window Rate Limiting, Pessimistic Locking, 3-Way Invoice Matching, Testcontainers, and Structured Logging with PII Masking.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+            <ul>
+                <li><a href="../../index.html" class="active">Blog</a></li>
+            </ul>
+            <div class="lang-switch" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+                <a href="spend_sync_trade_off_tr.html" class="lang-btn" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; color: #2b5ea7; background: transparent; font-weight: 700; border-radius: 2px;">TR</a>
+                <a href="spend_sync_trade_off_en.html" class="lang-btn active" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; background: #2b5ea7; color: #fff; font-weight: 700; border-radius: 2px;">EN</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-08-26">
+                        <i class="far fa-calendar"></i> Aug 26, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 15 min read
+                    </span>
+                    <span class="lang-indicator" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-globe"></i> <strong>Language:</strong> English
+                        <a href="spend_sync_trade_off_tr.html" style="color: #2c5aa0; margin-left: 6px;">(Türkçe'ye Geç)</a>
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">SpendSync: Architectural Notes and Trade-offs in an Enterprise Spend Platform</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Java</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Modular Monolith</span>
+                    <span class="tag">Redis</span>
+                    <span class="tag">PostgreSQL</span>
+                    <span class="tag">System Design</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    This blog originated from organizing and refining the architectural notes I took while designing and building the Spend-Sync project into a more systematic form.
+                </p>
+
+                <p>
+                    SpendSync is an enterprise-grade Procurement and Spend Management Platform. It encompasses the complete workflow from purchase requisitions to invoice payments, alongside budget control, vendor management, and automated invoice matching. Rather than focusing merely on "what I built", this post explores "why I built it this way and what I learned along the way".
+                </p>
+
+                <hr>
+
+                <h2>Table of Contents</h2>
+
+                <ol>
+                    <li><a href="#1-modular-monolith-as-an-architectural-choice">Modular Monolith as an Architectural Choice</a></li>
+                    <li><a href="#2-multi-tenant-isolation-threadlocal-and-request-filter">Multi-Tenant Isolation: ThreadLocal and Request Filter</a></li>
+                    <li><a href="#3-sliding-window-rate-limiting-with-redis-zset">Sliding Window Rate Limiting with Redis ZSET</a></li>
+                    <li><a href="#4-preventing-double-spending-with-pessimistic-locking">Preventing Double-Spending with Pessimistic Locking</a></li>
+                    <li><a href="#5-3-way-invoice-matching-algorithm">3-Way Invoice Matching Algorithm</a></li>
+                    <li><a href="#6-testcontainers-integration-testing-in-real-containers-not-mocks">Testcontainers: Integration Testing in Real Containers, Not Mocks</a></li>
+                    <li><a href="#7-structured-logging-and-pii-masking">Structured Logging and PII Masking</a></li>
+                </ol>
+
+                <hr>
+
+                <h2 id="1-modular-monolith-as-an-architectural-choice">1. Modular Monolith as an Architectural Choice</h2>
+
+                <p>
+                    Considering that the services of a Procurement and Spend Management Platform communicate with high-traffic frequency and that this communication must be both sustainable and traceable, building this project with a microservices architecture would have inflated the scale drastically and made traffic coordination difficult, at least at this initial stage.
+                </p>
+
+                <p>
+                    For example, during a 3-Way Matching process, matching an invoice requires accessing data across multiple domains simultaneously:
+                </p>
+
+                <ul>
+                    <li><code>PurchaseOrder</code> &rarr; purchasing module</li>
+                    <li><code>GoodsReceipt</code> &rarr; receiving module</li>
+                    <li><code>SupplierInvoice</code> &rarr; matching module</li>
+                    <li><code>BudgetPool</code> &rarr; budget module</li>
+                    <li><code>Tenant</code> &rarr; core module</li>
+                </ul>
+
+                <p>
+                    In microservices, this translates to five separate HTTP calls. Each call introduces latency in milliseconds and represents a potential failure point. Ensuring that all five services complete successfully requires the Saga pattern. Saga means distributed transactions, and distributed transactions produce one of the most painful classes of bugs in production environments.
+                </p>
+
+                <p>
+                    A Modular Monolith, on the other hand, provides a single deployment unit from an infrastructure standpoint while enabling strict internal boundaries. The fundamental rule: no module may access another module's <code>internal/</code> package directly; they communicate exclusively through interfaces defined in the <code>api/</code> package.
+                </p>
+
+<pre><code class="language-java">// MatchingServiceImpl.java: CORRECT
+private final BudgetService budgetService;   // api.BudgetService interface
+
+// WRONG: direct dependency on internal package
+// private final BudgetServiceImpl budgetServiceImpl;
+</code></pre>
+
+                <h3>Modular Monolith &rarr; Microservices Transition</h3>
+
+                <p>
+                    If SpendSync scales in the future and, for instance, requires deploying the Vendor Portal independently, the <code>vendorportal/api</code> interfaces are already clean. Drawing a network boundary becomes an implementation detail rather than an API overhaul. This is the "modulith-first" philosophy: establish clear boundaries first, extract into distributed services later if needed.
+                </p>
+
+                <hr>
+
+                <h2 id="2-multi-tenant-isolation-threadlocal-and-request-filter">2. Multi-Tenant Isolation: ThreadLocal and Request Filter</h2>
+
+                <p>
+                    SpendSync serves multiple companies (tenants). Company A's budget records must never be visible to Company B. This is the foundational pillar of SaaS. If handled incorrectly, it creates critical security vulnerabilities and severe compliance violations (GDPR/KVKK).
+                </p>
+
+                <p>
+                    To enforce this, every incoming HTTP request carries an <code>X-Tenant-Id</code> header:
+                </p>
+
+<pre><code class="language-http">GET /api/v1/budget/pools
+Authorization: Bearer eyJhbGc...
+X-Tenant-Id: 550e8400-e29b-41d4-a716-446655440000
+</code></pre>
+
+                <p>
+                    The <code>TenantFilter</code> extracts this header and binds it to a <code>ThreadLocal</code> context:
+                </p>
+
+<pre><code class="language-java">@Component
+public class TenantFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String tenantHeaderValue = request.getHeader("X-Tenant-Id");
+
+        try {
+            if (tenantHeaderValue != null && !tenantHeaderValue.isBlank()) {
+                UUID tenantId = UUID.fromString(tenantHeaderValue.trim());
+                TenantContext.setTenantId(tenantId);
+                MDC.put("tenantId", tenantId.toString());
+            } else {
+                // Fallback: Use tenantId embedded in JWT
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.getPrincipal() instanceof UserPrincipal principal) {
+                    TenantContext.setTenantId(principal.getTenantId());
+                }
+            }
+            filterChain.doFilter(request, response);
+        } finally {
+            TenantContext.clear(); // CRITICAL
+        }
+    }
+}
+</code></pre>
+
+                <p>
+                    The <code>clear()</code> invocation in the <code>finally</code> block is paramount. Tomcat operates on a thread pool; once a request completes, the thread returns to the pool. If <code>clear()</code> is omitted, a subsequent request processed by the same thread would inherit the previous tenant's identity context.
+                </p>
+
+                <h3>TenantContext: ThreadLocal Wrapper</h3>
+
+<pre><code class="language-java">public final class TenantContext {
+
+    private static final ThreadLocal&lt;UUID&gt; TENANT_ID_HOLDER = new ThreadLocal&lt;&gt;();
+
+    public static void setTenantId(UUID tenantId) {
+        TENANT_ID_HOLDER.set(tenantId);
+    }
+
+    public static UUID getRequiredTenantId() {
+        return Optional.ofNullable(TENANT_ID_HOLDER.get())
+            .orElseThrow(() -> new SpendSyncException(
+                "No tenant context found.", HttpStatus.UNAUTHORIZED, "MISSING_TENANT"));
+    }
+
+    public static void clear() {
+        TENANT_ID_HOLDER.remove(); // remove() is safer than set(null)
+    }
+}
+</code></pre>
+
+                <p>
+                    With <code>ThreadLocal&lt;UUID&gt;</code>, each thread maintains its own isolated value. Thread A's UUID has no effect on Thread B.
+                </p>
+
+                <h3>Automatic Isolation at the Repository Layer</h3>
+
+                <p>
+                    Every database query is strictly filtered by tenant ID:
+                </p>
+
+<pre><code class="language-java">// BudgetServiceImpl.java
+UUID tenantId = TenantContext.getRequiredTenantId();
+
+BudgetPool pool = budgetPoolRepository
+    .findByIdAndTenantId(poolId, tenantId)
+    .orElseThrow(...); // Pool belonging to another tenant → 404
+</code></pre>
+
+                <p>
+                    At the SQL level: <code>SELECT * FROM budget_pools WHERE id = ? AND tenant_id = ?</code>
+                </p>
+
+                <p>
+                    If the tenant ID does not match, the record behaves as if it does not exist. Tenant A can never query or mutate Tenant B's data.
+                </p>
+
+                <p>
+                    An important caveat to note: this pattern is specific to Java web applications running within a unified process. If the architecture expands to include an API Gateway layer or transitions to microservices, tenant isolation would benefit from an external gateway layer. Otherwise, each microservice must re-verify tenant IDs, introducing repetitive overhead.
+                </p>
+
+                <p>
+                    Furthermore, managing tenant context via threads on thread-pooled servers like Tomcat makes the <code>finally</code> block mandatory. Failing to clear state risks cross-tenant data leaks. An alternative approach is utilizing request attributes; however, this comes with its own ordering constraints: if the tenant filter does not execute before authentication filters, the tenant ID will not be accessible.
+                </p>
+
+                <p>
+                    Additionally, when delegating tasks to asynchronous workers, explicit context propagation mechanisms must be introduced to safely transfer tenant identity across thread boundaries.
+                </p>
+
+                <hr>
+
+                <h2 id="3-sliding-window-rate-limiting-with-redis-zset">3. Sliding Window Rate Limiting with Redis ZSET</h2>
+
+                <p>
+                    When building rate limiters, fixed window counters are frequently the default choice. However, fixed window mechanisms have notable shortcomings. In this project, fixed window limiting was initially implemented, but its limitations soon became evident, leading to a migration to a sliding window rate limiter.
+                </p>
+
+                <p>
+                    What are the core flaws of Fixed Window?<br>
+                    The primary weakness is traffic bursting at window boundaries. Users or automated scripts can burst high traffic right before a window closes, and immediately send another burst as the new window opens.
+                </p>
+
+                <p>
+                    To illustrate: assume a limit of "10 requests per 1 minute". An attacker dispatches 10 requests at 00:59:50 (accepted because the first window is active). At 01:00:02, a new window begins, and another 10 requests are sent. Within a span of 12 seconds, 20 requests pass through unchecked. The rate limiter functioned as coded, yet failed its core security objective.
+                </p>
+
+                <p>
+                    The sliding window algorithm resolves this by continuously looking backward over the exact window duration. It consistently answers the question: "How many requests occurred in the last 60 seconds?" To achieve this, individual request timestamps must be recorded rather than incrementing a single scalar counter. Redis's Sorted Set (ZSET) data structure is ideal here: every member holds a score representing its Unix timestamp. Running <code>ZREMRANGEBYSCORE</code> removes all entries older than 60 seconds in a single command, and the remaining cardinality reflects active requests within the rolling window.
+                </p>
+
+                <h3>Real Implementation</h3>
+
+<pre><code class="language-java">@Aspect
+@Component
+public class RateLimitAspect {
+
+    @Around("@annotation(rateLimit)")
+    public Object applyRateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
+        String identifier = resolveClientIdentifier(rateLimit.type());
+        String redisKey = "spendsync:ratelimit:" + rateLimit.key() + ":" + identifier;
+
+        long now = System.currentTimeMillis();
+        long windowStart = now - (rateLimit.periodSeconds() * 1000L);
+
+        try {
+            stringRedisTemplate.opsForZSet().removeRangeByScore(redisKey, 0, windowStart);
+
+            Long currentRequests = stringRedisTemplate.opsForZSet().zCard(redisKey);
+            long count = currentRequests != null ? currentRequests : 0L;
+
+            if (count >= rateLimit.limit()) {
+                response.setHeader("Retry-After", String.valueOf(rateLimit.periodSeconds()));
+                response.setHeader("X-RateLimit-Remaining", "0");
+                throw new RateLimitExceededException(...);
+            }
+
+            String member = now + ":" + UUID.randomUUID().toString().substring(0, 8);
+            stringRedisTemplate.opsForZSet().add(redisKey, member, (double) now);
+            stringRedisTemplate.expire(redisKey, Duration.ofSeconds(rateLimit.periodSeconds() + 10));
+
+        } catch (RateLimitExceededException e) {
+            throw e;
+        } catch (Exception e) {
+            // Fail-open: Do not block users if Redis fails (for lower-risk endpoints)
+            log.error("Redis Rate Limiter failed: {}. Allowing request.", e.getMessage());
+        }
+
+        return joinPoint.proceed();
+    }
+}
+</code></pre>
+
+                <p>
+                    Endpoints are protected declaratively using annotations:
+                </p>
+
+<pre><code class="language-java">@RateLimit(key = "auth:login", limit = 5, periodSeconds = 60, type = RateLimitType.IP)
+public AuthResponse login(LoginRequest request) { ... }
+</code></pre>
+
+                <p>
+                    Target identifiers vary by strategy: <code>USER</code> evaluates the JWT username, <code>TENANT</code> tracks <code>X-Tenant-Id</code>, and <code>IP</code> tracks client addresses.
+                </p>
+
+                <h3>Current Atomicity Issue</h3>
+
+                <p>
+                    In the initial Java implementation above, the operations execute as three distinct roundtrips:
+                </p>
+
+<pre><code>ZREMRANGEBYSCORE → ZCARD → ZADD</code></pre>
+
+                <p>
+                    If two concurrent requests execute <code>ZCARD</code> simultaneously, both may observe the count below the limit, a classic race condition. The solution is combining all three operations into a single atomic Redis Lua script:
+                </p>
+
+<pre><code class="language-lua">local key = KEYS[1]
+local window_start = tonumber(ARGV[1])
+local now = tonumber(ARGV[2])
+local limit = tonumber(ARGV[3])
+local member = ARGV[4]
+
+redis.call('ZREMRANGEBYSCORE', key, 0, window_start)
+local count = redis.call('ZCARD', key)
+if count >= limit then return 0 end
+redis.call('ZADD', key, now, member)
+return 1
+</code></pre>
+
+                <p>
+                    Executing Lua scripts in Redis ensures server-side atomic execution without race conditions across threads. This boosts performance while guaranteeing strict consistency.
+                </p>
+
+                <p>
+                    A valuable lesson learned: Redis processes Lua scripts synchronously, blocking the single-threaded event loop during execution. Therefore, scripts must remain short and lightweight to prevent latency spikes.
+                </p>
+
+                <h2 id="4-preventing-double-spending-with-pessimistic-locking">4. Preventing Double-Spending with Pessimistic Locking</h2>
+
+                <p>
+                    One of the most critical challenges in financial systems is the double-spending problem. Consider a scenario where a company's budget pool has 10,000 USD available, and two users trigger allocations concurrently:
+                </p>
+
+<pre><code>T1: User A → SELECT available → Sees 10,000 USD
+T2: User B → SELECT available → Sees 10,000 USD (A has not committed yet)
+T3: A → 10,000 >= 8,000 → ACCEPTED → reserved += 8,000 → UPDATE
+T4: B → 10,000 >= 6,000 → ACCEPTED → reserved += 6,000 → UPDATE
+</code></pre>
+
+                <p>
+                    Result: 14,000 USD allocated from an initial budget of 10,000 USD.
+                </p>
+
+                <p>
+                    Several strategies exist to resolve this concurrency conflict:
+                </p>
+
+                <ol>
+                    <li>Optimistic Locking</li>
+                    <li>Redis Optimistic</li>
+                    <li>Pessimistic Lock</li>
+                </ol>
+
+                <p>
+                    Let's explore each approach and why Pessimistic Locking was selected for SpendSync.
+                </p>
+
+                <h3>1. Redis Optimistic</h3>
+
+                <p>
+                    With Redis, you monitor keys using the <code>WATCH</code> command within a <code>MULTI/EXEC</code> transaction block. If the watched key is modified by another client before commit, the <code>EXEC</code> command returns nil, requiring a retry loop.
+                </p>
+
+                <p>
+                    In a budget scenario, this reads the current balance, watches the key, computes the allocation, and attempts to write. If a collision occurs, the operation fails and retries.
+                </p>
+
+                <p>
+                    The main drawback is the retry complexity. Under heavy contention, requests enter endless retry loops, raising thorny questions in financial flows: "How many times should we retry, and what happens upon timeout?" Furthermore, budget records reside in PostgreSQL. Introducing Redis as an additional synchronization layer complicates the topology and requires dual-state consistency management. Hence, this approach was discarded.
+                </p>
+
+                <h3>2. Optimistic Locking</h3>
+
+                <p>
+                    Optimistic Locking assumes conflicts are rare. Data is read along with a version attribute, business logic runs, and the update commits only if the version remains unchanged.
+                </p>
+
+                <p>
+                    In JPA/Hibernate, a <code>@Version</code> column automatically increments on each update:
+                </p>
+
+<pre><code class="language-java">@Entity
+public class BudgetPool {
+
+    @Id
+    private UUID id;
+
+    @Version
+    private int version; // Automatically incremented
+
+    private BigDecimal availableAmount;
+
+    // ...
+}
+</code></pre>
+
+                <p>
+                    When reading with version = 5, Hibernate generates the following update statement:
+                </p>
+
+<pre><code>UPDATE budget_pools
+SET reserved_amount = ?, version = 6
+WHERE id = ? AND version = 5
+</code></pre>
+
+                <p>
+                    If another transaction modified the row in the interim (version became 6), zero rows are updated, and Hibernate throws an <code>OptimisticLockException</code>.
+                </p>
+
+                <p>
+                    Why is this problematic for budget reservations?
+                </p>
+
+                <p>
+                    Optimistic locking incurs heavy overhead under contention: read the row, execute full validation, send an update, catch an exception, and restart from scratch. If 10 threads hit the same budget pool simultaneously, 9 fail and retry. During peak business moments, such as fiscal year-end when departments submit expenses simultaneously, optimistic locking exhausts system resources.
+                </p>
+
+                <p>
+                    More importantly, budget reservations are direct user actions. The user clicked "Submit Purchase Order" and is awaiting a response. Placing complex retry logic into the application layer introduces ambiguity regarding timeouts and error reporting. Pessimistic locking eliminates this uncertainty: locks are either acquired immediately or queued sequentially.
+                </p>
+
+                <h3>3. Pessimistic Lock</h3>
+
+                <p>
+                    In PostgreSQL, <code>SELECT ... FOR UPDATE</code> locks the selected row at the read stage. No other transaction can mutate or obtain a write lock on that row until the holding transaction completes. Competing transactions queue up cleanly. When the active transaction commits or rolls back, the lock releases automatically.
+                </p>
+
+<pre><code class="language-java">// BudgetPoolRepository.java
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("SELECT b FROM BudgetPool b WHERE b.id = :id AND b.tenant.id = :tenantId")
+Optional&lt;BudgetPool&gt; findByIdAndTenantIdWithLock(@Param("id") UUID id,
+                                                  @Param("tenantId") UUID tenantId);
+</code></pre>
+
+                <p>
+                    Hibernate translates this annotation directly to:
+                </p>
+
+<pre><code class="language-sql">SELECT * FROM budget_pools WHERE id = ? AND tenant_id = ? FOR UPDATE
+</code></pre>
+
+                <p>
+                    This guarantees zero double-spending with deterministic transaction ordering.
+                </p>
+
+                <p>
+                    The reservation flow functions seamlessly: the moment <code>findByIdAndTenantIdWithLock</code> executes, PostgreSQL locks the row. Other transactions wait their turn in line. Once the first transaction commits, the next in queue reads the updated, accurate balance.
+                </p>
+
+                <p>
+                    In code, this is orchestrated as follows:
+                </p>
+
+<pre><code class="language-java">@Override
+@Transactional
+public BudgetReservationResult reserveBudget(UUID budgetPoolId, BigDecimal amount, ...) {
+    UUID tenantId = TenantContext.getRequiredTenantId();
+
+    // Lock and read: no concurrent transaction can modify this row
+    BudgetPool pool = budgetPoolRepository
+        .findByIdAndTenantIdWithLock(budgetPoolId, tenantId)
+        .orElseThrow(...);
+
+    BigDecimal availableBefore = pool.getAvailableAmount();
+
+    if (amount.compareTo(availableBefore) > 0) {
+        // Insufficient funds: handle according to enforcement mode
+        switch (pool.getEnforcementMode()) {
+            case HARD_STOP  -> throw new SpendSyncException("Insufficient budget.", ...);
+            case TOLERANCE  -> {
+                // If within configured tolerance band, allow with overrun flag
+                if (reserved + spent + amount > pool.getMaxAllowedAllocation())
+                    throw new SpendSyncException("Tolerance exceeded.", ...);
+                isOverrun = true;
+            }
+            case SOFT_STOP  -> isOverrun = true; // Allow but flag for executive approval
+        }
+    }
+
+    pool.setReservedAmount(pool.getReservedAmount().add(amount));
+    budgetPoolRepository.save(pool);
+
+    // Append to immutable audit ledger
+    budgetTransactionRepository.save(new BudgetTransaction(
+        pool, BudgetTransactionType.RESERVE, amount, availableBefore, pool.getAvailableAmount(), ...
+    ));
+
+    return BudgetReservationResult.success(pool.getId(), isOverrun, ...);
+}
+</code></pre>
+
+                <p>
+                    Crucially, the lock releases only when the transaction commits, ensuring subsequent threads always observe accurate ledger balances.
+                </p>
+
+                <p>
+                    I validated this concurrency guarantee using Testcontainers running an official PostgreSQL 16 instance. With 10 threads submitting simultaneous 1,000 USD reservation requests against a 5,000 USD pool:
+                </p>
+
+<pre><code class="language-java">@Test
+void givenTenConcurrentThreads_whenReservingBudget_thenExactlyFiveSucceed()
+        throws InterruptedException {
+    ExecutorService executor = Executors.newFixedThreadPool(10);
+    CountDownLatch startLatch = new CountDownLatch(1);
+    CountDownLatch doneLatch  = new CountDownLatch(10);
+    AtomicInteger success = new AtomicInteger(0);
+    AtomicInteger failure = new AtomicInteger(0);
+
+    for (int i = 0; i < 10; i++) {
+        executor.submit(() -> {
+            try {
+                startLatch.await(); // Release all threads simultaneously
+                budgetService.reserveBudget(poolId, new BigDecimal("1000.00"), ...);
+                success.incrementAndGet();
+            } catch (SpendSyncException e) {
+                failure.incrementAndGet();
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+    }
+
+    startLatch.countDown(); // Fire!
+    doneLatch.await(10, TimeUnit.SECONDS);
+
+    assertThat(success.get()).isEqualTo(5);   // Exactly 5 succeed
+    assertThat(failure.get()).isEqualTo(5);   // Exactly 5 fail
+    assertThat(finalPool.getAvailableAmount())
+        .isEqualByComparingTo(BigDecimal.ZERO); // Zero leakage, perfectly balanced
+}
+</code></pre>
+
+                <p>
+                    The outcome is deterministic: exactly 5 succeed, 5 fail, remaining balance is 0.00 USD. Zero double-spending.
+                </p>
+
+                <p>
+                    Why Testcontainers? In-memory databases like H2 do not accurately replicate PostgreSQL's <code>SELECT ... FOR UPDATE</code> lock semantics. A concurrency test might pass on H2 while failing under production database engines. Testing against a genuine PostgreSQL container is essential for verifying real locking behavior.
+                </p>
+
+                <h2 id="5-3-way-invoice-matching-algorithm">5. 3-Way Invoice Matching Algorithm</h2>
+
+                <p>
+                    In enterprise procurement, receiving goods and paying invoices generates three distinct artifacts:
+                </p>
+
+                <div style="overflow-x: auto; margin: 25px 0;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Document</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Created By</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Content</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>PO (Purchase Order)</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Buyer Company</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Contract: Item X, Unit Price Y, Quantity Z"</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>GRN (Goods Receipt Note)</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Warehouse / Logistics</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Delivery: A items accepted, B items rejected"</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Vendor Invoice</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Supplier</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Bill: Z items delivered, Price Y, Payment requested"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Manual reconciliation can take weeks and is prone to human error. Automated 3-Way Matching performs this cross-verification algorithmically.
+                </p>
+
+                <h3>Algorithm</h3>
+
+                <p>
+                    <strong>Step 1: 2-Way vs 3-Way Distinction</strong>
+                </p>
+
+                <p>
+                    For service and software subscriptions, physical warehouse delivery does not occur; hence, a 2-way match (PO vs Invoice) suffices. For physical goods, a GRN is mandatory.
+                </p>
+
+<pre><code class="language-java">boolean isServiceOrSoftware =
+    "SERVICE".equalsIgnoreCase(poLine.getItemCategory()) ||
+    "SOFTWARE".equalsIgnoreCase(poLine.getItemCategory());
+
+BigDecimal maxAllowedQuantity = isServiceOrSoftware
+    ? poLine.getQuantity()
+    : goodsReceiptLineItemRepository.sumAcceptedQuantityByPoLineId(poLine.getId());
+</code></pre>
+
+                <p>
+                    <strong>Step 2: Quantity Verification</strong>
+                </p>
+
+<pre><code class="language-java">if (lineReq.invoicedQuantity().compareTo(maxAllowedQuantity) > 0) {
+    hasDiscrepancy = true;
+    invLine.setMatchStatus(InvoiceMatchStatus.DISCREPANCY_HOLD);
+    invLine.setVarianceReason(
+        String.format("Qty Discrepancy: Invoiced (%.2f) > Accepted (%.2f)",
+            lineReq.invoicedQuantity(), maxAllowedQuantity));
+}
+</code></pre>
+
+                <p>
+                    <strong>Step 3: Price Verification (±1% Tolerance Band)</strong>
+                </p>
+
+<pre><code class="language-java">private static final BigDecimal PRICE_TOLERANCE_PERCENTAGE = BigDecimal.valueOf(1.00);
+
+BigDecimal priceDiff = lineReq.unitPrice().subtract(poLine.getUnitPrice()).abs();
+BigDecimal maxPriceTolerance = poLine.getUnitPrice()
+    .multiply(PRICE_TOLERANCE_PERCENTAGE)
+    .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+
+if (priceDiff.compareTo(maxPriceTolerance) > 0) {
+    hasDiscrepancy = true;
+    invLine.setMatchStatus(InvoiceMatchStatus.DISCREPANCY_HOLD);
+}
+</code></pre>
+
+                <p>
+                    Why ±1%? Currency fluctuations and fractional rounding naturally occur in real transactions. A zero-tolerance policy yields excessive false positives.
+                </p>
+
+                <p>
+                    <strong>Step 4: Decision and Budget Movement</strong>
+                </p>
+
+<pre><code class="language-java">if (!hasDiscrepancy) {
+    invoice.setStatus(InvoiceStatus.APPROVED_FOR_PAYMENT);
+
+    // Transition reservation into actual spend
+    budgetService.commitBudget(budgetPoolId, grandTotal, ...);
+
+    // Release unutilized funds if invoice is less than PO
+    if (po.getTotalAmount().compareTo(grandTotal) > 0) {
+        BigDecimal unusedBudget = po.getTotalAmount().subtract(grandTotal);
+        budgetService.releaseBudget(budgetPoolId, unusedBudget, ...);
+    }
+} else {
+    invoice.setMatchStatus(InvoiceMatchStatus.DISCREPANCY_HOLD);
+    // Placed in manual review queue
+}
+
+// Publish domain event
+eventPublisher.publishEvent(new InvoiceMatchedEvent(...));
+</code></pre>
+
+                <h3>UBL-TR e-Invoice Support</h3>
+
+                <p>
+                    In Turkey, the official e-Invoice standard is UBL-TR. SpendSync includes native XML parsing for these documents:
+                </p>
+
+<pre><code class="language-java">Document doc = DocumentBuilderFactory.newInstance()
+    .newDocumentBuilder()
+    .parse(new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8)));
+
+String ettn = extractText(doc, "cbc:UUID"); // e-Invoice tracking UUID
+NodeList invoiceLines = doc.getElementsByTagNameNS("*", "InvoiceLine");
+</code></pre>
+
+                <p>
+                    Because enterprise organizations are legally bound to e-Invoice networks, this parser enables vendors to upload raw XML invoices directly. Accounting manual entry is bypassed entirely, and matching executes automatically into <code>AUTO_MATCHED</code> or <code>DISCREPANCY_HOLD</code> statuses.
+                </p>
+
+                <h2 id="6-testcontainers-integration-testing-in-real-containers-not-mocks">6. Testcontainers: Integration Testing in Real Containers, Not Mocks</h2>
+
+                <h3>The Limits of Mocks</h3>
+
+<pre><code class="language-java">@MockBean
+RedisTemplate&lt;String, String&gt; redisTemplate;
+when(redisTemplate.opsForZSet().zCard(anyString())).thenReturn(5L);
+</code></pre>
+
+                <p>
+                    This unit test passes effortlessly. Yet it never exercises Redis's real ZSET atomicity, never exposes race conditions, and cannot verify whether <code>FOR UPDATE</code> locks function correctly on the database.
+                </p>
+
+                <p>
+                    Mocks validate the programmed assumptions of the mock, not the actual runtime characteristics of the infrastructure.
+                </p>
+
+                <h3>What is Testcontainers?</h3>
+
+                <p>
+                    Testcontainers is a Java framework that spins up real Docker containers for the duration of a test suite and automatically cleans them up upon completion.
+                </p>
+
+<pre><code class="language-java">@SpringBootTest(webEnvironment = RANDOM_PORT)
+@Testcontainers
+class RateLimitContainerTest {
+
+    @Container
+    static final GenericContainer&lt;?&gt; redisContainer =
+        new GenericContainer&lt;&gt;("redis:7.2-alpine").withExposedPorts(6379);
+
+    @DynamicPropertySource
+    static void configure(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port", () -> redisContainer.getMappedPort(6379));
+    }
+
+    @Test
+    void givenFiveRequests_whenSixthArrives_thenReturn429() throws Exception {
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/api/v1/auth/login").content(loginJson))
+                .andExpect(status().isOk());
+        }
+
+        mockMvc.perform(post("/api/v1/auth/login").content(loginJson))
+            .andExpect(status().isTooManyRequests())
+            .andExpect(header().exists("Retry-After"))
+            .andExpect(header().string("X-RateLimit-Remaining", "0"));
+    }
+}
+</code></pre>
+
+                <h3>Three Critical Tests</h3>
+
+                <p>
+                    <strong>Test 1: Sliding Window Rate Limiter:</strong> Verifies limit thresholds and <code>429 Too Many Requests</code> behavior against a live Redis ZSET instance.
+                </p>
+
+                <p>
+                    <strong>Test 2: Concurrent Budget Reservation:</strong> 10 threads compete for shared funds. Verifies exactly 5 accepted, 5 rejected, and zero remaining balance.
+                </p>
+
+                <p>
+                    <strong>Test 3: Multi-TTL Cache:</strong> Validates entity serialization with <code>@class</code> metadata, verifies TTL assignments, and confirms cache hits on subsequent queries.
+                </p>
+
+                <h3>Trade-offs</h3>
+
+                <div style="overflow-x: auto; margin: 25px 0;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;"></th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Mock</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Testcontainers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Execution Speed</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">⚡ Milliseconds</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">🐢 Container startup ~5-15s</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Concurrency Testing</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Race Condition Detection</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Realism & Confidence</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    The balanced strategy: Unit tests utilize fast mocks, whereas infrastructure-critical concurrency paths rely on Testcontainers. Across SpendSync's 512 tests, the majority are rapid mock tests, while the 3 Testcontainers suites supply our highest operational confidence.
+                </p>
+
+                <hr>
+
+                <h2 id="7-structured-logging-and-pii-masking">7. Structured Logging and PII Masking</h2>
+
+                <h3>Why Structured Logging?</h3>
+
+<pre><code># Unstructured plain log: difficult to parse
+2026-08-24 14:32:11 ERROR BudgetServiceImpl - Budget pool not found for id abc-123
+
+# Structured log (JSON): every attribute is indexed and queryable
+{"timestamp":"2026-08-24T14:32:11Z","level":"ERROR","tenantId":"t-550","requestId":"req-7f2a",
+ "logger":"BudgetServiceImpl","message":"Budget pool not found","poolId":"abc-123","errorCode":"BUDGET_POOL_NOT_FOUND"}
+</code></pre>
+
+                <p>
+                    Queries such as <code>tenantId = "t-550" AND level = "ERROR"</code> evaluate instantaneously, integrating directly into ELK, Splunk, and Grafana Loki.
+                </p>
+
+<pre><code class="language-markup">&lt;!-- logback-spring.xml --&gt;
+&lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender"&gt;
+    &lt;encoder class="net.logstash.logback.encoder.LogstashEncoder"&gt;
+        &lt;includeMdcKeyName&gt;tenantId&lt;/includeMdcKeyName&gt;
+        &lt;includeMdcKeyName&gt;requestId&lt;/includeMdcKeyName&gt;
+        &lt;includeMdcKeyName&gt;userId&lt;/includeMdcKeyName&gt;
+    &lt;/encoder&gt;
+&lt;/appender&gt;
+</code></pre>
+
+                <h3>Distributed Tracing with MDC</h3>
+
+                <p>
+                    MDC (Mapped Diagnostic Context) is a ThreadLocal-backed key-value store where each thread preserves contextual metadata.
+                </p>
+
+<pre><code class="language-java">// TenantFilter: when request arrives:
+MDC.put("tenantId", tenantId.toString());
+
+// JwtAuthenticationFilter: when user is authenticated:
+MDC.put("userId", principal.getUsername());
+MDC.put("requestId", UUID.randomUUID().toString().substring(0, 8));
+
+// Always inside finally block:
+MDC.clear();
+</code></pre>
+
+                <p>
+                    All log entries produced during a single request share the exact same <code>requestId</code> and <code>tenantId</code>. During production incidents, running <code>grep "requestId=req-7f2a" logs.json</code> retrieves the full chronological execution trace of that request.
+                </p>
+
+                <h3>PII Masking</h3>
+
+                <p>
+                    In financial software, personally identifiable information (PII) like IBANs, tax IDs, and email addresses must never leak into raw log files.
+                </p>
+
+<pre><code class="language-java">public class PiiMaskingConverter extends ClassicConverter {
+
+    private static final Pattern IBAN_PATTERN =
+        Pattern.compile("\\bTR\\d{2}[\\s\\d]{20,26}\\b");
+
+    private static final Pattern EMAIL_PATTERN =
+        Pattern.compile("\\b([a-zA-Z0-9._%+\\-]{1,3})[a-zA-Z0-9._%+\\-]*@([a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,})\\b");
+
+    @Override
+    public String convert(ILoggingEvent event) {
+        String message = event.getFormattedMessage();
+        message = IBAN_PATTERN.matcher(message).replaceAll("TR**MASKED_IBAN**");
+        message = EMAIL_PATTERN.matcher(message).replaceAll("$1***@$2");
+        return message;
+    }
+}
+</code></pre>
+
+                <p>
+                    Output log:
+                </p>
+
+<pre><code class="language-json">{"message": "Payment initiated for IBAN TR**MASKED_IBAN** to vendor ab***@company.com"}
+</code></pre>
+
+                <p>
+                    Raw sensitive credentials never enter disk logs, satisfying statutory GDPR/KVKK compliance.
+                </p>
+
+                <h3>Asynchronous Logging</h3>
+
+                <p>
+                    Under high load, synchronous disk I/O degrades response throughput:
+                </p>
+
+<pre><code class="language-java">@Configuration
+@EnableAsync
+public class AsyncLoggingConfig {
+
+    @Bean(name = "taskExecutor")
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("AsyncLog-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+}
+</code></pre>
+
+                <p>
+                    <code>CallerRunsPolicy</code>: If the log queue fills up, logging executes on the caller thread, ensuring zero log loss while naturally applying backpressure.
+                </p>
+
+                <hr>
+
+                <h2 id="conclusion">Conclusion</h2>
+
+                <p>
+                    The unifying theme across these decisions is clear: <strong>Every technical choice is a trade-off.</strong> Mock vs Testcontainers? Pessimistic vs optimistic locking? Monolith vs microservices? None represent universal absolute truths; context and architectural constraints dictate the right choice.
+                </p>
+
+                <p>
+                    SpendSync was built around intentional, calculated decisions, with clear rationale and well-understood trade-offs for every path chosen.
+                </p>
+
+                <p>
+                    You can inspect the complete source code on GitHub: <strong><a href="https://github.com/doguhanniltextra/spend-sync" target="_blank">doguhanniltextra/spend-sync</a></strong>
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=SpendSync%3A%20Architectural%20Notes%20and%20Trade-offs%20in%20an%20Enterprise%20Spend%20Platform" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Language Preference Persistence Script -->
+    <script>
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.textContent.trim().toLowerCase();
+                localStorage.setItem('preferred_lang', lang);
+            });
+        });
+    </script>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-http.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+</body>
+
+</html>
