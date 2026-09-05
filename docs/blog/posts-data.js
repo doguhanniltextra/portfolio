@@ -1,5 +1,13 @@
 window.BLOG_POSTS = [
     {
+        title: "Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak",
+        href: "./page/container_isolation_in_linux.html",
+        date: "September 5, 2026",
+        readingTime: "10 min read",
+        excerpt: "Docker, Linux üzerinde kendi kaynakları için izolasyonu nasıl sağlıyor? Linux kernel'inin namespaces, cgroups v2, pivot_root ve veth/NAT gibi temel mekanizmalarını sıfırdan bir Go projesi geliştirerek inceliyoruz.",
+        tags: ["Linux Kernel", "Containers", "Docker", "Go", "Cgroups"]
+    },
+    {
         title: "SpendSync: Kurumsal Harcama Platformu Mimari Notları ve Trade-off'lar",
         href: "./page/spend_sync_trade_off.html",
         date: "August 26, 2026",

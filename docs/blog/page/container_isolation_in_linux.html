@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak - Doguhan Ilter</title>
+    <meta name="description" content="Docker ve container teknolojisinin arkasındaki Linux kernel mekanizmaları: Namespaces, Cgroups v2, pivot_root, OverlayFS ve Veth/NAT ağ yapısı.">
+    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups, pivot_root, OverlayFS, Veth, iptables, Golang, Systems Programming">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-09-05">
+                        <i class="far fa-calendar"></i> September 5, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 10 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Linux Kernel</span>
+                    <span class="tag">Containers</span>
+                    <span class="tag">Docker</span>
+                    <span class="tag">Go</span>
+                    <span class="tag">Operating Systems</span>
+                    <span class="tag">Cgroups</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    Ağustos başlarında eksik olduğum bir konu hakkında daha detaylı bilgiler öğrenmek için kitaplar araştırırken tesadüfen önüme gelen bir kitabı incelemeye başladım. İlk başlarda göz atıp geçerim dediğim bu kitap daha henüz başlarındayken bile bana yepyeni sorular sordurttu ve cevaplarını verebilmek bir yana, o cevapları inşaa edebilmem hemen hemen bir ayımı aldı.
+                </p>
+
+                <p>
+                    Kitabın ismi Operating Systems: Three Easy Pieces ve yazarları ise Remzi Arpaci-Dusseau ve Andrea Arpaci-Dusseau.
+                </p>
+
+                <p>
+                    Kitaptan biraz bahsetmek gerekirse, işletim sisteminin üç ayağını detaylı bir şekilde açıklıyor: Virtualization, Concurrency, Persistence ve araya sıkıştırmış olsa da dördüncü olarak sayabileceğimiz I/O işlemleri. Kitabın içeriği teknik olsa da esprili bir dille anlattığını söyleyebilirim ve akademisyen tuzağına düşmeyip endüstride kullanım alanlarını da söylediği için anlatılan bilgilerin akılda kalıcılığı da artıyor, okumanızı öneririm.
+                </p>
+
+                <p>
+                    Sizi bilmiyorum ama ben bir tool kullanırken arkasını kurcalamayı seven insanlardanım. “Al, kullan, geç.” şeklinde davranmak hiçbir zaman sevdiğim bir yaklaşım olmadı. Bu yüzden kullandığım veya endüstride kullanılan araçları mümkün olduğunca incelemeye, çalışma prensipleriyle ilgili notlar almaya çalışırım. Ne zaman projesiz kalsam da dönüp bu notlara bakar ve oradan yeni proje fikirleri çıkarmaya çalışırım.
+                </p>
+
+                <p>
+                    Kitabın Virtualization başlığıyla ilgili bölümlerini okurken, daha önce kenara aldığım ve bir türlü zaman ayıramadığım bir soruya aslında yavaş yavaş cevap verildiğini fark ettim:
+                </p>
+
+                <p>
+                    Docker, Linux üzerinde kendi kaynakları için izolasyonu nasıl sağlıyor?
+                </p>
+
+                <p>
+                    Açık söylemek gerekirse başta bunun yalnızca Docker'a ait bir mekanizma olduğunu düşünüyordum. Fakat kitabın kendisi konu üzerinde derinleştikçe Docker'ın burada yaptığı şeyin, Linux kernel'inin sunduğu bazı temel mekanizmaları bir araya getirmek olduğunu fark ettim ve doğal olarak bir başka soru daha türedi buradan:
+                </p>
+
+                <p>
+                    Peki Linux bunu nasıl yapıyor?
+                </p>
+
+                <p>
+                    İşte peşinden bir ay boyunca koşturduğum soru tam olarak buydu. Bu yazıda size bu bir aylık sürecin bana öğrettiklerini ve ortaya çıkardığım ufak proje sayesinde neleri deneyimlediğimden bahsedeceğim.
+                </p>
+
+                <h2>Ölçeği Netleştirelim</h2>
+
+                <p>
+                    Öğrendiklerimden bahsetmeden önce aynı dili konuşabilmemiz adına birkaç terimin bu proje açısından ne anlama geldiğini söylemek ihtiyacı hissettim, bu sayede kafa karışıklığı oluşturmayacağını düşünüyorum.
+                </p>
+
+                <ul>
+                    <li>Sanallaştırma derken neden bahsediyoruz? Virtual Machine mi yani?</li>
+                </ul>
+
+                <p>
+                    Aslında tam olarak değil.
+                </p>
+
+                <p>
+                    Sanallaştırma kelimesini duyduğumuzda çoğumuzun aklına Virtual Machine -VM- geliyor. Bunun sebebi gayet doğal; sanal makine fiziksel bir bilgisayarın işlemcisini, belleğini, diskini ve diğer donanımlarını sanal olarak başka bir işletim sistemine sunuyor. Ancak benim bu projede incelediğim yapı ise bundan farklı.
+                </p>
+
+                <p>
+                    Container tarafında yeni bir işletim sistemi çalıştırmıyoruz. Yeni bir kernel de oluşturmuyoruz. Bunun yerine, aynı Linux kernel'ini kullanan process'lere -Process ne demek bu konuya geleceğiz- farklı bir çalışma ortamı sunuyoruz.
+                </p>
+
+                <p>
+                    Bu nedenle burada "sanallaştırma" derken kastettiğimiz şey Virtual Machine seviyesinde donanım sanallaştırması değil, işletim sistemi seviyesinde izolasyon ve sanallaştırma.
+                </p>
+
+                <h2>Proje Hakkında</h2>
+
+                <p>
+                    Bu projeyi Golang (1.22+) ile sıfırdan, Docker veya runc gibi hiçbir harici container kütüphanesine dokunmadan, doğrudan Linux kernel syscall'ları ve primitifleriyle geliştirdim. Amacım "production-ready" bir araç yapmaktan ziyade, Docker'ı daha iyi anlamaya çalışıp işletim sisteminin sunduğu temel mekanizmaları birebir deneyimlemekti.
+                </p>
+
+                <p>
+                    Proje Linkine Buradan Ulaşabilirsiniz:<br>
+                    <a href="https://github.com/doguhanniltextra/minicontainer" target="_blank">https://github.com/doguhanniltextra/minicontainer</a>
+                </p>
+
+                <h2>Her Şeyin Başı: Process</h2>
+
+                <p>
+                    OSTEP kitabında da yazarın özellikle belirttiği ilk kavram Process idi. Günlük hayatta çoğumuz "program", "uygulama" ve "process" kelimelerini birbirinin yerine kullanırız ancak kernel'in gözünden baktığınızda aralarında hayati bir fark var:
+                </p>
+
+                <p>
+                    Diskinizde duran bir ".exe" ya da derlenmiş bir Go binary'si özünde ölüdür. İçinde sadece yığınla makine kodları ve talimatlar bulundurur. Siz terminale "./uygulama" yazdığınızda kernel bu baytları alır, belleğe -RAM- yükler, ona bir çalışma alanı açar ve CPU'ya "Şimdi bunu çalıştır" der.
+                </p>
+
+                <p>
+                    İşte diskteki ölü kodun belleğe taşınıp yaşayan, kaynak tüketen ve komut koşturan haline "process" diyoruz.
+                </p>
+
+                <p>
+                    OSTEP'de bu konu hakkında kullanılan metafor ise işletim sisteminin çok iyi bir illüzyonist olduğu. Bir process çalışırken, işletim sistemi öyle hallere girer ki; sanki koskoca bilgisayarın işlemcisi -CPU- sadece onun için dönüyor, 16 GB'lik belleğin tamamı sanki o process'e tahsis edilmiş gibi davranır.
+                </p>
+
+                <p>
+                    Kitabın Virtualization ile ilgili olan kısmının sonuna doğru öğrenci ile öğretmenin yaptığı soru cevap kesitinde öğrencinin "...yani işletim sistemi dediğimiz şey aslında paranoyak gibi davranan bir şey mi?" diye sorması gayet doğaldır çünkü binlerce process'in aynı anda aynı donanımı paylaştığı bir ortamda, kernel kimseye güvenemez. Bir process sonsuz döngüye girip işlemciyi kilitleyebilir, bir başkası gidip yan komşusunun belleğini okumaya ya da üzerine yazmaya çalışabilir. Bu yüzden kernel hem devasa bir illüzyonist hem de eli sopalı bir gardiyandır, her process'e kendi dünyasındaymış gibi hissettirirken bir yandan da onların boğazına sarılıp sınırlarını çizer.
+                </p>
+
+                <p>
+                    Standart bir Linux sisteminde işletim sistemi ne kadar paranoyak olursa olsun, process'leri birbirinden tamamen gizlemez. Bugün terminalinizi açıp sıradan bir program çalıştırdığınızda, o program aslında bilgisayarda yalnız olmadığını gayet iyi bilir.
+                </p>
+
+                <ul>
+                    <li><code>ps aux</code> dediğinde host'taki diğer yüzlerce process'i görebilir.</li>
+                    <li>Bilgisayarın kök dizinindeki -/- tüm dosyalara, kütüphanelere erişebilir.</li>
+                    <li>Makinenin tek bir IP adresini ve network kartını diğer tüm programlarla paylaşır ve istediği kadar bellek tüketip makineyi kilitleme riskini taşır.</li>
+                </ul>
+
+                <p>
+                    Peki ya biz bu illüzyonu bir adım öteye taşımak istersek? Bir process'in gözünü öyle bir bağlayalım ki:
+                </p>
+
+                <ul>
+                    <li>Bilgisayarda çalışan tek bir process'in kendisi olduğunu sansın.</li>
+                    <li>Kendi ana makinesindeki dosyaları değil, sadece ona gösterdiğimiz ufak bir klasörü tüm dünya sansın.</li>
+                    <li>Kendine ait bağımsız bir sanal ağ kartı ve IP adresi olsun.</li>
+                    <li>Ne kadar çabalarsa çabalasın asla 100 MB'tan fazla RAM tüketemeyeceği prangaları olsun.</li>
+                </ul>
+
+                <p>
+                    İşte bir Linux process'ine bu özel gözlükleri takıp ayaklarına bu prangaları vurduğunuzda ortaya çıkan şeye endüstride Container deniyor.
+                </p>
+
+                <h2>İllüzyonun Gözlükleri</h2>
+
+                <p>
+                    Eğer container'ı sıradan bir process'ten ayıran şey gördüğü dünya ise, bu dünyayı filtreleyen gözlüğün adı Linux'ta <strong>Namespace</strong>'tir.
+                </p>
+
+                <p>
+                    Linux kernel'inde aslında global olan kaynaklar vardır: Sistemdeki tüm process ID'leri, ağ kartları, disk mount noktaları, makine adı...
+                </p>
+
+                <p>
+                    Normalde her process bu ortak havuza bakar, ancak kernel bize der ki: "İstersen yeni bir process başlatırken ona özel pencereler açabilirim. O pencereden baktığında sadece benim izin verdiğim dünyayı görür."
+                </p>
+
+                <p>
+                    Projede ilk olarak tam da bu gözlükleri takarak başladım:
+                </p>
+
+                <h3>1. PID Namespace</h3>
+
+                <p>
+                    Linux'ta her process bir numaraya (PID) sahiptir. Bilgisayar ilk açıldığında kernel <code>PID 1</code> olarak <code>systemd</code>yi -veya init sistemini- başlatır ve geri kalan her şey onun dalları olarak ürer.
+                </p>
+
+                <p>
+                    Go kodunda process'i başlatırken <code>Cloneflags: syscall.CLONE_NEWPID</code> dedim ve Kernel, bu process için yepyeni, sıfırdan başlayan bir sayaç açar.
+                </p>
+
+                <p>
+                    Host makineden baktığınızda bu process belki <code>PID 9452</code>'dir ama container'ın içine girip <code>echo $$</code> yazdığınızda artık o <code>PID 1</code>'dir.
+                </p>
+
+                <p>
+                    Bu process artık kendi evreninde en tepededir, hatta içeride bir hata yapıp <code>kill -9 1</code> çalıştırsa bile sadece kendi evrenini öldürür; host'un gerçek systemd'sine asla dokunamaz.
+                </p>
+
+                <h3>Process Halen Daha Host'u Görüyor!</h3>
+
+                <p>
+                    Process'i oluşturduğunuzda evet artık kendisi <code>PID 1</code> olarak gözükebilir ancak eğer ki <code>ps aux</code> yazarsanız Host'ta açık olan yüzlerce process halen daha görülebilir haldedir, bunun sebebi ise aslında işletim sisteminin çalışma felsefesi.
+                </p>
+
+                <p>
+                    Linux'ta <code>ps</code> komutu kernel'e gidip sihirli bir soru sormuyor. Linux'ta her şey bir dosya olduğundan ötürü, <code>ps</code> komutu sadece <code>/proc</code> isimli özel bir dizine gider ve oradaki klasörleri -her klasör bir PID'dir- listeler.
+                </p>
+
+                <p>
+                    İşte biz process'in gözünü bağladık ancak ayakları halen daha host'un <code>/proc</code> dizinine bastığından farklı processleri görebilir haldeydi.
+                </p>
+
+                <p>
+                    Buradan bir adım daha ileriye gitmek istersek process'e kendi mount tablosunu vermemiz gerekir. Host'un kendisine ait olan <code>/proc</code>'unu unut ve bu container içinden sıfırdan, sadece kendisinin gördüğü process'leri barındıran taze bir <code>/proc</code> mount etmemiz gerek. Buna <code>CLONE_NEWNS</code> deniyor.
+                </p>
+
+                <p>
+                    Bundan sonrası aslında o kadar da yabancı olmadığımız şeyler değil. UTS Namespace (<code>CLONE_NEWUTS</code>) process'e kendi bilgisayar adını -hostname- verme yeteneği iken, NET Namespace (<code>CLONE_NEWNET</code>) ile process'in önüne tamamen bomboş bir ağ tablosu koyduk. Host'un ethernet kartını ve Wi-Fi'ını elinden aldık; sadece içi boş bir lo -loopback- ile baş başa bıraktık.
+                </p>
+
+                <h2>İllüzyonun Prangaları</h2>
+
+                <p>
+                    Process'e gözlükleri taktık; artık kendini <code>PID 1</code> sanıyor, host'un diğer process'lerinden haberi yok, kendine ait bir bilgisayar adı var.
+                </p>
+
+                <p>
+                    Peki bir sorunumuz çözüldü mü? <strong>Hayır.</strong>
+                </p>
+
+                <p>
+                    Çünkü process dış dünyayı görmüyor olsa bile, hala ana makinenin fiziksel donanımı üzerinde koşuyor. Eğer bu container içine kötü niyetli -ya da dikkatsiz- bir geliştirici girip meşhur <strong>Fork Bomb</strong>u çalıştıracak olsaydı açıkçası container izole falan dinlemez; Linux kernel'inin tüm process tablosunu kilitler ve ana makinenizi dondurur, fişi çekmek zorunda kalabilirsiniz ya da biraz şanslıysanız bir bellek sızıntısı olur ve makinenizdeki RAM'i yutup meşhur OOM Killer silahını çeker ve host'taki masum process'leri rastgele kurşuna dizmeye başlar ve kendisini bir nebze rahatlatır.
+                </p>
+
+                <p>
+                    Kaynak kısıtlandırmak için Cgroups (Control Groups) kullandım, modern ismiyle Cgroups v2.
+                </p>
+
+                <h3>Cgroups ve Dosya Sistemiyle İşletim Sistemini Yönetmek</h3>
+
+                <p>
+                    Cgroups v2'nin en güzel tarafı API'sidir. Herhangi bir karmaşık syscall çağırmanıza gerek yok. Linux'un "her şey bir dosyadır" kuralı burada da beni kurtardı ve <code>/sys/fs/cgroup/</code> altında container'a özel bir klasör açtım: <code>/sys/fs/cgroup/minicontainer-123/</code>
+                </p>
+
+                <p>
+                    Bu klasörün içine kernel otomatik olarak birtakım ayar dosyaları koyar. Siz sadece o dosyalara düz metin olarak sınırları yazarsınız:
+                </p>
+
+                <ul>
+                    <li>Klasörün içindeki <code>pids.max</code> dosyasına 20 yazıp process'in PID'sini <code>cgroup.procs</code> dosyasına eklediğinizde artık container içinde birisi fork bomb çalıştırmayı denese bile 20. process'e ulaştığı anda kernel <code>fork: Resource temporarily unavailable</code> der ve saldırıyı boğar.</li>
+                    <li><code>memory.max</code> ile birlikte 100 MB sınır koyabilirsiniz.</li>
+                    <li><code>cpu.max</code> ile CPU kullanımına kota koyabiliyorsunuz.</li>
+                </ul>
+
+                <p>
+                    Process'in gözünü bağladık, ayağına prangayı taktık ancak bir sorun daha var: Container içinde <code>cd /</code> yapıp <code>ls</code> dediğimizde gördüğümüz şey hala ana makinenin kendi diski. Bu durumun izole olmasını istediğimiz bir process için ne kadar tehlikeli olduğunu anlatmaya gerek yoktur sanırım.
+                </p>
+
+                <h2>Dosya Sistemi İzolasyonu</h2>
+
+                <p>
+                    Process'i PID olarak kandırdık, kaynaklarını Cgroups ile sınırladık. Ama hâlâ çok tehlikeli bir açık vardı:
+                </p>
+
+                <p>
+                    Process içine girip <code>cd /home</code> dediğimizde, ana makinenin tüm dosyalarını, kişisel verilerini görebiliyorduk. Bir container'ın host'un dosya sistemine dokunabilmesi kabul edilemez bir güvenlik açığıdır.
+                </p>
+
+                <p>
+                    Container'a <em>Senin tüm dünyan sadece bu klasörden ibaret</em> dememiz gerekiyor.
+                </p>
+
+                <h3>chroot vs pivot_root</h3>
+
+                <p>
+                    Linux'ta bir process'in kök dizinini değiştirmek denince akla gelen ilk klasik araç <code>chroot</code> komutudur. 1979'dan beri Unix'in dünyasında ve açıkçası ben de <code>chroot</code> yapıp geçerim diye düşündüm ancak konuyu biraz araştırdıkça container izolasyonu için pivot_root kadar yeterli ve güvenli olduğuna ikna olamadım çünkü <code>chroot</code> sadece process'in o anki görünümünü kısıtlıyor; root yetkisine sahip zeki bir process, basit bir jailbreak numarasıyla geri tırmanabilir.
+                </p>
+
+                <p>
+                    Bu yüzden modern container dünyasının yaptığı gibi daha sert ve geri dönüşü olmayan bir syscall kullandım: <code>pivot_root</code>.
+                </p>
+
+                <p>
+                    <code>pivot_root</code> tam anlamıyla bir cambazlık yapıyor:
+                </p>
+
+                <ul>
+                    <li>Önce Alpine Linux gibi minimal bir işletim sisteminin dosyalarını bir klasöre koyuyorsunuz. (assets/rootfs)</li>
+                    <li><code>pivot_root</code> çağrısı ile bu yeni klasörü sistemin yeni kök dizini yapıyorsunuz.</li>
+                    <li>Ana makinenin eski gerçek kök dizinini ise geçici bir yere <code>.old_root</code> itiyorsunuz.</li>
+                    <li>Hemen ardından <code>.old_root</code> dizinini unmount edip tamamen sistemden söküp atarsınız.</li>
+                </ul>
+
+                <p>
+                    Köprüleri arkadan yaktıktan sonra artık container <code>cd ..</code> yapsa bile artık ana makinenin dosyalarına ulaşması mümkün değildir.
+                </p>
+
+                <h3>Taban İmajı Korumak: OverlayFS ve Copy-on-Write</h3>
+
+                <p>
+                    Dosya sistemini izole ettik ama bu sefer karşımıza pratik bir sorun çıktı:
+                </p>
+
+                <p>
+                    Elimizde tek bir Alpine Linux klasörü (<code>assets/rootfs</code>) var. Eğer container içine giren kullanıcı yanlışlıkla bir dosyayı silerse veya değiştirirse ne olacak? Ana imajımız bozulacak mı? Ya da aynı anda 3 tane container çalıştırmak istersek birbirlerinin dosyalarını mı ezecekler?
+                </p>
+
+                <p>
+                    Her container için diski baştan kopyalamak hem yavaş hem de korkunç bir disk israfı olurdu. Docker'ın bu sorunu çözmek için kullandığı mekanizma <strong>OverlayFS</strong> idi ve projede tam olarak bunu uyguladım.
+                </p>
+
+                <p>
+                    OverlayFS, iki farklı dizini şeffaf bir şekilde üst üste bindirip tek bir dizinmiş gibi gösterir:
+                </p>
+
+                <ol>
+                    <li><strong><code>lowerdir</code> (Alt Katman):</strong> Bizim orijinal Alpine Linux dosyalarımız. Burası kesinlikle <strong>salt okunurdur (read-only)</strong>. Container asla bu katmana doğrudan yazamaz.</li>
+                    <li><strong><code>upperdir</code> (Üst Katman):</strong> O container'a özel, içi bomboş açılan yazılabilir bir çalışma alanı.</li>
+                    <li><strong><code>merged</code> (Birleşik Görünüm):</strong> Container'ın <code>pivot_root</code> ile içine girdiği yer tam olarak burasıdır.</li>
+                </ol>
+
+                <p>
+                    Çalışma mantığı ise <strong>Copy-on-Write (CoW)</strong> prensibine dayanır:
+                </p>
+
+                <ul>
+                    <li>Container bir dosya okumak istediğinde, dosya alt katmandan (<code>lowerdir</code>) okunur.</li>
+                    <li>Ama container bir dosyayı değiştirmek ya da silmek istediğinde, kernel o dosyayı anında üst katmana kopyalar ve değişikliği orada yapar.</li>
+                    <li>Hatta container içinde <code>rm -rf /bin</code> deseniz bile, orijinal dosyalara hiçbir şey olmaz! Kernel sadece üst katmana "bu dosya silindi" anlamına gelen özel bir işaret (whiteout) koyar.</li>
+                </ul>
+
+                <p>
+                    Container kapandığında ise yaptığımız tek şey o container'a ait <code>upperdir</code> klasörünü silmektir. Taban imajımız ilk günkü gibi tertemiz kalır!
+                </p>
+
+                <h2>Fazla İzole Olmuş Process</h2>
+
+                <p>
+                    Evet bu sefer de sorunumuz bir process'i izole etmek değil, fazla izole olmuş bir process. Dış dünya ile tamamıyla bağını kestiğimiz için internete hiçbir şekilde çıkamıyor.
+                </p>
+
+                <p>
+                    Hatırlarsanız <code>CLONE_NEWNET</code> bayrağı ile container'a yepyeni bir NET namespace vermiştik. Bu yüzden container içinde <code>ip addr</code> yazdığınızda sadece <code>lo</code> (127.0.0.1) görünüyor. Ne bir IP adresi var, ne de internete çıkabileceği bir ethernet kartı.
+                </p>
+
+                <p>
+                    Peki Docker her container'a nasıl bağımsız bir IP adresi veriyor ve container'lar Google'a nasıl ping atabiliyor?
+                </p>
+
+                <p>
+                    Bu soruna yaklaşım olarak Linux kernel'inin üç temel ağ mekanizmasını kullandım:
+                </p>
+
+                <h3>Sanal Ethernet Kablosu: Veth Pair</h3>
+
+                <p>
+                    Linux kernel'inde <code>veth</code> adında harika bir yapı var. Bunu çift taraflı sanal bir ağ kablosu gibi düşünün; kablonun bir ucundan gönderdiğiniz herhangi bir veri paketi, anında diğer ucundan çıkıyor.
+                </p>
+
+                <p>
+                    Kodumuz arka planda iki ucu olan bir veth çifti üretiyor:
+                </p>
+
+                <ul>
+                    <li>Bir ucu host tarafında kalıyor</li>
+                    <li>Diğer ucu ise bir Netlink çağrısıyla container'ın izole NET namespace'inin içine fırlatılıyor.</li>
+                </ul>
+
+                <p>
+                    Container'ın içine soktuğumuz o ucun adını standart bir isimle değiştirelim (örn. <code>eth0</code>). Ardından bu <code>eth0</code> arayüzüne IPAM modülümüzden dinamik bir yerel IP atayıp ayağa kaldırıyoruz.
+                </p>
+
+                <h3>Sanal Switch</h3>
+
+                <p>
+                    Kablonun bir ucunu container'a taktık. Peki host tarafında kalan uç nereye bağlanacak?
+                </p>
+
+                <p>
+                    Host makinemizde <strong><code>mc-br0</code></strong> adında sanal bir köprü (Linux Bridge) oluşturuyoruz. Bridge'i odanızdaki fiziksel bir ağ anahtarı (Switch) gibi hayal edebilirsiniz.
+                </p>
+
+                <p>
+                    Host'ta kalan kablo ucunu (<code>mc-h-xxx</code>) bu <code>mc-br0</code> bridge'ine takıyoruz ve bridge'e ağ geçidi (Gateway) olarak <code>172.19.0.1</code> IP'sini veriyoruz. Container'a da diyoruz ki: <em>"Dünyaya çıkmak istediğin her paket için varsayılan kapın (default gateway) <code>172.19.0.1</code>'dir."</em>
+                </p>
+
+                <h3>İnternete Çıkış: IP Forwarding ve <code>iptables</code> NAT</h3>
+
+                <p>
+                    Container'dan <code>8.8.8.8</code>'e (Google DNS) bir paket attığınızda paket host makineye kadar gelir. Fakat bu paketin üzerinde kaynak IP olarak <code>172.19.0.2</code> yazar.
+                </p>
+
+                <p>
+                    İnternetteki hiçbir router bu özel IP'yi tanımaz ve paketin cevabını geri gönderemez.
+                </p>
+
+                <p>
+                    İşte burada devreye iki küçük Linux ayarı giriyor:
+                </p>
+
+                <ol>
+                    <li><strong>IP Forwarding:</strong> Kernel'e <code>/proc/sys/net/ipv4/ip_forward</code> dosyasına <code>1</code> yazarak şunu söylüyoruz: <em>"Gelen ağ paketlerini makineler arasında yönlendirmekten çekinme."</em></li>
+                    <li><strong>NAT (MASQUERADE):</strong> Host üzerine bir <code>iptables</code> kuralı yazıyoruz:
+                        <pre><code class="language-bash">iptables -t nat -A POSTROUTING -s 172.19.0.0/16 ! -o mc-br0 -j MASQUERADE</code></pre>
+                    </li>
+                </ol>
+
+                <p>
+                    Bu kural şu anlama gelir: Container'dan çıkıp internete giden her paketin üzerindeki <code>172.19.0.2</code> etiketini sök, yerine host'un gerçek IP adresini yapıştır. Dışarıdan cevap döndüğünde de paketi tekrar container'a ilet.
+                </p>
+
+                <p>
+                    Böylece container, host'un internet bağlantısını kullanarak kontrollü bir şekilde dış dünyayla iletişim kurabilir hale geliyor.
+                </p>
+
+                <p>
+                    Bütün bu ağ yapılandırmasını koda döküp container içinden testi çalıştırdığımda sonuç şuydu:
+                </p>
+
+                <pre><code class="language-bash">/ # ping -c 2 8.8.8.8
+64 bytes from 8.8.8.8: seq=0 ttl=115 time=12.4 ms
+64 bytes from 8.8.8.8: seq=1 ttl=115 time=12.1 ms</code></pre>
+
+                <p>
+                    Paketler başarıyla gidip geliyordu. Başlangıçta host ağından tamamen izole edilmiş bir process, artık kendi sanal arayüzü ve IP adresi üzerinden kontrollü bir şekilde internete erişebiliyordu.
+                </p>
+
+                <h2>Container Aslında Ne?</h2>
+
+                <p>
+                    Yazının başında peşine düştüğüm o soruya geri dönelim: Peki Linux bunu nasıl yapıyor?
+                </p>
+
+                <p>
+                    Bir aylık bu serüvenin sonunda öğrendiğim şey devasa container teknolojisinin 4 ayağın -ve tabii ki yüzlerce algoritmanın- orkestrasyonundan ibaret olduğu: Namespaces, Cgroups, pivot_root, Veth & NAT.
+                </p>
+
+                <p>
+                    Docker'ı yapanlar büyücüler değil, kernel'in onlarca yıldır sunduğu bu güçlü mekanizmaları, bizim için tek bir <code>docker run</code> komutunun arkasına sığdıran harika mühendisler.
+                </p>
+
+                <h2>Son Söz</h2>
+
+                <p>
+                    "Al, kullan, geç" yaklaşımı yerine; her gün kullandığımız araçların kaputunu açıp altına bakmak başta ürkütücü gelse de bir yazılımcıya en çok vizyon katan şeylerden biri. OSTEP kitabının başlattığı bu kıvılcım, bana işletim sisteminin aslında bir kara kutu olmadığını, sadece belirli kurallarla çalışan muazzam bir mantık zinciri olduğunu gösterdi.
+                </p>
+
+                <p>
+                    Bu süreçte yazdığım kodları, aldığım notları ve geliştirdiğim minicontainer projesini incelemek isterseniz tüm kaynak kodlarına <a href="https://github.com/doguhanniltextra/minicontainer" target="_blank">GitHub</a> üzerinden ulaşabilirsiniz.
+                </p>
+
+                <p>
+                    Umarım sizin için de keyifli ve ufuk açıcı bir okuma olmuştur!
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Container%20Nedir%3F%20Linux%20Kernel%27inin%20Sa%C4%9Flad%C4%B1%C4%9F%C4%B1%20%C4%B0zolasyonu%20S%C4%B1f%C4%B1rdan%20Anlamak&url=https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+</body>
+
+</html>
