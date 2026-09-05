@@ -13,6 +13,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_tr.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_en.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://doguhanniltextra.github.io/portfolio/blog/page/context_propagation_go.html</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>

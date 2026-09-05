@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is a Container? Understanding Linux Kernel Isolation from Scratch - Doguhan Ilter</title>
+    <meta name="description" content="A deep dive into how the Linux kernel provides container isolation: Namespaces (PID, Mount, UTS, NET), resource limiting with Cgroups v2, filesystem isolation with pivot_root and OverlayFS, and networking with Veth pairs and iptables NAT.">
+    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups v2, pivot_root, OverlayFS, Veth, iptables, Go, Operating Systems, Systems Programming">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../main.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <link rel="stylesheet" href="post.css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+            <ul>
+                <li><a href="../../index.html" class="active">Blog</a></li>
+            </ul>
+            <div class="lang-switch" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+                <a href="container_isolation_in_linux_tr.html" class="lang-btn" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; color: #2b5ea7; background: transparent; font-weight: 700; border-radius: 2px;">TR</a>
+                <a href="container_isolation_in_linux_en.html" class="lang-btn active" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; background: #2b5ea7; color: #fff; font-weight: 700; border-radius: 2px;">EN</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-09-05">
+                        <i class="far fa-calendar"></i> September 5, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 10 min read
+                    </span>
+                    <span class="lang-indicator" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-globe"></i> <strong>Language:</strong> English
+                        <a href="container_isolation_in_linux_tr.html" style="color: #2c5aa0; margin-left: 6px;">(Türkçe'ye Geç)</a>
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">What is a Container? Understanding Linux Kernel Isolation from Scratch</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Linux Kernel</span>
+                    <span class="tag">Containers</span>
+                    <span class="tag">Docker</span>
+                    <span class="tag">Go</span>
+                    <span class="tag">Operating Systems</span>
+                    <span class="tag">Cgroups</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p class="lead">
+                    In early August, while researching books to deepen my understanding of a topic where I felt lacking, I stumbled upon a book quite by chance. What began as a book I thought I’d simply skim through quickly ended up prompting brand-new questions right from the early chapters. Far from just finding the answers, actually building those answers took me almost an entire month.
+                </p>
+
+                <p>
+                    The book is titled <em>Operating Systems: Three Easy Pieces</em>, written by Remzi Arpaci-Dusseau and Andrea Arpaci-Dusseau.
+                </p>
+
+                <p>
+                    To briefly touch on the book, it thoroughly explains the three pillars of an operating system: Virtualization, Concurrency, Persistence, along with I/O operations which can be considered a fourth pillar tucked in between. Although technical in nature, it is written with an engaging and witty tone. By avoiding academic abstraction and constantly referencing real-world industry applications, the concepts stick with you much better, and I highly recommend reading it.
+                </p>
+
+                <p>
+                    I don't know about you, but whenever I use a tool, I'm the kind of person who loves looking under the hood. A "take it, use it, move on" mindset has never been an approach I enjoyed. Because of this, I always try to inspect the tools I work with or those widely adopted in the industry, taking notes on their inner workings. Whenever I'm between projects, I look back at these notes to extract new project ideas.
+                </p>
+
+                <p>
+                    While reading the chapters on Virtualization, I realized that a question I had set aside and never found time for was gradually being answered:
+                </p>
+
+                <p>
+                    How does Docker provide isolation for its resources on Linux?
+                </p>
+
+                <p>
+                    To be frank, at first I thought this was a proprietary mechanism unique to Docker. But as the book dug deeper into the topic, I realized that what Docker actually does is orchestrate a few fundamental mechanisms already provided by the Linux kernel. Naturally, that spawned another question:
+                </p>
+
+                <p>
+                    So, how does Linux actually do this?
+                </p>
+
+                <p>
+                    That was precisely the question I chased for an entire month. In this article, I want to share what that one-month journey taught me and what I experienced through the small project I built.
+                </p>
+
+                <h2>Clarifying the Scope</h2>
+
+                <p>
+                    Before diving into what I learned, I feel the need to clarify what a few terms mean in the context of this project so we're on the same page and avoid confusion.
+                </p>
+
+                <ul>
+                    <li>When we say virtualization, what are we talking about? Do we mean a Virtual Machine?</li>
+                </ul>
+
+                <p>
+                    Not quite.
+                </p>
+
+                <p>
+                    When most of us hear the word virtualization, a Virtual Machine (VM) comes to mind. That is completely natural; a VM presents the processor, memory, storage, and other peripherals of a physical machine virtually to another operating system. However, the architecture I explored in this project is different.
+                </p>
+
+                <p>
+                    With containers, we are not running a brand new operating system. Nor are we spawning a new kernel. Instead, we are providing processes that share the same Linux kernel (we'll get into what a process really is in a moment) with an isolated operating environment.
+                </p>
+
+                <p>
+                    Therefore, when we say "virtualization" here, we are not referring to hardware virtualization at the VM level, but operating-system-level isolation and virtualization.
+                </p>
+
+                <h2>About the Project</h2>
+
+                <p>
+                    I built this project from scratch using Golang (1.22+), without touching Docker, runc, or any external container libraries, relying solely on raw Linux kernel syscalls and primitives. My goal was not to build a "production-ready" tool, but rather to truly understand Docker and experience first-hand the foundational mechanisms offered by the operating system.
+                </p>
+
+                <p>
+                    You can access the project link here:<br>
+                    <a href="https://github.com/doguhanniltextra/minicontainer" target="_blank">https://github.com/doguhanniltextra/minicontainer</a>
+                </p>
+
+                <h2>Where Everything Begins: The Process</h2>
+
+                <p>
+                    The first concept emphasized heavily by the authors of OSTEP was the Process. In daily life, many of us use "program", "application", and "process" interchangeably. But through the eyes of the kernel, there is a vital distinction:
+                </p>
+
+                <p>
+                    An ".exe" or compiled Go binary sitting on your disk is essentially dead. It is merely a collection of machine code and instructions. When you type <code>./application</code> into your terminal, the kernel takes these bytes, loads them into memory (RAM), allocates an execution workspace, and tells the CPU: "Now run this."
+                </p>
+
+                <p>
+                    This living state of dead code brought into memory, consuming resources and running instructions, is what we call a "process".
+                </p>
+
+                <p>
+                    The metaphor used in OSTEP for this is that the operating system is a master illusionist. When a process runs, the operating system orchestrates such an illusion that it feels as though the entire CPU spins exclusively for it, and the entirety of the 16 GB RAM is dedicated solely to that process.
+                </p>
+
+                <p>
+                    Towards the end of the virtualization section, during a Q&A between student and teacher, it's quite natural for the student to ask: "...so the operating system is essentially something that acts paranoid?" Because in an environment where thousands of processes share the exact same hardware simultaneously, the kernel cannot trust anyone. A rogue process might enter an infinite loop and lock up the CPU, or another might try to read or overwrite its neighbor's memory. Hence, the kernel is both a grand illusionist and an iron-fisted warden: while making every process feel like it owns its own universe, it keeps a tight grip on their throats, enforcing strict boundaries.
+                </p>
+
+                <p>
+                    In a standard Linux system, no matter how paranoid the operating system acts, it does not completely conceal processes from each other. When you open a terminal and run an ordinary program today, that program knows full well it is not alone on the machine:
+                </p>
+
+                <ul>
+                    <li>When running <code>ps aux</code>, it can see hundreds of other processes running on the host.</li>
+                    <li>It can access all files and libraries starting from the root directory (<code>/</code>).</li>
+                    <li>It shares the machine's single IP address and network interface with every other application, carrying the risk of consuming arbitrary amounts of memory and freezing the system.</li>
+                </ul>
+
+                <p>
+                    What if we want to take this illusion a step further? What if we blindfold a process so effectively that:
+                </p>
+
+                <ul>
+                    <li>It believes it is the sole running process in the entire machine.</li>
+                    <li>Instead of seeing the host's actual files, it believes a tiny directory we expose is the whole world.</li>
+                    <li>It has its own independent virtual network interface and IP address.</li>
+                    <li>No matter how hard it tries, it has iron shackles preventing it from consuming more than 100 MB of RAM.</li>
+                </ul>
+
+                <p>
+                    When you put these special blindfolds on a Linux process and chain its feet with these shackles, the resulting construct is what the industry calls a Container.
+                </p>
+
+                <h2>The Illusion's Lenses</h2>
+
+                <p>
+                    If what distinguishes a container from an ordinary process is the world it perceives, the lens filtering that world in Linux is called a <strong>Namespace</strong>.
+                </p>
+
+                <p>
+                    In the Linux kernel, there are inherently global resources: all process IDs across the system, network interfaces, disk mount points, the hostname...
+                </p>
+
+                <p>
+                    Normally, every process looks into this shared pool. But the kernel tells us: "If you want, when launching a new process, I can open dedicated windows for it. When looking through that window, it will only see the world I permit it to see."
+                </p>
+
+                <p>
+                    In the project, I started precisely by putting on these lenses:
+                </p>
+
+                <h3>1. PID Namespace</h3>
+
+                <p>
+                    In Linux, every process has an identifier (PID). When the machine boots up, the kernel launches <code>systemd</code> (or the init system) as <code>PID 1</code>, and everything else branches out as its descendants.
+                </p>
+
+                <p>
+                    In the Go code, when spawning the process, I set <code>Cloneflags: syscall.CLONE_NEWPID</code>, and the kernel opens a brand new counter starting from scratch for this process.
+                </p>
+
+                <p>
+                    Looking from the host machine, this process might be <code>PID 9452</code>, but if you step inside the container and run <code>echo $$</code>, it is now <code>PID 1</code>.
+                </p>
+
+                <p>
+                    This process now sits at the pinnacle of its own universe; even if it makes a mistake inside and runs <code>kill -9 1</code>, it merely terminates its own world and can never touch the host's real systemd.
+                </p>
+
+                <h3>The Process Can Still See the Host!</h3>
+
+                <p>
+                    When you create the process, yes, it may appear as <code>PID 1</code>, but if you run <code>ps aux</code>, hundreds of processes running on the host are still visible. The reason behind this lies in the design philosophy of the operating system.
+                </p>
+
+                <p>
+                    In Linux, the <code>ps</code> command doesn't query the kernel with some magical question. Because everything in Linux is a file, the <code>ps</code> command simply reads a special pseudo-filesystem called <code>/proc</code> and lists the directories inside (where each directory name corresponds to a PID).
+                </p>
+
+                <p>
+                    So while we blindfolded the process, its feet were still standing firmly in the host's <code>/proc</code> directory, allowing it to see external processes.
+                </p>
+
+                <p>
+                    To take this a step further, we must provide the process with its own mount table. We need it to forget the host's <code>/proc</code> and mount a fresh <code>/proc</code> from within the container that exposes only the processes visible to itself. This is achieved via <code>CLONE_NEWNS</code> (Mount Namespace).
+                </p>
+
+                <p>
+                    From here on, things become more familiar. While the UTS Namespace (<code>CLONE_NEWUTS</code>) grants the process the ability to have its own hostname, the NET Namespace (<code>CLONE_NEWNET</code>) places a completely blank routing and interface table before the process. We stripped away the host's ethernet and Wi-Fi adapters, leaving it alone with only an empty loopback (<code>lo</code>) interface.
+                </p>
+
+                <h2>The Illusion's Shackles</h2>
+
+                <p>
+                    We equipped the process with lenses; it now believes it is <code>PID 1</code>, has zero awareness of the host's other processes, and possesses its own hostname.
+                </p>
+
+                <p>
+                    Did that solve all our problems? <strong>No.</strong>
+                </p>
+
+                <p>
+                    Because even if the process cannot see the outside world, it is still running on the physical hardware of the host machine. If a malicious or careless developer inside this container were to execute the infamous <strong>Fork Bomb</strong>, the container wouldn't care about isolation; it would saturate the Linux kernel's entire process table, freezing your host machine until you pull the plug. Or if you're lucky, a memory leak would devour your host's RAM, triggering the infamous OOM Killer gun to start arbitrarily shooting down innocent processes on the host just to catch its breath.
+                </p>
+
+                <p>
+                    To enforce resource limitations, I utilized Cgroups (Control Groups), specifically Cgroups v2.
+                </p>
+
+                <h3>Managing the Operating System via Cgroups and the Filesystem</h3>
+
+                <p>
+                    The best part about Cgroups v2 is its API. You don't need to invoke any obscure, complex syscalls. Linux's "everything is a file" philosophy saved the day here as well, and I created a container-specific directory under <code>/sys/fs/cgroup/</code>: <code>/sys/fs/cgroup/minicontainer-123/</code>.
+                </p>
+
+                <p>
+                    Inside this folder, the kernel automatically exposes a set of control files. You simply write limits as plain text into those files:
+                </p>
+
+                <ul>
+                    <li>Writing <code>20</code> into the <code>pids.max</code> file inside that directory and adding the process PID to <code>cgroup.procs</code> ensures that if someone attempts a fork bomb inside the container, the moment it hits the 20th process, the kernel returns <code>fork: Resource temporarily unavailable</code>, suffocating the attack instantly.</li>
+                    <li>With <code>memory.max</code>, you can enforce a strict 100 MB memory cap.</li>
+                    <li>With <code>cpu.max</code>, you can enforce hard CPU throttling quotas.</li>
+                </ul>
+
+                <p>
+                    We blindfolded the process and shackled its feet, but there was still another problem: when executing <code>cd /</code> followed by <code>ls</code> inside the container, what we saw was still the host machine's actual disk. I probably don't need to explain how catastrophic that is for a process we intend to isolate.
+                </p>
+
+                <h2>Filesystem Isolation</h2>
+
+                <p>
+                    We tricked the process regarding its PID and restricted its resources with Cgroups. But a critical vulnerability still remained:
+                </p>
+
+                <p>
+                    Entering the process and executing <code>cd /home</code> allowed us to view all the files and personal data of the host machine. A container having access to the host's filesystem is an unacceptable security flaw.
+                </p>
+
+                <p>
+                    We need to tell the container: <em>"Your entire universe consists only of this single folder."</em>
+                </p>
+
+                <h3>chroot vs pivot_root</h3>
+
+                <p>
+                    When changing the root directory of a process in Linux comes to mind, the classic tool that immediately surfaces is <code>chroot</code>. It has been part of the Unix world since 1979, and frankly, I initially thought about simply using <code>chroot</code> and moving on. However, as I researched further, I was not convinced it was secure enough compared to <code>pivot_root</code> for container isolation. <code>chroot</code> only restricts the current view of the process; a clever process running as root can easily escape using a classic jailbreak trick and crawl back up the hierarchy.
+                </p>
+
+                <p>
+                    Therefore, just as the modern container ecosystem does, I opted for a much stricter, irreversible syscall: <code>pivot_root</code>.
+                </p>
+
+                <p>
+                    <code>pivot_root</code> performs what can only be described as architectural gymnastics:
+                </p>
+
+                <ul>
+                    <li>First, you place the filesystem of a minimal operating system like Alpine Linux into a directory (<code>assets/rootfs</code>).</li>
+                    <li>Using the <code>pivot_root</code> call, you make this directory the new root filesystem of the system.</li>
+                    <li>You push the old, genuine root filesystem of the host into a temporary mount location: <code>.old_root</code>.</li>
+                    <li>Immediately afterward, you unmount <code>.old_root</code> and detach it entirely from the system.</li>
+                </ul>
+
+                <p>
+                    Once those bridges are burned behind, even if the container executes <code>cd ..</code>, reaching the host's files becomes impossible.
+                </p>
+
+                <h3>Preserving the Base Image: OverlayFS and Copy-on-Write</h3>
+
+                <p>
+                    We isolated the filesystem, but this immediately introduced a practical dilemma:
+                </p>
+
+                <p>
+                    We only have a single Alpine Linux directory (<code>assets/rootfs</code>). What happens if a user inside the container accidentally deletes or modifies a file? Will our base image be corrupted? Or what if we want to run 3 containers concurrently, will they overwrite each other's files?
+                </p>
+
+                <p>
+                    Duplicating the disk from scratch for each container would be prohibitively slow and an egregious waste of storage. The mechanism Docker employs to solve this is <strong>OverlayFS</strong>, and that is precisely what I implemented in the project.
+                </p>
+
+                <p>
+                    OverlayFS transparently stacks two different directories on top of each other, presenting them as a single unified directory:
+                </p>
+
+                <ol>
+                    <li><strong><code>lowerdir</code> (Lower Layer):</strong> Our original Alpine Linux files. This layer is strictly <strong>read-only</strong>. The container can never write directly to it.</li>
+                    <li><strong><code>upperdir</code> (Upper Layer):</strong> An initially empty, writable workspace allocated specifically for that container instance.</li>
+                    <li><strong><code>merged</code> (Unified View):</strong> The composite mount point that the container actually enters via <code>pivot_root</code>.</li>
+                </ol>
+
+                <p>
+                    Its operating logic relies on the <strong>Copy-on-Write (CoW)</strong> principle:
+                </p>
+
+                <ul>
+                    <li>When the container reads a file, it reads directly from the lower layer (<code>lowerdir</code>).</li>
+                    <li>When the container attempts to modify or delete a file, the kernel immediately copies that file into the upper layer (<code>upperdir</code>) and performs the mutation there.</li>
+                    <li>Even if someone runs <code>rm -rf /bin</code> inside the container, the original files remain completely untouched! The kernel simply creates a special marker (whiteout) in the upper layer indicating that the file is deleted.</li>
+                </ul>
+
+                <p>
+                    When the container shuts down, all we have to do is delete that container's specific <code>upperdir</code> directory. Our base image remains pristine, just like day one!
+                </p>
+
+                <h2>An Overly Isolated Process</h2>
+
+                <p>
+                    Now, our problem wasn't isolating a process, but rather dealing with an overly isolated process. Because we severed all ties to the outside world, it had zero access to the internet.
+                </p>
+
+                <p>
+                    Remember that we gave the container a fresh NET namespace via the <code>CLONE_NEWNET</code> flag. Consequently, running <code>ip addr</code> inside the container only reveals <code>lo</code> (127.0.0.1). It has neither an assigned IP address nor an ethernet interface to reach the internet.
+                </p>
+
+                <p>
+                    So how does Docker allocate an independent IP address to each container, and how do containers successfully ping Google?
+                </p>
+
+                <p>
+                    To solve this problem, I utilized three fundamental networking mechanisms of the Linux kernel:
+                </p>
+
+                <h3>The Virtual Ethernet Cable: Veth Pair</h3>
+
+                <p>
+                    The Linux kernel features a fantastic construct called <code>veth</code> (virtual ethernet). Think of it as a virtual, bidirectional ethernet cable: any packet you send into one end instantly emerges from the other.
+                </p>
+
+                <p>
+                    Our code generates a veth pair with two endpoints in the background:
+                </p>
+
+                <ul>
+                    <li>One end remains on the host side.</li>
+                    <li>The other end is injected directly into the container's isolated NET namespace via a Netlink call.</li>
+                </ul>
+
+                <p>
+                    We rename the endpoint pushed inside the container to a standardized convention (e.g., <code>eth0</code>). Then, we dynamically assign a local IP from our IPAM module to this <code>eth0</code> interface and bring it up.
+                </p>
+
+                <h3>The Virtual Switch</h3>
+
+                <p>
+                    We plugged one end of the cable into the container. But where does the end residing on the host connect?
+                </p>
+
+                <p>
+                    On the host machine, we create a virtual bridge (Linux Bridge) named <strong><code>mc-br0</code></strong>. You can visualize the bridge as a physical network switch sitting in your room.
+                </p>
+
+                <p>
+                    We attach the host-side cable endpoint (<code>mc-h-xxx</code>) to this <code>mc-br0</code> bridge and configure <code>172.19.0.1</code> as the gateway IP for the bridge. We then instruct the container: <em>"For any packet you wish to send out to the world, your default gateway is <code>172.19.0.1</code>."</em>
+                </p>
+
+                <h3>Internet Outbound: IP Forwarding and <code>iptables</code> NAT</h3>
+
+                <p>
+                    When you send a packet from the container to <code>8.8.8.8</code> (Google DNS), the packet reaches the host machine. However, the source IP on that packet says <code>172.19.0.2</code>.
+                </p>
+
+                <p>
+                    No router on the public internet recognizes this private IP, and none can route the reply back.
+                </p>
+
+                <p>
+                    This is where two crucial Linux configurations come into play:
+                </p>
+
+                <ol>
+                    <li><strong>IP Forwarding:</strong> We tell the kernel by writing <code>1</code> into <code>/proc/sys/net/ipv4/ip_forward</code>: <em>"Do not hesitate to forward network packets between interfaces."</em></li>
+                    <li><strong>NAT (MASQUERADE):</strong> We configure an <code>iptables</code> rule on the host:
+                        <pre><code class="language-bash">iptables -t nat -A POSTROUTING -s 172.19.0.0/16 ! -o mc-br0 -j MASQUERADE</code></pre>
+                    </li>
+                </ol>
+
+                <p>
+                    This rule translates to: Strip the <code>172.19.0.2</code> label off every outbound packet leaving the container for the internet, and substitute it with the host's real IP address. When a response arrives from the outside, relay the packet back to the container.
+                </p>
+
+                <p>
+                    In this manner, the container can communicate with the external world in a controlled fashion using the host's internet connectivity.
+                </p>
+
+                <p>
+                    Once I translated this entire networking configuration into code and ran the test from inside the container, the result was:
+                </p>
+
+                <pre><code class="language-bash">/ # ping -c 2 8.8.8.8
+64 bytes from 8.8.8.8: seq=0 ttl=115 time=12.4 ms
+64 bytes from 8.8.8.8: seq=1 ttl=115 time=12.1 ms</code></pre>
+
+                <p>
+                    Packets were successfully traveling back and forth. A process that started out completely isolated from the host network could now reliably access the internet through its own virtual interface and assigned IP address.
+                </p>
+
+                <h2>What is a Container, Really?</h2>
+
+                <p>
+                    Let's return to the question I set out to answer at the beginning: So, how does Linux actually do this?
+                </p>
+
+                <p>
+                    What I realized at the end of this one-month journey is that massive container technologies are simply the orchestration of four core pillars (and, of course, hundreds of clever algorithms): Namespaces, Cgroups, pivot_root, and Veth & NAT.
+                </p>
+
+                <p>
+                    The creators of Docker are not magicians; they are brilliant engineers who packaged these powerful mechanisms, which the kernel has offered for decades, behind a single, convenient <code>docker run</code> command for all of us.
+                </p>
+
+                <h2>Final Thoughts</h2>
+
+                <p>
+                    Instead of a "take it, use it, move on" approach, popping open the hood of the tools we use daily might seem daunting at first, but it is one of the most rewarding ways for a software engineer to broaden their horizons. The spark ignited by OSTEP demonstrated to me that the operating system is not an impenetrable black box, but an extraordinary chain of logic operating under precise rules.
+                </p>
+
+                <p>
+                    If you would like to explore the code I wrote, the notes I took, and the minicontainer project I built throughout this journey, you can access the full source code on <a href="https://github.com/doguhanniltextra/minicontainer" target="_blank">GitHub</a>.
+                </p>
+
+                <p>
+                    I hope this has been an enjoyable and eye-opening read for you as well!
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=What%20is%20a%20Container%3F%20Understanding%20Linux%20Kernel%20Isolation%20from%20Scratch&url=https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_en.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_en.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Language Preference Persistence Script -->
+    <script>
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.textContent.trim().toLowerCase();
+                localStorage.setItem('preferred_lang', lang);
+            });
+        });
+    </script>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+</body>
+
+</html>
