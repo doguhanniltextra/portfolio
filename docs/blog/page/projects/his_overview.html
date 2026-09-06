@@ -190,7 +190,7 @@ jdbc:postgresql://postgresql:5432/patient_db?currentSchema=patient_schema
                 </div>
 
                 <p>
-                    Consumer groups are used throughout (<code>lab-order-group</code>, <code>doctor-lab-result-group</code>, <code>billing-lab-order-group</code>, etc.) which means any service can be horizontally scaled by simply adding more instances â€” Kafka handles the rebalancing automatically.
+                    Consumer groups are used throughout (<code>lab-order-group</code>, <code>doctor-lab-result-group</code>, <code>billing-lab-order-group</code>, etc.) which means any service can be horizontally scaled by simply adding more instances — Kafka handles the rebalancing automatically.
                 </p>
 
                 <h2>Reliability: The Outbox Pattern</h2>
@@ -232,7 +232,7 @@ outboxRepository.save(OutboxEvent.builder()
                 </p>
 
                 <div class="callout callout-warning">
-                    <strong>âš ï¸ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" and the answer is: "It keeps going."
+                    <strong>⚠️ Important:</strong> The combination of Outbox Pattern (producer side) and Dead Letter Queues (consumer side) creates end-to-end resilience for the entire event pipeline. Together, they answer the question: "What happens to our system when things go wrong?" and the answer is: "It keeps going."
                 </div>
 
                 <h2>Security Architecture</h2>
@@ -291,7 +291,7 @@ public ResponseEntity&lt;Admission&gt; admitPatient(...) { ... }
                     <div class="feature-box">
                         <i class="fas fa-file-alt"></i>
                         <h4>Logstash + MongoDB</h4>
-                        <p>Logback Kafka Appender ships all service logs to Kafka â†’ Logstash â†’ MongoDB. Searchable audit trail by user, service, and timestamp.</p>
+                        <p>Logback Kafka Appender ships all service logs to Kafka → Logstash → MongoDB. Searchable audit trail by user, service, and timestamp.</p>
                     </div>
                 </div>
 
@@ -345,7 +345,7 @@ deploy:
 </code></pre>
 
                 <div class="callout callout-success">
-                    <strong>âœ… Result:</strong> Upgrading Spring Boot for all 10 services is a single line change in one file. No drift, no version mismatches, no "works on my service" incidents.
+                    <strong>✅ Result:</strong> Upgrading Spring Boot for all 10 services is a single line change in one file. No drift, no version mismatches, no "works on my service" incidents.
                 </div>
 
                 <h2>What I'd Do Differently</h2>

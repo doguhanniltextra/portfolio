@@ -74,7 +74,7 @@
                 <p class="lead">
                     Ready to get your hands dirty with Kubernetes resource management? This practical guide will walk
                     you through simple exercises to understand how requests and limits work in real scenarios. No
-                    complex theoryâ€”just practical examples you can run right now.
+                    complex theory—just practical examples you can run right now.
                 </p>
 
                 <div class="callout callout-info">
@@ -198,11 +198,11 @@ kubectl describe pod burstable-pod | grep "QoS Class"
 kubectl describe pod besteffort-pod | grep "QoS Class"</code></pre>
 
                 <div class="callout callout-success">
-                    <strong>âœ… Expected Results:</strong>
+                    <strong>✅ Expected Results:</strong>
                     <ul>
-                        <li>guaranteed-pod â†’ QoS Class: <strong>Guaranteed</strong></li>
-                        <li>burstable-pod â†’ QoS Class: <strong>Burstable</strong></li>
-                        <li>besteffort-pod â†’ QoS Class: <strong>BestEffort</strong></li>
+                        <li>guaranteed-pod → QoS Class: <strong>Guaranteed</strong></li>
+                        <li>burstable-pod → QoS Class: <strong>Burstable</strong></li>
+                        <li>besteffort-pod → QoS Class: <strong>BestEffort</strong></li>
                     </ul>
                 </div>
 
@@ -229,7 +229,7 @@ spec:
     args: ["--vm", "1", "--vm-bytes", "150M", "--vm-hang", "1"]</code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>âš ï¸ What's happening here?</strong> This pod is trying to allocate 150MB of memory, but its
+                    <strong>⚠️ What's happening here?</strong> This pod is trying to allocate 150MB of memory, but its
                     limit is only 100MB. Let's see what Kubernetes does!
                 </div>
 
@@ -311,7 +311,7 @@ kubectl run big-pod --image=nginx \
 kubectl describe resourcequota compute-quota -n limited-namespace</code></pre>
 
                 <div class="callout callout-warning">
-                    <strong>âš ï¸ Quota Exceeded!</strong> The pod requests more CPU than the namespace allows. This is
+                    <strong>⚠️ Quota Exceeded!</strong> The pod requests more CPU than the namespace allows. This is
                     how you protect your cluster from runaway resource consumption.
                 </div>
 

@@ -73,7 +73,7 @@
             <div class="post-content">
 
                 <p class="lead">
-                    PostgreSQL is more than just a relational databaseâ€”it's a sophisticated system with intricate
+                    PostgreSQL is more than just a relational database—it's a sophisticated system with intricate
                     internal mechanisms. This deep dive explores the fundamental architecture of PostgreSQL, from
                     PGDATA and database clusters to the Postmaster process and Multi-Version Concurrency Control
                     (MVCC), revealing how PostgreSQL achieves data consistency and high concurrency.
@@ -204,9 +204,9 @@
                 <h3>Tablespace Relationships</h3>
 
                 <ul>
-                    <li><strong>One Tablespace â†’ Multiple Databases:</strong> Multiple databases can share the same
+                    <li><strong>One Tablespace → Multiple Databases:</strong> Multiple databases can share the same
                         tablespace.</li>
-                    <li><strong>One Database â†’ Multiple Tablespaces:</strong> A single database can use multiple
+                    <li><strong>One Database → Multiple Tablespaces:</strong> A single database can use multiple
                         tablespaces to store different objects.</li>
                 </ul>
 
@@ -311,7 +311,7 @@
                     occur when multiple transactions run concurrently.</p>
 
                 <div class="callout callout-warning">
-                    <strong>âš ï¸ Note:</strong> All the following scenarios assume Transaction A and Transaction B are
+                    <strong>⚠️ Note:</strong> All the following scenarios assume Transaction A and Transaction B are
                     running concurrently.
                 </div>
 
@@ -410,7 +410,7 @@
                 </div>
 
                 <div class="callout callout-success">
-                    <strong>âœ… PostgreSQL's Stricter Approach:</strong> PostgreSQL behaves more strictly than the SQL
+                    <strong>✅ PostgreSQL's Stricter Approach:</strong> PostgreSQL behaves more strictly than the SQL
                     standard:
                     <ul>
                         <li><strong>Read Uncommitted does not exist</strong> in PostgreSQL (it is treated as Read
@@ -492,7 +492,7 @@
                 </ul>
 
                 <div class="callout callout-success">
-                    <strong>âœ… Key Benefit:</strong> This mechanism allows readers and writers to work without blocking
+                    <strong>✅ Key Benefit:</strong> This mechanism allows readers and writers to work without blocking
                     each other. Readers see a consistent snapshot of the data without waiting for writers to finish,
                     and writers can modify data without blocking readers.
                 </div>
@@ -537,8 +537,8 @@
                 <h2>Conclusion</h2>
 
                 <p>
-                    Understanding PostgreSQL's internal architectureâ€”from PGDATA and the Postmaster process to MVCC and
-                    transaction isolationâ€”is essential for building robust, high-performance database applications. The
+                    Understanding PostgreSQL's internal architecture—from PGDATA and the Postmaster process to MVCC and
+                    transaction isolation—is essential for building robust, high-performance database applications. The
                     abstractions provided by SQL are powerful, but knowing what happens under the hood enables you to
                     make informed decisions about schema design, transaction management, and performance tuning.
                 </p>

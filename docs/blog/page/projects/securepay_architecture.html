@@ -71,13 +71,13 @@
                 </p>
 
                 <p>
-                    Today, Iâ€™m pulling back the curtain on the architectural journey of building SecurePayâ€”a project that traverses the landscape of Zero-Trust security, Distributed Systems, and Infrastructure as Code.
+                    Today, I’m pulling back the curtain on the architectural journey of building SecurePay—a project that traverses the landscape of Zero-Trust security, Distributed Systems, and Infrastructure as Code.
                 </p>
 
                 <h2>1. The Architectural Blueprint: Beyond the Perimeter</h2>
                 
                 <p>
-                    Traditional security models rely on a "walled garden" approachâ€”once you're inside the network, you're trusted. In SecurePay, we operate on a <strong>Zero-Trust</strong> principle. We don't trust the network, and we don't trust the IP addresses.
+                    Traditional security models rely on a "walled garden" approach—once you're inside the network, you're trusted. In SecurePay, we operate on a <strong>Zero-Trust</strong> principle. We don't trust the network, and we don't trust the IP addresses.
                 </p>
 
                 <h3>The Stack at a Glance:</h3>
@@ -111,7 +111,7 @@
                 
                 <ol>
                     <li><strong>Workload Attestation:</strong> When a Pod starts in Kubernetes, the <strong>SPIRE Agent</strong> identifies it based on its Kubernetes ServiceAccount and Namespace.</li>
-                    <li><strong>SVID Issuance:</strong> The SPIRE Server issues a short-lived <strong>SVID (SPIFFE Verifiable Identity Document)</strong>â€”an X.509 certificate.</li>
+                    <li><strong>SVID Issuance:</strong> The SPIRE Server issues a short-lived <strong>SVID (SPIFFE Verifiable Identity Document)</strong>—an X.509 certificate.</li>
                     <li><strong>Automatic Rotation:</strong> These certificates are rotated every few hours automatically. There are no passwords to leak and no certificates to manually manage.</li>
                 </ol>
 
@@ -162,7 +162,7 @@
                 <p>In a microservices world, debugging "The request is slow" is impossible without distributed tracing.</p>
 
                 <div class="callout callout-success">
-                    <strong>âœ… Implementation:</strong> Using <strong>OpenTelemetry (OTel)</strong>, I implemented manual and automatic instrumentation where every request carries a <code>trace_id</code> through the entire stackâ€”from API Gateway to Kafka consumers.
+                    <strong>✅ Implementation:</strong> Using <strong>OpenTelemetry (OTel)</strong>, I implemented manual and automatic instrumentation where every request carries a <code>trace_id</code> through the entire stack—from API Gateway to Kafka consumers.
                 </div>
 
                 <h2>6. Engineering Challenges & Victories</h2>

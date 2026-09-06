@@ -77,11 +77,11 @@
                 <h2>Moving from REST Postcards to gRPC Stubs</h2>
                 
                 <p>
-                    In my earlier implementation, services talked to each other using <code>RestTemplate</code>. It felt like sending postcardsâ€”I had to manually build URLs like <code>baseUrl + "/patients/find/" + id</code>, manage circuit breakers with Resilience4j, and handle JSON parsing at every step.
+                    In my earlier implementation, services talked to each other using <code>RestTemplate</code>. It felt like sending postcards—I had to manually build URLs like <code>baseUrl + "/patients/find/" + id</code>, manage circuit breakers with Resilience4j, and handle JSON parsing at every step.
                 </p>
 
                 <p>
-                    I replaced this with <strong>gRPC over Protobuf</strong>. Instead of "phone calls" where lines could be busy, itâ€™s more like a direct radio connection. By defining our service contracts in <code>.proto</code> files, I could generate type-safe Java stubs that handle connections, retries, and deadlines natively.
+                    I replaced this with <strong>gRPC over Protobuf</strong>. Instead of "phone calls" where lines could be busy, it’s more like a direct radio connection. By defining our service contracts in <code>.proto</code> files, I could generate type-safe Java stubs that handle connections, retries, and deadlines natively.
                 </p>
 
                 <div class="callout callout-info">
@@ -170,7 +170,7 @@ public class DataSourceAspect {
                 <h2>Closing Thoughts</h2>
 
                 <div class="callout callout-success">
-                    <strong>âœ… Evolution:</strong> This architectural journey transformed my collection of services into a much more stable and observable ecosystem. It was a great lesson in choosing the right patterns to solve real distributed challenges.
+                    <strong>✅ Evolution:</strong> This architectural journey transformed my collection of services into a much more stable and observable ecosystem. It was a great lesson in choosing the right patterns to solve real distributed challenges.
                 </div>
 
                 <p>
