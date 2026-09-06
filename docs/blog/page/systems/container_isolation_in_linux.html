@@ -6,12 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak - Doguhan Ilter</title>
     <meta name="description" content="Docker ve container teknolojisinin arkasındaki Linux kernel mekanizmaları: Namespaces, Cgroups v2, pivot_root, OverlayFS ve Veth/NAT ağ yapısı.">
-    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups, pivot_root, OverlayFS, Veth, iptables, Golang, Systems Programming">
+    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups, Cgroups v2, pivot_root, OverlayFS, Veth, iptables, Golang, Systems Programming, Doğuhan İlter, Doguhan Ilter">
+    <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <link rel="alternate" hreflang="tr" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <link rel="alternate" hreflang="en" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html">
+    <link rel="alternate" hreflang="x-default" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <meta property="og:title" content="Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak - Doğuhan İlter">
+    <meta property="og:description" content="Docker ve container teknolojisinin arkasındaki Linux kernel mekanizmaları: Namespaces, Cgroups v2, pivot_root, OverlayFS ve Veth/NAT ağ yapısı.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak - Doğuhan İlter">
+    <meta name="twitter:description" content="Docker ve container teknolojisinin arkasındaki Linux kernel mekanizmaları: Namespaces, Cgroups v2, pivot_root, OverlayFS ve Veth/NAT ağ yapısı.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../main.css" />
     <link rel="stylesheet" href="../../blog.css" />
     <link rel="stylesheet" href="../post.css" />
+
+    <!-- Schema.org TechArticle Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak",
+      "description": "Docker ve container teknolojisinin arkasındaki Linux kernel mekanizmaları: Namespaces, Cgroups v2, pivot_root, OverlayFS ve Veth/NAT ağ yapısı.",
+      "keywords": ["Linux Kernel", "Containers", "Docker", "Namespaces", "Cgroups", "Cgroups v2", "pivot_root", "OverlayFS", "Veth", "iptables", "Golang", "Systems Programming"],
+      "inLanguage": "tr",
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": ["Doguhan Ilter", "doguhanniltextra"],
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": "Doguhan Ilter"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html",
+      "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html"
+    }
+    </script>
 </head>
 
 <body>

@@ -6,12 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What is a Container? Understanding Linux Kernel Isolation from Scratch - Doguhan Ilter</title>
     <meta name="description" content="A deep dive into how the Linux kernel provides container isolation: Namespaces (PID, Mount, UTS, NET), resource limiting with Cgroups v2, filesystem isolation with pivot_root and OverlayFS, and networking with Veth pairs and iptables NAT.">
-    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups v2, pivot_root, OverlayFS, Veth, iptables, Go, Operating Systems, Systems Programming">
+    <meta name="keywords" content="Linux Kernel, Containers, Docker, Namespaces, Cgroups, Cgroups v2, pivot_root, OverlayFS, Veth, iptables, Go, Operating Systems, Systems Programming, Doğuhan İlter, Doguhan Ilter">
+    <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html">
+    <link rel="alternate" hreflang="tr" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <link rel="alternate" hreflang="en" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html">
+    <link rel="alternate" hreflang="x-default" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html">
+    <meta property="og:title" content="What is a Container? Understanding Linux Kernel Isolation from Scratch - Doğuhan İlter">
+    <meta property="og:description" content="A deep dive into how the Linux kernel provides container isolation: Namespaces, Cgroups v2, pivot_root, OverlayFS, and Veth networking.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="What is a Container? Understanding Linux Kernel Isolation from Scratch - Doğuhan İlter">
+    <meta name="twitter:description" content="A deep dive into how the Linux kernel provides container isolation: Namespaces, Cgroups v2, pivot_root, OverlayFS, and Veth networking.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../main.css" />
     <link rel="stylesheet" href="../../blog.css" />
     <link rel="stylesheet" href="../post.css" />
+
+    <!-- Schema.org TechArticle Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "What is a Container? Understanding Linux Kernel Isolation from Scratch",
+      "description": "A deep dive into how the Linux kernel provides container isolation: Namespaces, Cgroups v2, pivot_root, OverlayFS, and networking with Veth pairs and iptables NAT.",
+      "keywords": ["Linux Kernel", "Containers", "Docker", "Namespaces", "Cgroups v2", "pivot_root", "OverlayFS", "Veth", "iptables", "Go", "Systems Programming"],
+      "inLanguage": "en",
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": ["Doguhan Ilter", "doguhanniltextra"],
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": "Doguhan Ilter"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html",
+      "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html"
+    }
+    </script>
 </head>
 
 <body>
