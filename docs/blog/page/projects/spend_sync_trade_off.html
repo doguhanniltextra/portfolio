@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpendSync: Architectural Notes and Trade-offs in an Enterprise Spend Platform - Doguhan Ilter</title>
-    <meta name="description" content="Architectural decisions behind SpendSync: Modular Monolith, Multi-Tenant isolation with ThreadLocal, Redis ZSET Sliding Window Rate Limiting, Pessimistic Locking, 3-Way Invoice Matching, Testcontainers, and Structured Logging with PII Masking.">
+    <title>SpendSync: Kurumsal Harcama Platformu Mimari Notları ve Trade-off'lar - Doguhan Ilter</title>
+    <meta name="description" content="SpendSync projesinin mimari kararları: Modüler Monolith, ThreadLocal ile Multi-Tenant izolasyonu, Redis ZSET Sliding Window Rate Limiting, Pessimistic Lock, 3-Way Matching, Testcontainers ve PII maskelemeli yapısal loglama.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../main.css" />
-    <link rel="stylesheet" href="../blog.css" />
-    <link rel="stylesheet" href="post.css" />
+    <link rel="stylesheet" href="../../../main.css" />
+    <link rel="stylesheet" href="../../blog.css" />
+    <link rel="stylesheet" href="../post.css" />
 </head>
 
 <body>
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <h1><a href="../../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
                 <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
@@ -31,11 +31,11 @@
     <nav class="nav">
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px;">
             <ul>
-                <li><a href="../../index.html" class="active">Blog</a></li>
+                <li><a href="../../../index.html" class="active">Blog</a></li>
             </ul>
             <div class="lang-switch" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem;">
-                <a href="spend_sync_trade_off_tr.html" class="lang-btn" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; color: #2b5ea7; background: transparent; font-weight: 700; border-radius: 2px;">TR</a>
-                <a href="spend_sync_trade_off_en.html" class="lang-btn active" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; background: #2b5ea7; color: #fff; font-weight: 700; border-radius: 2px;">EN</a>
+                <a href="spend_sync_trade_off_tr.html" class="lang-btn active" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; background: #2b5ea7; color: #fff; font-weight: 700; border-radius: 2px;">TR</a>
+                <a href="spend_sync_trade_off_en.html" class="lang-btn" style="padding: 4px 12px; text-decoration: none; border: 2px solid #2b5ea7; color: #2b5ea7; background: transparent; font-weight: 700; border-radius: 2px;">EN</a>
             </div>
         </div>
     </nav>
@@ -54,12 +54,12 @@
                         <i class="far fa-clock"></i> 15 min read
                     </span>
                     <span class="lang-indicator" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-globe"></i> <strong>Language:</strong> English
-                        <a href="spend_sync_trade_off_tr.html" style="color: #2c5aa0; margin-left: 6px;">(Türkçe'ye Geç)</a>
+                        <i class="fas fa-globe"></i> <strong>Dil:</strong> Türkçe
+                        <a href="spend_sync_trade_off_en.html" style="color: #2c5aa0; margin-left: 6px;">(Switch to English)</a>
                     </span>
                 </div>
 
-                <h1 class="post-title-main">SpendSync: Architectural Notes and Trade-offs in an Enterprise Spend Platform</h1>
+                <h1 class="post-title-main">SpendSync: Kurumsal Harcama Platformu Mimari Notları ve Trade-off'lar</h1>
 
                 <div class="post-tags-header">
                     <span class="tag">Java</span>
@@ -75,78 +75,78 @@
             <div class="post-content">
 
                 <p class="lead">
-                    This blog originated from organizing and refining the architectural notes I took while designing and building the Spend-Sync project into a more systematic form.
+                    Bu yazdığım blog, Spend-Sync projesinin yapım süresince mimariyi oluştururken aldığım notların biraz daha sistematik hale dönüştürülmesiyle ortaya çıktı.
                 </p>
 
                 <p>
-                    SpendSync is an enterprise-grade Procurement and Spend Management Platform. It encompasses the complete workflow from purchase requisitions to invoice payments, alongside budget control, vendor management, and automated invoice matching. Rather than focusing merely on "what I built", this post explores "why I built it this way and what I learned along the way".
+                    SpendSync, kurumsal düzeyde bir Tedarik ve Harcama Yönetim Platformu. Satın alma talebinden fatura ödemesine kadar uzanan iş akışını; bütçe kontrolü, tedarikçi yönetimi ve otomatik fatura eşleştirme ile birlikte ele alıyor. Bu blog, "ne yaptım"dan çok "neden böyle yaptım ve ne öğrendim"i anlatıyor.
                 </p>
 
                 <hr>
 
-                <h2>Table of Contents</h2>
+                <h2>İçindekiler</h2>
 
                 <ol>
-                    <li><a href="#1-modular-monolith-as-an-architectural-choice">Modular Monolith as an Architectural Choice</a></li>
-                    <li><a href="#2-multi-tenant-isolation-threadlocal-and-request-filter">Multi-Tenant Isolation: ThreadLocal and Request Filter</a></li>
-                    <li><a href="#3-sliding-window-rate-limiting-with-redis-zset">Sliding Window Rate Limiting with Redis ZSET</a></li>
-                    <li><a href="#4-preventing-double-spending-with-pessimistic-locking">Preventing Double-Spending with Pessimistic Locking</a></li>
-                    <li><a href="#5-3-way-invoice-matching-algorithm">3-Way Invoice Matching Algorithm</a></li>
-                    <li><a href="#6-testcontainers-integration-testing-in-real-containers-not-mocks">Testcontainers: Integration Testing in Real Containers, Not Mocks</a></li>
-                    <li><a href="#7-structured-logging-and-pii-masking">Structured Logging and PII Masking</a></li>
+                    <li><a href="#1-mimari-secim-olarak-moduler-monolith">Mimari Seçim Olarak Modüler Monolith</a></li>
+                    <li><a href="#2-multi-tenant-izolasyonu-threadlocal-ve-request-filter">Multi-Tenant İzolasyonu: ThreadLocal ve Request Filter</a></li>
+                    <li><a href="#3-redis-zset-ile-sliding-window-rate-limiting">Redis ZSET ile Sliding Window Rate Limiting</a></li>
+                    <li><a href="#4-pessimistic-lock-ile-double-spendingi-onlemek">Pessimistic Lock ile Double-Spending'i Önlemek</a></li>
+                    <li><a href="#5-3-yonlu-fatura-eslestirme-algoritmasi">3-Yönlü Fatura Eşleştirme Algoritması</a></li>
+                    <li><a href="#6-testcontainers-mock-degil-gercek-konteynerde-integration-test">Testcontainers: Mock Değil, Gerçek Konteynerde Integration Test</a></li>
+                    <li><a href="#7-yapisal-loglama-ve-pii-maskeleme">Yapısal Loglama ve PII Maskeleme</a></li>
                 </ol>
 
                 <hr>
 
-                <h2 id="1-modular-monolith-as-an-architectural-choice">1. Modular Monolith as an Architectural Choice</h2>
+                <h2 id="1-mimari-secim-olarak-moduler-monolith">1. Mimari Seçim Olarak Modüler Monolith</h2>
 
                 <p>
-                    Considering that the services of a Procurement and Spend Management Platform communicate with high-traffic frequency and that this communication must be both sustainable and traceable, building this project with a microservices architecture would have inflated the scale drastically and made traffic coordination difficult, at least at this initial stage.
+                    Tedarik ve Harcama Yönetim Platformu'nun servislerinin birbirleriyle yüksek trafikli iletişimde bulunduğunu ve bu iletişimin hem sürdürülebilir hem de izlenebilir -traceable- olması gerektiğini düşününce, bu projeyi mikroservis mimarisiyle oluşturmak hem ölçeği çok büyütecekti hem de iletişim trafiğini sürdürmek -en azından bu noktada- zor olacaktı.
                 </p>
 
                 <p>
-                    For example, during a 3-Way Matching process, matching an invoice requires accessing data across multiple domains simultaneously:
+                    Örneğin, 3-Way Matching işleminde bir faturayı eşleştirmek için aynı anda şu verilere erişmek gerekiyor:
                 </p>
 
                 <ul>
-                    <li><code>PurchaseOrder</code> &rarr; purchasing module</li>
-                    <li><code>GoodsReceipt</code> &rarr; receiving module</li>
-                    <li><code>SupplierInvoice</code> &rarr; matching module</li>
-                    <li><code>BudgetPool</code> &rarr; budget module</li>
-                    <li><code>Tenant</code> &rarr; core module</li>
+                    <li><code>PurchaseOrder</code> &rarr; purchasing modülü</li>
+                    <li><code>GoodsReceipt</code> &rarr; receiving modülü</li>
+                    <li><code>SupplierInvoice</code> &rarr; matching modülü</li>
+                    <li><code>BudgetPool</code> &rarr; budget modülü</li>
+                    <li><code>Tenant</code> &rarr; core modülü</li>
                 </ul>
 
                 <p>
-                    In microservices, this translates to five separate HTTP calls. Each call introduces latency in milliseconds and represents a potential failure point. Ensuring that all five services complete successfully requires the Saga pattern. Saga means distributed transactions, and distributed transactions produce one of the most painful classes of bugs in production environments.
+                    Microservices'te bu beş ayrı HTTP çağrısı demek. Her çağrı +ms latency, her çağrı potansiyel failure noktası. Beş servisi aynı anda başarıyla tamamlamak için Saga pattern gerekir. Saga pattern distributed transaction demek. Distributed transaction production'da en can sıkıcı hata sınıflarından birini üretir.
                 </p>
 
                 <p>
-                    A Modular Monolith, on the other hand, provides a single deployment unit from an infrastructure standpoint while enabling strict internal boundaries. The fundamental rule: no module may access another module's <code>internal/</code> package directly; they communicate exclusively through interfaces defined in the <code>api/</code> package.
+                    Modüler Monolith ise mimari açıdan tek deployment birimi veriyor ancak içeride kesin sınırlar -boundaries- çizmemize olanak sağlıyor; temel kural ise hiçbir modül başka modülün 'internal/' paketine doğrudan erişemez. Sadece 'api/' paketindeki interface üzerinden haberleşir.
                 </p>
 
-<pre><code class="language-java">// MatchingServiceImpl.java: CORRECT
-private final BudgetService budgetService;   // api.BudgetService interface
+<pre><code class="language-java">// MatchingServiceImpl.java — DOĞRU
+private final BudgetService budgetService;   // api.BudgetService interface'i
 
-// WRONG: direct dependency on internal package
+// YANLIŞ — internal pakete doğrudan bağımlılık
 // private final BudgetServiceImpl budgetServiceImpl;
 </code></pre>
 
-                <h3>Modular Monolith &rarr; Microservices Transition</h3>
+                <h3>Modüler Monolith &rarr; Microservices Geçişi</h3>
 
                 <p>
-                    If SpendSync scales in the future and, for instance, requires deploying the Vendor Portal independently, the <code>vendorportal/api</code> interfaces are already clean. Drawing a network boundary becomes an implementation detail rather than an API overhaul. This is the "modulith-first" philosophy: establish clear boundaries first, extract into distributed services later if needed.
+                    Eğer yarın SpendSync büyürse ve örneğin Vendor Portal'ı ayrı deploy etmek gerekirse, <code>vendorportal/api</code> interface'leri zaten temiz. Network sınırı çizmek bir implementation değişikliği olur, API değişikliği değil. Bu "modulith-first" yaklaşım — önce sınırları koy, sonra gerekirse ayır.
                 </p>
 
                 <hr>
 
-                <h2 id="2-multi-tenant-isolation-threadlocal-and-request-filter">2. Multi-Tenant Isolation: ThreadLocal and Request Filter</h2>
+                <h2 id="2-multi-tenant-izolasyonu-threadlocal-ve-request-filter">2. Multi-Tenant İzolasyonu: ThreadLocal ve Request Filter</h2>
 
                 <p>
-                    SpendSync serves multiple companies (tenants). Company A's budget records must never be visible to Company B. This is the foundational pillar of SaaS. If handled incorrectly, it creates critical security vulnerabilities and severe compliance violations (GDPR/KVKK).
+                    SpendSync birden fazla şirkete (tenant) hizmet veriyor. Şirket A'nın bütçe verileri, Şirket B tarafından görülememeli. Bu SaaS'ın temeli. Yanlış yapılırsa kritik güvenlik açığı ve KVKK ihlali.
                 </p>
 
                 <p>
-                    To enforce this, every incoming HTTP request carries an <code>X-Tenant-Id</code> header:
+                    Bunun için gelen her HTTP isteği <code>X-Tenant-Id</code> header'ı taşıyor:
                 </p>
 
 <pre><code class="language-http">GET /api/v1/budget/pools
@@ -155,7 +155,7 @@ X-Tenant-Id: 550e8400-e29b-41d4-a716-446655440000
 </code></pre>
 
                 <p>
-                    The <code>TenantFilter</code> extracts this header and binds it to a <code>ThreadLocal</code> context:
+                    <code>TenantFilter</code>, bu header'ı <code>ThreadLocal</code>'a bağlıyor:
                 </p>
 
 <pre><code class="language-java">@Component
@@ -173,7 +173,7 @@ public class TenantFilter extends OncePerRequestFilter {
                 TenantContext.setTenantId(tenantId);
                 MDC.put("tenantId", tenantId.toString());
             } else {
-                // Fallback: Use tenantId embedded in JWT
+                // Fallback: JWT içindeki tenantId'yi kullan
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 if (auth != null && auth.getPrincipal() instanceof UserPrincipal principal) {
                     TenantContext.setTenantId(principal.getTenantId());
@@ -181,14 +181,14 @@ public class TenantFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } finally {
-            TenantContext.clear(); // CRITICAL
+            TenantContext.clear(); // KRİTİK
         }
     }
 }
 </code></pre>
 
                 <p>
-                    The <code>clear()</code> invocation in the <code>finally</code> block is paramount. Tomcat operates on a thread pool; once a request completes, the thread returns to the pool. If <code>clear()</code> is omitted, a subsequent request processed by the same thread would inherit the previous tenant's identity context.
+                    <code>finally</code> bloğundaki <code>clear()</code> çağrısı hayati önem taşıyor. Tomcat thread havuzu kullanır; request bitince thread havuza geri döner. <code>clear()</code> çağrılmazsa bir sonraki isteği işleyen thread, önceki tenant'ın kimliğini taşır.
                 </p>
 
                 <h3>TenantContext: ThreadLocal Wrapper</h3>
@@ -208,19 +208,19 @@ public class TenantFilter extends OncePerRequestFilter {
     }
 
     public static void clear() {
-        TENANT_ID_HOLDER.remove(); // remove() is safer than set(null)
+        TENANT_ID_HOLDER.remove(); // remove(), set(null)'dan daha güvenli
     }
 }
 </code></pre>
 
                 <p>
-                    With <code>ThreadLocal&lt;UUID&gt;</code>, each thread maintains its own isolated value. Thread A's UUID has no effect on Thread B.
+                    <code>ThreadLocal&lt;UUID&gt;</code> her thread kendi değerini taşır. Thread A'nın UUID'si Thread B'yi etkilemez.
                 </p>
 
-                <h3>Automatic Isolation at the Repository Layer</h3>
+                <h3>Repository Katmanında Otomatik İzolasyon</h3>
 
                 <p>
-                    Every database query is strictly filtered by tenant ID:
+                    Her sorgu tenant ID ile filtreleniyor:
                 </p>
 
 <pre><code class="language-java">// BudgetServiceImpl.java
@@ -228,51 +228,51 @@ UUID tenantId = TenantContext.getRequiredTenantId();
 
 BudgetPool pool = budgetPoolRepository
     .findByIdAndTenantId(poolId, tenantId)
-    .orElseThrow(...); // Pool belonging to another tenant → 404
+    .orElseThrow(...); // Başka tenant'ın pool'u → 404
 </code></pre>
 
                 <p>
-                    At the SQL level: <code>SELECT * FROM budget_pools WHERE id = ? AND tenant_id = ?</code>
+                    SQL düzeyinde: <code>SELECT * FROM budget_pools WHERE id = ? AND tenant_id = ?</code>
                 </p>
 
                 <p>
-                    If the tenant ID does not match, the record behaves as if it does not exist. Tenant A can never query or mutate Tenant B's data.
+                    Tenant ID eşleşmezse kayıt yok gibi görünür. Tenant A hiçbir zaman Tenant B'nin kaydına ulaşamaz.
                 </p>
 
                 <p>
-                    An important caveat to note: this pattern is specific to Java web applications running within a unified process. If the architecture expands to include an API Gateway layer or transitions to microservices, tenant isolation would benefit from an external gateway layer. Otherwise, each microservice must re-verify tenant IDs, introducing repetitive overhead.
+                    Tabii burada şu parantezi açmak gerekiyor. Bu yöntem Java web uygulamaları için geçerli. Eğer projenin bir noktada gateway katmanı oluşacaksa, ya da mikroservis mimarisine geçilirse, bu tenant izolasyonu için ek bir katman -genellikle bir gateway- kullanmak gerekebilir. Aksi takdirde, her servisin tenant ID'yi doğrulaması gerekir ki bu da bir miktar overhead yaratabilir.
                 </p>
 
                 <p>
-                    Furthermore, managing tenant context via threads on thread-pooled servers like Tomcat makes the <code>finally</code> block mandatory. Failing to clear state risks cross-tenant data leaks. An alternative approach is utilizing request attributes; however, this comes with its own ordering constraints: if the tenant filter does not execute before authentication filters, the tenant ID will not be accessible.
+                    Ek olarak yine söylemek gerekiyor ki bu Thread kullanarak tenant izolasyonu yapmak, Tomcat gibi thread havuzu kullanan sunucularda <code>finally</code> bloğu kullanmak hayati önem taşıyor. Yoksa bir request'ten kalan tenant ID, bir sonraki isteği işleyen thread tarafından taşınabilir ve ciddi güvenlik açıkları oluşturabilir. Bunun için başka bir yöntem olarak request attribute'larını kullanmak daha güvenli olabilir. Ancak, bu yöntemin de kendine özgü dezavantajları var. Örneğin, filtre zincirindeki sıralama kritik önem taşıyor. Eğer tenant filtre, authentication filtre'sinden önce çalışmazsa,tenant ID'ye erişilemez.
                 </p>
 
                 <p>
-                    Additionally, when delegating tasks to asynchronous workers, explicit context propagation mechanisms must be introduced to safely transfer tenant identity across thread boundaries.
+                    Bunun haricinde, asenkron işlemlerde bu yöntemin güvenli bir şekilde çalışabilmesi için ek önlemler almak gerekebilir.
                 </p>
 
                 <hr>
 
-                <h2 id="3-sliding-window-rate-limiting-with-redis-zset">3. Sliding Window Rate Limiting with Redis ZSET</h2>
+                <h2 id="3-redis-zset-ile-sliding-window-rate-limiting">3. Redis ZSET ile Sliding Window Rate Limiting</h2>
 
                 <p>
-                    When building rate limiters, fixed window counters are frequently the default choice. However, fixed window mechanisms have notable shortcomings. In this project, fixed window limiting was initially implemented, but its limitations soon became evident, leading to a migration to a sliding window rate limiter.
+                    Bir rate limiter için benim sık sık başvurduğum yol fixed window'dur. Ancak, bu yöntem her zaman ideal olmayabiliyor. Bu projede de ilk başta fixed window kullanılarak rate limiting implementasyonu yapılmıştı, daha sonra fixed window'un dezavantajları ortaya çıktı ve yerine sliding window kullanılarak rate limiting implementasyonu yapıldı.
                 </p>
 
                 <p>
-                    What are the core flaws of Fixed Window?<br>
-                    The primary weakness is traffic bursting at window boundaries. Users or automated scripts can burst high traffic right before a window closes, and immediately send another burst as the new window opens.
+                    Peki Fixed Window'un dezavantajları nelerdir?<br>
+                    Görünürde en temel dezavantajı, pencere sınırlarında oluşan yoğunluk. Yani, pencere başlangıcında yoğun bir trafikle gelen kullanıcılar, sonraki pencere başlangıcında da yoğun bir trafikle gelebilirler.
                 </p>
 
                 <p>
-                    To illustrate: assume a limit of "10 requests per 1 minute". An attacker dispatches 10 requests at 00:59:50 (accepted because the first window is active). At 01:00:02, a new window begins, and another 10 requests are sent. Within a span of 12 seconds, 20 requests pass through unchecked. The rate limiter functioned as coded, yet failed its core security objective.
+                    Bunu somutlaştırmak gerekirse; diyelim ki rate limit "1 dakikada 10 istek". Saldırgan 00:59:50'de 10 istek gönderir, pencere sonu yani kabul edilir. 01:00:02'de yeni bir pencere açılır, yeniden 10 istek. Toplamda 12 saniyede 20 istek geçmiş olur. Rate limiter "çalıştı" ancak amacını gerçekleştiremedi.
                 </p>
 
                 <p>
-                    The sliding window algorithm resolves this by continuously looking backward over the exact window duration. It consistently answers the question: "How many requests occurred in the last 60 seconds?" To achieve this, individual request timestamps must be recorded rather than incrementing a single scalar counter. Redis's Sorted Set (ZSET) data structure is ideal here: every member holds a score representing its Unix timestamp. Running <code>ZREMRANGEBYSCORE</code> removes all entries older than 60 seconds in a single command, and the remaining cardinality reflects active requests within the rolling window.
+                    Sliding window bu problemi şöyle çözer: Her an geriye doğru pencere uzunluğu kadar bakar. "Son 60 saniyede kaç istek var?" sorusunu her seferinde taze bir şekilde yanıtlıyor. Bunun için her isteğin tam zamanını kaydetmen gerekiyor, bir sayaç yetmiyor. Redis'in Sorted Set yapısı tam burada devreye giriyor. Sorted Set'te her üye bir score taşıyor, scora olarak isteğin Unix timestamp'ini kullanırsan, ZREMRANGEBYSCORE ile  "60 saniyeden eski tüm girişleri sil" komutunu tek satırda yazabiliyorsun. Kalan eleman sayısı, penceredeki aktif istek sayısı. Bu kadar.
                 </p>
 
-                <h3>Real Implementation</h3>
+                <h3>Gerçek Implementasyon</h3>
 
 <pre><code class="language-java">@Aspect
 @Component
@@ -305,7 +305,7 @@ public class RateLimitAspect {
         } catch (RateLimitExceededException e) {
             throw e;
         } catch (Exception e) {
-            // Fail-open: Do not block users if Redis fails (for lower-risk endpoints)
+            // Fail-open: Redis çökerse kullanıcıyı bloklama (düşük riskli endpoint'ler için)
             log.error("Redis Rate Limiter failed: {}. Allowing request.", e.getMessage());
         }
 
@@ -315,7 +315,7 @@ public class RateLimitAspect {
 </code></pre>
 
                 <p>
-                    Endpoints are protected declaratively using annotations:
+                    Herhangi bir endpoint'e annotation ile ekleniyor:
                 </p>
 
 <pre><code class="language-java">@RateLimit(key = "auth:login", limit = 5, periodSeconds = 60, type = RateLimitType.IP)
@@ -323,19 +323,19 @@ public AuthResponse login(LoginRequest request) { ... }
 </code></pre>
 
                 <p>
-                    Target identifiers vary by strategy: <code>USER</code> evaluates the JWT username, <code>TENANT</code> tracks <code>X-Tenant-Id</code>, and <code>IP</code> tracks client addresses.
+                    Rate limit tiplerine göre farklı identifier: <code>USER</code> için JWT username, <code>TENANT</code> için X-Tenant-Id, <code>IP</code> için istemci adresi.
                 </p>
 
-                <h3>Current Atomicity Issue</h3>
+                <h3>Mevcut Atomiklik Sorunu</h3>
 
                 <p>
-                    In the initial Java implementation above, the operations execute as three distinct roundtrips:
+                    Şu anki implementasyonda üç operasyon ayrı komutlar:
                 </p>
 
 <pre><code>ZREMRANGEBYSCORE → ZCARD → ZADD</code></pre>
 
                 <p>
-                    If two concurrent requests execute <code>ZCARD</code> simultaneously, both may observe the count below the limit, a classic race condition. The solution is combining all three operations into a single atomic Redis Lua script:
+                    İki eşzamanlı istek <code>ZCARD</code>'ı aynı anda okursa, ikisi de "limit altında" görebilir. Bu bir race condition. Çözüm, Redis Lua scripti ile üç operasyonu atomik tek işlem yapmak:
                 </p>
 
 <pre><code class="language-lua">local key = KEYS[1]
@@ -352,31 +352,31 @@ return 1
 </code></pre>
 
                 <p>
-                    Executing Lua scripts in Redis ensures server-side atomic execution without race conditions across threads. This boosts performance while guaranteeing strict consistency.
+                    Açıkçası böyle bir Redis kullanımı benim için de ilk oldu. Redis'in Lua script desteği sayesinde bu üç operasyonu atomik olarak tek işlemde yapabildim. Redis, Lua scriptlerini sunucu tarafında atomik olarak çalıştırıyor, yani thread'ler arasında race condition yaşanmıyor. Bu sayede hem performans artıyor hem de güvenilirlik sağlanıyor.
                 </p>
 
                 <p>
-                    A valuable lesson learned: Redis processes Lua scripts synchronously, blocking the single-threaded event loop during execution. Therefore, scripts must remain short and lightweight to prevent latency spikes.
+                    Sonradan öğrendiğim bir bilgi: Redis, Lua scriptlerini çalıştırırken thread'leri block ediyor. Bu yüzden Redis'te çok uzun süren Lua scriptleri yazmamak gerekiyor. Bu nedenle Redis'te Lua scriptleri kullanırken dikkatli olmakta fayda var.
                 </p>
 
-                <h2 id="4-preventing-double-spending-with-pessimistic-locking">4. Preventing Double-Spending with Pessimistic Locking</h2>
+                <h2 id="4-pessimistic-lock-ile-double-spendingi-onlemek">4. Pessimistic Lock ile Double-Spending'i Önlemek</h2>
 
                 <p>
-                    One of the most critical challenges in financial systems is the double-spending problem. Consider a scenario where a company's budget pool has 10,000 USD available, and two users trigger allocations concurrently:
+                    Bu projede kritik sorunlardan bir tanesi Double-Spending problemidir, örneğin bir şirketin bütçe havuzunda 10.000 TL var ve iki kullanıcı aynı anda şu harcamaları yapıyor:
                 </p>
 
-<pre><code>T1: User A → SELECT available → Sees 10,000 USD
-T2: User B → SELECT available → Sees 10,000 USD (A has not committed yet)
-T3: A → 10,000 >= 8,000 → ACCEPTED → reserved += 8,000 → UPDATE
-T4: B → 10,000 >= 6,000 → ACCEPTED → reserved += 6,000 → UPDATE
+<pre><code>T1: Kullanıcı A → SELECT available → 10.000 TL görüyor
+T2: Kullanıcı B → SELECT available → 10.000 TL görüyor  (A henüz yazmadı)
+T3: A → 10.000 >= 8.000 → KABUL → reserved += 8.000 → UPDATE
+T4: B → 10.000 >= 6.000 → KABUL → reserved += 6.000 → UPDATE
 </code></pre>
 
                 <p>
-                    Result: 14,000 USD allocated from an initial budget of 10,000 USD.
+                    Souç olarak 14.000 TL harcandı ancak havuzda en başta 10.000 TL vardı.
                 </p>
 
                 <p>
-                    Several strategies exist to resolve this concurrency conflict:
+                    Bu sorunu çözmenin birkaç yolu var:
                 </p>
 
                 <ol>
@@ -386,31 +386,31 @@ T4: B → 10,000 >= 6,000 → ACCEPTED → reserved += 6,000 → UPDATE
                 </ol>
 
                 <p>
-                    Let's explore each approach and why Pessimistic Locking was selected for SpendSync.
+                    İnceleyeceğimiz yöntemler bunlar ve ben neden Pessimistic Locking seçtim, bunu blogda ele alacağım.
                 </p>
 
                 <h3>1. Redis Optimistic</h3>
 
                 <p>
-                    With Redis, you monitor keys using the <code>WATCH</code> command within a <code>MULTI/EXEC</code> transaction block. If the watched key is modified by another client before commit, the <code>EXEC</code> command returns nil, requiring a retry loop.
+                    Redis'in WATCH komutuyla bir key'i izlemeye başlarsın, ardından MULTI/EXEC bloğu içinde işlem yaparsın. Eğer WATCH sonrasında o key başka bir transaction tarafından değiştirildiyse, EXEC komutu ile nil döner ve işlemi yeniden denemen gerekir.
                 </p>
 
                 <p>
-                    In a budget scenario, this reads the current balance, watches the key, computes the allocation, and attempts to write. If a collision occurs, the operation fails and retries.
+                    Bütçe senaryosunda ise şöyle çalışabilir; mevcut bakiyeyi oku, WATCH ile kilitle, yeni bakiyeyi hesapla, MULTI/EXEC ile yaz. Eğer arada başka biri yazdıysa EXEC başarısız olur ve retry gerekir.
                 </p>
 
                 <p>
-                    The main drawback is the retry complexity. Under heavy contention, requests enter endless retry loops, raising thorny questions in financial flows: "How many times should we retry, and what happens upon timeout?" Furthermore, budget records reside in PostgreSQL. Introducing Redis as an additional synchronization layer complicates the topology and requires dual-state consistency management. Hence, this approach was discarded.
+                    Bu yaklaşımın temel sorunu retry mantığı. Yüksek çakışma altında sürekli retry döngüsüne girebilirsin, finan işlemlerde "kaç kere denedim nerede durmalıyım" sorusu karmaşıklaşıyor. Ayrıca bütçe verimiz zaten PostgreSQL'de yaşıyor. Redis'i ek bir koordinasyon katmanı olarak sokmak hem mimariyi karmaşıklaştırıyor hem de iki ayrı store arasında tutarlılığı yönetmek gerekiyor. Bu nedenle bu yaklaşımdan vazgeçtik.
                 </p>
 
                 <h3>2. Optimistic Locking</h3>
 
                 <p>
-                    Optimistic Locking assumes conflicts are rare. Data is read along with a version attribute, business logic runs, and the update commits only if the version remains unchanged.
+                    Optimistic Locking, her işlemin başında veriyi okuyup, işlem bittiğinde verinin değişip değişmediğini kontrol etmeye dayanır. Eğer veri değişmişse işlem reddedilir, değişmemişse kabul edilir. Yani bir nevi “ilk gelen kazanır” mantığı ama sonradan değişiklik olursa kaybedersin.
                 </p>
 
                 <p>
-                    In JPA/Hibernate, a <code>@Version</code> column automatically increments on each update:
+                    JPA'da şöyle çalışıyor; entity'e bir "version" kolonu ekliyorsun. Her update işleminde bu kolon otomatik artıyor.
                 </p>
 
 <pre><code class="language-java">@Entity
@@ -420,7 +420,7 @@ public class BudgetPool {
     private UUID id;
 
     @Version
-    private int version; // Automatically incremented
+    private int version; // Otomatik artar
 
     private BigDecimal availableAmount;
 
@@ -429,7 +429,7 @@ public class BudgetPool {
 </code></pre>
 
                 <p>
-                    When reading with version = 5, Hibernate generates the following update statement:
+                    Veriyi okuyunca version = 5 geliyor. Yazmaya çalışınca Hibernate şunu üretiyor:
                 </p>
 
 <pre><code>UPDATE budget_pools
@@ -438,25 +438,25 @@ WHERE id = ? AND version = 5
 </code></pre>
 
                 <p>
-                    If another transaction modified the row in the interim (version became 6), zero rows are updated, and Hibernate throws an <code>OptimisticLockException</code>.
+                    Eğer o arada başka biri yazmışsa version artık 6 olmuştur, WHERE version = 5 eşleşmez, güncellenen satır sayısı 0 döner. Hibernate bunu OptimisticLockException olarak fırlatır. Yeniden denemen gerekir.
                 </p>
 
                 <p>
-                    Why is this problematic for budget reservations?
+                    Peki bu neden bütçe rezervasyonu için sorun?
                 </p>
 
                 <p>
-                    Optimistic locking incurs heavy overhead under contention: read the row, execute full validation, send an update, catch an exception, and restart from scratch. If 10 threads hit the same budget pool simultaneously, 9 fail and retry. During peak business moments, such as fiscal year-end when departments submit expenses simultaneously, optimistic locking exhausts system resources.
+                    Optimistic locking "çakışma nadir olur" varsayımı üzerine kuruludur. Yüksek çakışmada ceza çok ağır: veriyi oku, tüm iş mantığını çalıştır, DB'ye yaz, exception al, baştan başla. 10 thread aynı anda aynı bütçe havuzuna giriyorsa 9'u bu döngüye giriyor. Yüksek çakışmanın nadir olmadığı senaryolarda- örneğin mali yıl sonu, tüm departmanlar aynı anda harcama yapıyor- optimistic locking pratikte sistemi yoruyor.
                 </p>
 
                 <p>
-                    More importantly, budget reservations are direct user actions. The user clicked "Submit Purchase Order" and is awaiting a response. Placing complex retry logic into the application layer introduces ambiguity regarding timeouts and error reporting. Pessimistic locking eliminates this uncertainty: locks are either acquired immediately or queued sequentially.
+                    İkinci sorun daha önemli: bütçe işlemi kullanıcı aksiyonunun sonucu. Kullanıcı "satın alma talebi gönder" dedi ve bir yanıt bekliyor. "Tekrar dene" mantığını iş katmanına koymak karmaşık; kaç kere deneyeceksin, her denemede kullanıcıya ne söyleyeceksin, timeout olursa ne olacak? Bu soruların cevapları pessimistic lock ile hiç gündeme gelmiyor çünkü kilit ya alınır ya beklenir, belirsizlik yok.
                 </p>
 
                 <h3>3. Pessimistic Lock</h3>
 
                 <p>
-                    In PostgreSQL, <code>SELECT ... FOR UPDATE</code> locks the selected row at the read stage. No other transaction can mutate or obtain a write lock on that row until the holding transaction completes. Competing transactions queue up cleanly. When the active transaction commits or rolls back, the lock releases automatically.
+                    PostgreSQL'de <code>SELECT ... FOR UPDATE</code> bir satırı okuma anında kilitler. Kilidi alan transaction tamamlanana kadar başka transaction aynı satıra erişemez. Bekleyen transaction'lar ise sıraya girer. İşlem bittiğinde ya da rollback olduğunda kilit otomatik kalkar.
                 </p>
 
 <pre><code class="language-java">// BudgetPoolRepository.java
@@ -467,22 +467,22 @@ Optional&lt;BudgetPool&gt; findByIdAndTenantIdWithLock(@Param("id") UUID id,
 </code></pre>
 
                 <p>
-                    Hibernate translates this annotation directly to:
+                    Hibernate bu annotation ile şunu üretir:
                 </p>
 
 <pre><code class="language-sql">SELECT * FROM budget_pools WHERE id = ? AND tenant_id = ? FOR UPDATE
 </code></pre>
 
                 <p>
-                    This guarantees zero double-spending with deterministic transaction ordering.
+                    Bu yöntem ile çift harcama önlenir ve aynı zamanda işlem akışında belirsizlik olmaz.
                 </p>
 
                 <p>
-                    The reservation flow functions seamlessly: the moment <code>findByIdAndTenantIdWithLock</code> executes, PostgreSQL locks the row. Other transactions wait their turn in line. Once the first transaction commits, the next in queue reads the updated, accurate balance.
+                    Rezervasyon akışı şöyle işliyor: <code>findByIdAndTenantIdWithLock</code> çağrıldığı anda PostgreSQL o satırı kilitliyor. Diğer transaction'lar aynı satıra ulaşmak istediğinde bekliyor, sıraya giriyor. İlk transaction commit veya rollback yapınca kilit kalkar, sıradaki devam eder.
                 </p>
 
                 <p>
-                    In code, this is orchestrated as follows:
+                    Kod tarafında bu şöyle görünüyor:
                 </p>
 
 <pre><code class="language-java">@Override
@@ -490,7 +490,7 @@ Optional&lt;BudgetPool&gt; findByIdAndTenantIdWithLock(@Param("id") UUID id,
 public BudgetReservationResult reserveBudget(UUID budgetPoolId, BigDecimal amount, ...) {
     UUID tenantId = TenantContext.getRequiredTenantId();
 
-    // Lock and read: no concurrent transaction can modify this row
+    // Kilitle ve oku — başka transaction buraya giremez
     BudgetPool pool = budgetPoolRepository
         .findByIdAndTenantIdWithLock(budgetPoolId, tenantId)
         .orElseThrow(...);
@@ -498,23 +498,23 @@ public BudgetReservationResult reserveBudget(UUID budgetPoolId, BigDecimal amoun
     BigDecimal availableBefore = pool.getAvailableAmount();
 
     if (amount.compareTo(availableBefore) > 0) {
-        // Insufficient funds: handle according to enforcement mode
+        // Bütçe yetersiz — ne yapılacak enforcement mode'a bağlı
         switch (pool.getEnforcementMode()) {
             case HARD_STOP  -> throw new SpendSyncException("Insufficient budget.", ...);
             case TOLERANCE  -> {
-                // If within configured tolerance band, allow with overrun flag
+                // Yapılandırılmış tolerans bandı içindeyse geçer, overrun flag'lenir
                 if (reserved + spent + amount > pool.getMaxAllowedAllocation())
                     throw new SpendSyncException("Tolerance exceeded.", ...);
                 isOverrun = true;
             }
-            case SOFT_STOP  -> isOverrun = true; // Allow but flag for executive approval
+            case SOFT_STOP  -> isOverrun = true; // Geçer ama yönetici onayı flag'lenir
         }
     }
 
     pool.setReservedAmount(pool.getReservedAmount().add(amount));
     budgetPoolRepository.save(pool);
 
-    // Append to immutable audit ledger
+    // Her hareketi audit ledger'a yaz
     budgetTransactionRepository.save(new BudgetTransaction(
         pool, BudgetTransactionType.RESERVE, amount, availableBefore, pool.getAvailableAmount(), ...
     ));
@@ -524,11 +524,11 @@ public BudgetReservationResult reserveBudget(UUID budgetPoolId, BigDecimal amoun
 </code></pre>
 
                 <p>
-                    Crucially, the lock releases only when the transaction commits, ensuring subsequent threads always observe accurate ledger balances.
+                    Burada dikkat çeken bir nokta: transaction commit edildiğinde kilit serbest kalıyor, yani sıradaki thread ancak o zaman devam edebiliyor. Hiçbir thread "yanlış" bakiyeyi görmüyor.
                 </p>
 
                 <p>
-                    I validated this concurrency guarantee using Testcontainers running an official PostgreSQL 16 instance. With 10 threads submitting simultaneous 1,000 USD reservation requests against a 5,000 USD pool:
+                    Bu davranışı Testcontainers ile gerçek bir PostgreSQL 16 container'ında test ettim. 10 thread aynı anda başlıyor, bütçe havuzunda 5000 TL var, her thread 1000 TL rezerv etmeye çalışıyor:
                 </p>
 
 <pre><code class="language-java">@Test
@@ -543,7 +543,7 @@ void givenTenConcurrentThreads_whenReservingBudget_thenExactlyFiveSucceed()
     for (int i = 0; i < 10; i++) {
         executor.submit(() -> {
             try {
-                startLatch.await(); // Release all threads simultaneously
+                startLatch.await(); // Hepsini aynı anda bırak
                 budgetService.reserveBudget(poolId, new BigDecimal("1000.00"), ...);
                 success.incrementAndGet();
             } catch (SpendSyncException e) {
@@ -554,71 +554,71 @@ void givenTenConcurrentThreads_whenReservingBudget_thenExactlyFiveSucceed()
         });
     }
 
-    startLatch.countDown(); // Fire!
+    startLatch.countDown(); // Ateş!
     doneLatch.await(10, TimeUnit.SECONDS);
 
-    assertThat(success.get()).isEqualTo(5);   // Exactly 5 succeed
-    assertThat(failure.get()).isEqualTo(5);   // Exactly 5 fail
+    assertThat(success.get()).isEqualTo(5);   // Tam olarak 5 başarılı
+    assertThat(failure.get()).isEqualTo(5);   // Tam olarak 5 başarısız
     assertThat(finalPool.getAvailableAmount())
-        .isEqualByComparingTo(BigDecimal.ZERO); // Zero leakage, perfectly balanced
+        .isEqualByComparingTo(BigDecimal.ZERO); // Kalan sıfır, hiç kayıp yok
 }
 </code></pre>
 
                 <p>
-                    The outcome is deterministic: exactly 5 succeed, 5 fail, remaining balance is 0.00 USD. Zero double-spending.
+                    Test sonucu deterministik. Ne 4 ne 6, tam olarak 5. Kalan bakiye sıfır. Double-spending yok.
                 </p>
 
                 <p>
-                    Why Testcontainers? In-memory databases like H2 do not accurately replicate PostgreSQL's <code>SELECT ... FOR UPDATE</code> lock semantics. A concurrency test might pass on H2 while failing under production database engines. Testing against a genuine PostgreSQL container is essential for verifying real locking behavior.
+                    Neden Testcontainers? H2 gibi in-memory veritabanları <code>SELECT ... FOR UPDATE</code> semantiğini PostgreSQL gibi uygulamıyor. Bu testi H2'de yazsan geçer ama gerçek davranışı test etmemiş olursun. Gerçek PostgreSQL container'ı olmadan bu testin bir anlamı yok.
                 </p>
 
-                <h2 id="5-3-way-invoice-matching-algorithm">5. 3-Way Invoice Matching Algorithm</h2>
+                <h2 id="5-3-yonlu-fatura-eslestirme-algoritmasi">5. 3-Yönlü Fatura Eşleştirme Algoritması</h2>
 
                 <p>
-                    In enterprise procurement, receiving goods and paying invoices generates three distinct artifacts:
+                    Bir şirket mal aldığında üç ayrı belge üretilir:
                 </p>
 
                 <div style="overflow-x: auto; margin: 25px 0;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
                             <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
-                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Document</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Created By</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Content</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Belge</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Oluşturan</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">İçerik</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>PO (Purchase Order)</strong></td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Buyer Company</td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Contract: Item X, Unit Price Y, Quantity Z"</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Alıcı şirket</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"X ürünü, Y fiyattan, Z adet sözleşme"</td>
                             </tr>
                             <tr style="background: #fdfdfd;">
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>GRN (Goods Receipt Note)</strong></td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Warehouse / Logistics</td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Delivery: A items accepted, B items rejected"</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Depo/lojistik</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"A adet kabul edildi, B adet reddedildi"</td>
                             </tr>
                             <tr>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Vendor Invoice</strong></td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Supplier</td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Bill: Z items delivered, Price Y, Payment requested"</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Tedarikçi</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">"Z adet teslimat, Y fiyattan, ödeme bekliyorum"</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <p>
-                    Manual reconciliation can take weeks and is prone to human error. Automated 3-Way Matching performs this cross-verification algorithmically.
+                    Manuel kontrol haftalarca sürebilir ve insan hatasına açık. Otomatik 3-Way Match bu karşılaştırmayı algoritmik yapıyor.
                 </p>
 
-                <h3>Algorithm</h3>
+                <h3>Algoritma</h3>
 
                 <p>
-                    <strong>Step 1: 2-Way vs 3-Way Distinction</strong>
+                    <strong>Adım 1 — 2-Way vs 3-Way Ayrımı</strong>
                 </p>
 
                 <p>
-                    For service and software subscriptions, physical warehouse delivery does not occur; hence, a 2-way match (PO vs Invoice) suffices. For physical goods, a GRN is mandatory.
+                    Hizmet/yazılım kalemleri için depo teslim alımı olmaz, bu yüzden 2-way match (PO vs Invoice) yeterli. Fiziksel ürünlerde GRN zorunlu.
                 </p>
 
 <pre><code class="language-java">boolean isServiceOrSoftware =
@@ -631,7 +631,7 @@ BigDecimal maxAllowedQuantity = isServiceOrSoftware
 </code></pre>
 
                 <p>
-                    <strong>Step 2: Quantity Verification</strong>
+                    <strong>Adım 2 — Miktar Kontrolü</strong>
                 </p>
 
 <pre><code class="language-java">if (lineReq.invoicedQuantity().compareTo(maxAllowedQuantity) > 0) {
@@ -644,7 +644,7 @@ BigDecimal maxAllowedQuantity = isServiceOrSoftware
 </code></pre>
 
                 <p>
-                    <strong>Step 3: Price Verification (±1% Tolerance Band)</strong>
+                    <strong>Adım 3 — Fiyat Kontrolü (±%1 Tolerans Bandı)</strong>
                 </p>
 
 <pre><code class="language-java">private static final BigDecimal PRICE_TOLERANCE_PERCENTAGE = BigDecimal.valueOf(1.00);
@@ -661,54 +661,54 @@ if (priceDiff.compareTo(maxPriceTolerance) > 0) {
 </code></pre>
 
                 <p>
-                    Why ±1%? Currency fluctuations and fractional rounding naturally occur in real transactions. A zero-tolerance policy yields excessive false positives.
+                    Neden ±%1? Kur farkı, küçük yuvarlama hataları gerçek hayatta olur. Sıfır tolerans çok fazla false positive üretir.
                 </p>
 
                 <p>
-                    <strong>Step 4: Decision and Budget Movement</strong>
+                    <strong>Adım 4 — Karar ve Bütçe Hareketi</strong>
                 </p>
 
 <pre><code class="language-java">if (!hasDiscrepancy) {
     invoice.setStatus(InvoiceStatus.APPROVED_FOR_PAYMENT);
 
-    // Transition reservation into actual spend
+    // Rezervasyonu fiili harcamaya çevir
     budgetService.commitBudget(budgetPoolId, grandTotal, ...);
 
-    // Release unutilized funds if invoice is less than PO
+    // PO toplamından az fatura geldiyse farkı serbest bırak
     if (po.getTotalAmount().compareTo(grandTotal) > 0) {
         BigDecimal unusedBudget = po.getTotalAmount().subtract(grandTotal);
         budgetService.releaseBudget(budgetPoolId, unusedBudget, ...);
     }
 } else {
     invoice.setMatchStatus(InvoiceMatchStatus.DISCREPANCY_HOLD);
-    // Placed in manual review queue
+    // Manuel inceleme kuyruğuna düşer
 }
 
-// Publish domain event
+// Domain event yayınla
 eventPublisher.publishEvent(new InvoiceMatchedEvent(...));
 </code></pre>
 
-                <h3>UBL-TR e-Invoice Support</h3>
+                <h3>UBL-TR e-Fatura Desteği</h3>
 
                 <p>
-                    In Turkey, the official e-Invoice standard is UBL-TR. SpendSync includes native XML parsing for these documents:
+                    Türkiye'de yasal e-Fatura standardı UBL-TR. SpendSync bu XML formatını parse edebiliyor:
                 </p>
 
 <pre><code class="language-java">Document doc = DocumentBuilderFactory.newInstance()
     .newDocumentBuilder()
     .parse(new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8)));
 
-String ettn = extractText(doc, "cbc:UUID"); // e-Invoice tracking UUID
+String ettn = extractText(doc, "cbc:UUID"); // e-Fatura takip numarası
 NodeList invoiceLines = doc.getElementsByTagNameNS("*", "InvoiceLine");
 </code></pre>
 
                 <p>
-                    Because enterprise organizations are legally bound to e-Invoice networks, this parser enables vendors to upload raw XML invoices directly. Accounting manual entry is bypassed entirely, and matching executes automatically into <code>AUTO_MATCHED</code> or <code>DISCREPANCY_HOLD</code> statuses.
+                    Türkiye'deki her büyük şirket yasal olarak e-Fatura sistemine bağlı. Bu UBL-TR parser sayesinde tedarikçi doğrudan XML faturasını sisteme yükleyebiliyor, muhasebe ekibinin araya girmesine gerek kalmıyor. Eşleştirme otomatik çalışıyor, sonuç ya AUTO_MATCHED ya DISCREPANCY_HOLD.
                 </p>
 
-                <h2 id="6-testcontainers-integration-testing-in-real-containers-not-mocks">6. Testcontainers: Integration Testing in Real Containers, Not Mocks</h2>
+                <h2 id="6-testcontainers-mock-degil-gercek-konteynerde-integration-test">6. Testcontainers: Mock Değil, Gerçek Konteynerde Integration Test</h2>
 
-                <h3>The Limits of Mocks</h3>
+                <h3>Mock'ların Sınırı</h3>
 
 <pre><code class="language-java">@MockBean
 RedisTemplate&lt;String, String&gt; redisTemplate;
@@ -716,17 +716,17 @@ when(redisTemplate.opsForZSet().zCard(anyString())).thenReturn(5L);
 </code></pre>
 
                 <p>
-                    This unit test passes effortlessly. Yet it never exercises Redis's real ZSET atomicity, never exposes race conditions, and cannot verify whether <code>FOR UPDATE</code> locks function correctly on the database.
+                    Bu test geçer. Ama Redis'in gerçek ZSET atomikliğini test etmiyor. Race condition'ı test etmiyor. <code>FOR UPDATE</code> kilidinin gerçekten çalışıp çalışmadığını test etmiyor.
                 </p>
 
                 <p>
-                    Mocks validate the programmed assumptions of the mock, not the actual runtime characteristics of the infrastructure.
+                    Mock, implementasyonun davranışını değil, mock'ın programlanan davranışını test eder.
                 </p>
 
-                <h3>What is Testcontainers?</h3>
+                <h3>Testcontainers Nedir?</h3>
 
                 <p>
-                    Testcontainers is a Java framework that spins up real Docker containers for the duration of a test suite and automatically cleans them up upon completion.
+                    Test süresince gerçek Docker container'ları ayağa kaldıran Java kütüphanesi. Test bittikten sonra container otomatik silinir.
                 </p>
 
 <pre><code class="language-java">@SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -758,21 +758,21 @@ class RateLimitContainerTest {
 }
 </code></pre>
 
-                <h3>Three Critical Tests</h3>
+                <h3>Üç Kritik Test</h3>
 
                 <p>
-                    <strong>Test 1: Sliding Window Rate Limiter:</strong> Verifies limit thresholds and <code>429 Too Many Requests</code> behavior against a live Redis ZSET instance.
+                    <strong>Test 1 — Sliding Window Rate Limiter:</strong> Gerçek Redis ZSET üzerinde limit aşımı ve <code>429 Too Many Requests</code> davranışı.
                 </p>
 
                 <p>
-                    <strong>Test 2: Concurrent Budget Reservation:</strong> 10 threads compete for shared funds. Verifies exactly 5 accepted, 5 rejected, and zero remaining balance.
+                    <strong>Test 2 — Concurrent Budget Reservation:</strong> 10 thread aynı anda bütçeden para harcıyor. Tam olarak 5 kabul, 5 red. Kalan bakiye sıfır.
                 </p>
 
                 <p>
-                    <strong>Test 3: Multi-TTL Cache:</strong> Validates entity serialization with <code>@class</code> metadata, verifies TTL assignments, and confirms cache hits on subsequent queries.
+                    <strong>Test 3 — Multi-TTL Cache:</strong> Cache'e yazılan entity'nin <code>@class</code> bilgisiyle serialize edildiği, TTL'nin doğru atandığı ve ikinci istekte Redis'ten geldiği doğrulanıyor.
                 </p>
 
-                <h3>Trade-offs</h3>
+                <h3>Trade-off</h3>
 
                 <div style="overflow-x: auto; margin: 25px 0;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -785,22 +785,22 @@ class RateLimitContainerTest {
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Execution Speed</td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">⚡ Milliseconds</td>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">🐢 Container startup ~5-15s</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Hız</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">⚡ Milisaniye</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">🐢 Container başlatma ~5-15s</td>
                             </tr>
                             <tr style="background: #fdfdfd;">
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Concurrency Testing</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Concurrency testi</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Race Condition Detection</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Race condition</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
                             </tr>
                             <tr style="background: #fdfdfd;">
-                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Realism & Confidence</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0; font-weight: 600;">Gerçekçilik</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">❌</td>
                                 <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">✅</td>
                             </tr>
@@ -809,25 +809,25 @@ class RateLimitContainerTest {
                 </div>
 
                 <p>
-                    The balanced strategy: Unit tests utilize fast mocks, whereas infrastructure-critical concurrency paths rely on Testcontainers. Across SpendSync's 512 tests, the majority are rapid mock tests, while the 3 Testcontainers suites supply our highest operational confidence.
+                    Strateji: Birim testler için mock, kritik altyapı davranışı için Testcontainers. SpendSync'te 512 testin çoğunluğu mock'lu birim test — 3 Testcontainers testi en önemli güvenceyi sağlıyor.
                 </p>
 
                 <hr>
 
-                <h2 id="7-structured-logging-and-pii-masking">7. Structured Logging and PII Masking</h2>
+                <h2 id="7-yapisal-loglama-ve-pii-maskeleme">7. Yapısal Loglama ve PII Maskeleme</h2>
 
-                <h3>Why Structured Logging?</h3>
+                <h3>Neden Yapısal Loglama?</h3>
 
-<pre><code># Unstructured plain log: difficult to parse
+<pre><code># Klasik log — ayrıştırması zor
 2026-08-24 14:32:11 ERROR BudgetServiceImpl - Budget pool not found for id abc-123
 
-# Structured log (JSON): every attribute is indexed and queryable
+# Yapısal log (JSON) — her alan sorgulanabilir
 {"timestamp":"2026-08-24T14:32:11Z","level":"ERROR","tenantId":"t-550","requestId":"req-7f2a",
  "logger":"BudgetServiceImpl","message":"Budget pool not found","poolId":"abc-123","errorCode":"BUDGET_POOL_NOT_FOUND"}
 </code></pre>
 
                 <p>
-                    Queries such as <code>tenantId = "t-550" AND level = "ERROR"</code> evaluate instantaneously, integrating directly into ELK, Splunk, and Grafana Loki.
+                    <code>tenantId = "t-550" AND level = "ERROR"</code> gibi filtreler anında çalışır. ELK, Splunk, Grafana Loki'ye doğrudan entegre olur.
                 </p>
 
 <pre><code class="language-markup">&lt;!-- logback-spring.xml --&gt;
@@ -840,31 +840,31 @@ class RateLimitContainerTest {
 &lt;/appender&gt;
 </code></pre>
 
-                <h3>Distributed Tracing with MDC</h3>
+                <h3>MDC ile Distributed Tracing</h3>
 
                 <p>
-                    MDC (Mapped Diagnostic Context) is a ThreadLocal-backed key-value store where each thread preserves contextual metadata.
+                    MDC (Mapped Diagnostic Context), ThreadLocal tabanlı key-value store. Her thread kendi context'ini taşır.
                 </p>
 
-<pre><code class="language-java">// TenantFilter: when request arrives:
+<pre><code class="language-java">// TenantFilter — request geldiğinde:
 MDC.put("tenantId", tenantId.toString());
 
-// JwtAuthenticationFilter: when user is authenticated:
+// JwtAuthenticationFilter — kullanıcı doğrulandığında:
 MDC.put("userId", principal.getUsername());
 MDC.put("requestId", UUID.randomUUID().toString().substring(0, 8));
 
-// Always inside finally block:
+// finally bloğunda her zaman:
 MDC.clear();
 </code></pre>
 
                 <p>
-                    All log entries produced during a single request share the exact same <code>requestId</code> and <code>tenantId</code>. During production incidents, running <code>grep "requestId=req-7f2a" logs.json</code> retrieves the full chronological execution trace of that request.
+                    Aynı request'te üretilen tüm log satırları aynı <code>requestId</code> ve <code>tenantId</code>'yi taşır. Production'da bir hata olduğunda <code>grep "requestId=req-7f2a" logs.json</code> ile o request'e ait tüm satırlar kronolojik sırayla gelir.
                 </p>
 
-                <h3>PII Masking</h3>
+                <h3>PII Maskeleme</h3>
 
                 <p>
-                    In financial software, personally identifiable information (PII) like IBANs, tax IDs, and email addresses must never leak into raw log files.
+                    Finansal sistemlerde log'lara hassas veri girmemeli. IBAN, vergi kimlik numarası, e-posta adresleri.
                 </p>
 
 <pre><code class="language-java">public class PiiMaskingConverter extends ClassicConverter {
@@ -886,20 +886,20 @@ MDC.clear();
 </code></pre>
 
                 <p>
-                    Output log:
+                    Log çıktısı:
                 </p>
 
 <pre><code class="language-json">{"message": "Payment initiated for IBAN TR**MASKED_IBAN** to vendor ab***@company.com"}
 </code></pre>
 
                 <p>
-                    Raw sensitive credentials never enter disk logs, satisfying statutory GDPR/KVKK compliance.
+                    Gerçek IBAN ve e-posta log'a girmez. KVKK/GDPR uyumluluğu için zorunlu.
                 </p>
 
-                <h3>Asynchronous Logging</h3>
+                <h3>Asenkron Loglama</h3>
 
                 <p>
-                    Under high load, synchronous disk I/O degrades response throughput:
+                    Yüksek trafikte senkron loglama I/O bekleme oluşturur:
                 </p>
 
 <pre><code class="language-java">@Configuration
@@ -921,23 +921,23 @@ public class AsyncLoggingConfig {
 </code></pre>
 
                 <p>
-                    <code>CallerRunsPolicy</code>: If the log queue fills up, logging executes on the caller thread, ensuring zero log loss while naturally applying backpressure.
+                    <code>CallerRunsPolicy</code>: Kuyruk dolduğunda log işlemi caller thread'de çalışır — log drop olmaz ama backpressure mekanizması devreye girer.
                 </p>
 
                 <hr>
 
-                <h2 id="conclusion">Conclusion</h2>
+                <h2 id="sonuc">Sonuç</h2>
 
                 <p>
-                    The unifying theme across these decisions is clear: <strong>Every technical choice is a trade-off.</strong> Mock vs Testcontainers? Pessimistic vs optimistic locking? Monolith vs microservices? None represent universal absolute truths; context and architectural constraints dictate the right choice.
+                    Bu sekiz konunun ortak paydası şu: <strong>Her teknik karar bir trade-off.</strong> Mock mu, Testcontainers mı? Pessimistic mi, optimistic lock mı? Monolith mu, microservices mi? Hiçbiri evrensel "doğru cevap" değil, bağlam ve gereksinimler karar veriyor.
                 </p>
 
                 <p>
-                    SpendSync was built around intentional, calculated decisions, with clear rationale and well-understood trade-offs for every path chosen.
+                    SpendSync bu kararları bilinçli olarak vermeye çalıştı. Her seçimin gerekçesi var, her trade-off düşünüldü.
                 </p>
 
                 <p>
-                    You can inspect the complete source code on GitHub: <strong><a href="https://github.com/doguhanniltextra/spend-sync" target="_blank">doguhanniltextra/spend-sync</a></strong>
+                    Kodun tamamına GitHub üzerinden ulaşabilirsiniz: <strong><a href="https://github.com/doguhanniltextra/spend-sync" target="_blank">doguhanniltextra/spend-sync</a></strong>
                 </p>
 
             </div>
@@ -948,7 +948,7 @@ public class AsyncLoggingConfig {
                 <div class="share-section">
                     <h4>Share this article</h4>
                     <div class="share-buttons">
-                        <a href="https://twitter.com/intent/tweet?text=SpendSync%3A%20Architectural%20Notes%20and%20Trade-offs%20in%20an%20Enterprise%20Spend%20Platform" class="share-btn twitter" target="_blank">
+                        <a href="https://twitter.com/intent/tweet?text=SpendSync%3A%20Kurumsal%20Harcama%20Platformu%20Mimari%20Notlar%C4%B1%20ve%20Trade-off%27lar" class="share-btn twitter" target="_blank">
                             <i class="fab fa-twitter"></i> Twitter
                         </a>
                         <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/" class="share-btn linkedin" target="_blank">

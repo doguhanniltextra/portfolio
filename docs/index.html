@@ -22,6 +22,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./main.css" />
     <link rel="stylesheet" href="./blog/blog.css" />
+    <script src="./blog/posts-data.js"></script>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JHFHDZRLP"></script>
@@ -79,9 +80,53 @@
             <p class="blog-subtitle">Thoughts on everything I find interesting</p>
         </div>
 
+        <!-- Apple-Style Intelligent Guided Search -->
+        <div class="apple-search-wrapper" id="apple-search-wrapper">
+            <div class="apple-search-box" id="apple-search-box">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <div class="input-ghost-container">
+                    <input type="text" id="apple-blog-search" class="apple-search-input" placeholder="Search concepts, topics, tech (e.g. Concurrency, Kernel)..." autocomplete="off" spellcheck="false" aria-label="Search articles and topics" />
+                    <div class="search-ghost-text" id="search-ghost-text" aria-hidden="true"></div>
+                </div>
+                <div class="search-actions">
+                    <button type="button" class="search-clear-btn" id="search-clear-btn" hidden aria-label="Clear search">✕</button>
+                    <span class="search-kbd-hint" title="Press / or ⌘K to search"><kbd>/</kbd></span>
+                </div>
+            </div>
+
+            <!-- Quick Guided Topic Chips -->
+            <div class="search-quick-chips" aria-label="Popular search topics">
+                <span class="chips-label">Popular:</span>
+                <button type="button" class="search-chip" data-query="Containers">Containers</button>
+                <button type="button" class="search-chip" data-query="Concurrency">Concurrency</button>
+                <button type="button" class="search-chip" data-query="Kafka">Kafka</button>
+                <button type="button" class="search-chip" data-query="PostgreSQL">PostgreSQL</button>
+                <button type="button" class="search-chip" data-query="Zero Trust">Zero Trust</button>
+                <button type="button" class="search-chip" data-query="Kubernetes">Kubernetes</button>
+                <button type="button" class="search-chip" data-query="Go">Go</button>
+            </div>
+
+            <!-- Apple Spotlight Floating Dropdown -->
+            <div class="spotlight-dropdown" id="spotlight-dropdown" hidden role="listbox" aria-label="Search suggestions">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
         <div class="blog-layout">
             <!-- Main Blog Posts -->
             <main class="blog-main" id="main-content" role="main">
+                <div class="blog-view-toolbar">
+                    <span class="articles-count-badge" id="articles-count-badge">21 Articles</span>
+                    <div class="view-switcher" role="group" aria-label="View switcher">
+                        <button type="button" class="view-switch-btn active" id="view-cards-btn" data-view="cards" title="Card View" aria-pressed="true">
+                            <i class="fas fa-th-large"></i> <span>Cards</span>
+                        </button>
+                        <button type="button" class="view-switch-btn" id="view-compact-btn" data-view="compact" title="Timeline View" aria-pressed="false">
+                            <i class="fas fa-list-ul"></i> <span>Timeline</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="filter-status" aria-live="polite" hidden>
                     <span class="filter-status-text"></span>
                     <button type="button" class="clear-filter-btn">Clear filter</button>
@@ -91,573 +136,8 @@
                     <p>There are no blog posts matching this filter yet. Try another tag or clear the current filter.</p>
                 </div>
 
-                <!-- Post - Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> September 5, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/container_isolation_in_linux.html">Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Docker, Linux üzerinde kendi kaynakları için izolasyonu nasıl sağlıyor? Linux kernel'inin namespaces, cgroups v2, pivot_root ve veth/NAT gibi temel mekanizmalarını sıfırdan bir Go projesi geliştirerek inceliyoruz.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 10 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Linux Kernel</span>
-                            <span class="tag">Containers</span>
-                            <span class="tag">Docker</span>
-                            <span class="tag">Go</span>
-                            <span class="tag">Cgroups</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/container_isolation_in_linux.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - SpendSync -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> August 26, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/spend_sync_trade_off.html">SpendSync: Kurumsal Harcama Platformu Mimari Notları ve Trade-off'lar</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Kurumsal düzeyde Tedarik ve Harcama Yönetim Platformu SpendSync'in mimari kararları: Modüler monolith, ThreadLocal ile multi-tenant izolasyonu, Redis Sliding Window Rate Limiter, Pessimistic Lock ile double-spending önleme, 3-Way Matching ve Testcontainers.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Java</span>
-                            <span class="tag">Spring Boot</span>
-                            <span class="tag">Modular Monolith</span>
-                            <span class="tag">Redis</span>
-                            <span class="tag">PostgreSQL</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/spend_sync_trade_off.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - TCP'den HTTP'ye -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> August 10, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/tcp_to_http.html">TCP'den HTTP'ye: Bir Veri Paketinin Yolculuğu</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Bir butona tıklıyoruz, yarım saniye sonra ekranda veri beliriyor. Ama o yarım saniyede tam olarak ne oluyor? TCP'nin three-way handshake'inden HTTP'nin request-response döngüsüne, bir veri paketinin internet üzerindeki yolculuğunu katman katman inceliyoruz.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">TCP</span>
-                            <span class="tag">HTTP</span>
-                            <span class="tag">Networking</span>
-                            <span class="tag">Go</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/tcp_to_http.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Context Propagation in Go -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 30, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/context_propagation_go.html">Context Propagation in Go: What I Learned From a Missed PR</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        I picked up an open-source issue about adding Context propagation to a REST API, spent three weeks researching it and then missed the PR. Here's everything I learned anyway.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 6 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Go</span>
-                            <span class="tag">Context</span>
-                            <span class="tag">REST API</span>
-                            <span class="tag">Open Source</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/context_propagation_go.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - The Ledger Project -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 27, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/the_ledger_project.html">The Ledger Project and What I Learned</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        The Ledger project is a modular monolithic financial ledger system designed for atomic transactions, consistent double-entry accounting, and high-concurrency reliability. By implementing double-entry bookkeeping and pessimistic locking, it ensures that not a single cent is lost.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 8 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Clean Architecture</span>
-                            <span class="tag">Fintech</span>
-                            <span class="tag">System Design</span>
-                            <span class="tag">Java</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/the_ledger_project.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - CQRS/gRPC/Saga -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 20, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/cqrs_grpc_design_patterns.html">CQRS - gRPC - Design Patterns | Patient Management Feature</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Transitioning from a monolithic mindset to microservices was a journey of solving real architectural challenges. This post explores my implementation of CQRS, gRPC, and the Outbox pattern in the Patient Management project.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 20 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">CQRS</span>
-                            <span class="tag">gRPC</span>
-                            <span class="tag">Saga Pattern</span>
-                            <span class="tag">Architecture</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/cqrs_grpc_design_patterns.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Securepay Overview -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 17, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/securepay-overview.html">A Junior Perspective | Securepay</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Securepay project is a basic simulation of how to create a reliable, scalable and maintainable system from my perspective. I decided to publish a blog about what I've learned from this project.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Backend</span>
-                            <span class="tag">Architecture</span>
-                            <span class="tag">Microservices</span>
-                            <span class="tag">Security</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/securepay-overview.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - HIS Overview -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 9, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/his_overview.html">HIS v1.0: A Deep System Design Overview</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        A deep system design analysis of a production-grade, event-driven Hospital Information System. Covers the full microservices topology, schema isolation, Outbox Pattern, Dead Letter Queues, three-layer security, and the full observability stack.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 12 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Microservices</span>
-                            <span class="tag">Spring Boot</span>
-                            <span class="tag">Kafka</span>
-                            <span class="tag">Architecture</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/his_overview.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Strategy Pattern -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 7, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/strategy_pattern.html">Strategy Pattern</a>
-                    </h3>
-                    <p class="post-excerpt">
-                         If you have ever worked on a billing system, you know the nightmare: every insurance provider has different rules. Some cover 80%, some have fixed discounts, and some cover nothing at all.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Microservices</span>
-                            <span class="tag">Strategy Pattern</span>
-                            <span class="tag">Algorithm</span>
-                            <span class="tag">Spring Boot</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/strategy_pattern.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Why gRPC over REST -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 7, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/why-grpc-over-rest.html">Why gRPC over REST</a>
-                    </h3>
-                    <p class="post-excerpt">
-                         If you have spent more than five minutes in microservices development, 
-                         your default answer for service-to-service communication is probably REST. 
-                         It is simple, human-readable, and Postman makes it look easy. But as my Hospital Information System (HIS) grew, 
-                         I started asking: "Is 'easy to read' really more important than 'hard to break'?"
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Microservices</span>
-                            <span class="tag">gRPC</span>
-                            <span class="tag">REST</span>
-                            <span class="tag">Spring Boot</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/why-grpc-over-rest.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - DLQ -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 7, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/dlq_pattern.html">What is DLQ and How I Used It</a>
-                    </h3>
-                    <p class="post-excerpt">
-                         Have you ever seen "Resilience" in any system design book? It's a shortcut to say 
-                         "What happens to our system when things go wrong?" and it is a good question because 
-                         I promise you, things will definitely go wrong.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Microservices</span>
-                            <span class="tag">DLQ</span>
-                            <span class="tag">Kafka</span>
-                            <span class="tag">Spring Boot</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/dlq_pattern.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Outbox Pattern -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> April 7, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/outbox_pattern.html">What is Outbox Pattern and How I Used It</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        A deep dive into the Transactional Outbox Pattern. What it is, when to use it, and how I
-                        applied it in my Hospital Information System to guarantee reliable, atomic messaging between
-                        microservices without the Dual Write Problem.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Microservices</span>
-                            <span class="tag">Outbox Pattern</span>
-                            <span class="tag">Kafka</span>
-                            <span class="tag">Spring Boot</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/outbox_pattern.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - P95 Latency -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 27, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/p95_latency.html">P95 Latency Explained: What It Is and Why It Matters</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Average latency is almost always a lie. P95 latency tells you a much more honest story.
-                        Learn what the 95th percentile means, why averages mislead you, and how to use percentile
-                        metrics to understand your system's real-world performance.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 5 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Performance</span>
-                            <span class="tag">Observability</span>
-                            <span class="tag">Backend</span>
-                            <span class="tag">SRE</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/p95_latency.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - SPIFFE/SPIRE Deep Dive -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 18, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/spiffe_spire_deep_dive.html">Lessons from the Trenches: What I Learned
-                            Implementing SPIFFE/SPIRE in SecurePay</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Zero-Trust isn't just a buzzword. Here's a brief explanation of what I've learned about workload
-                        identity, SPIFFE/SPIRE architecture, and handling mTLS at scale while building the SecurePay
-                        project.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Security</span>
-                            <span class="tag">Zero Trust</span>
-                            <span class="tag">SPIFFE</span>
-                            <span class="tag">Cloud Native</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/spiffe_spire_deep_dive.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - SecurePay Architecture -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 18, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/securepay_architecture.html">Engineering SecurePay: A Deep Dive into Zero-Trust,
-                            Event-Driven Fintech Architecture</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Pulling back the curtain on the architectural journey of building SecurePay, a high-performance,
-                        polyglot payment platform. Explore Zero-Trust security with SPIFFE/SPIRE, event-driven
-                        orchestration with Kafka, and cloud-native infrastructure on AWS.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 10 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Go</span>
-                            <span class="tag">Zero Trust</span>
-                            <span class="tag">Kafka</span>
-                            <span class="tag">AWS</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/securepay_architecture.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Cloudflare Tunnel -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 15, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/cloudflare_tunnel.html">Cloudflare Tunnel: Secure Infrastructure Connectivity
-                            Without Public IP</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Discover how Cloudflare Tunnel provides a secure way to connect your resources to Cloudflare
-                        without exposing public IP addresses. Learn about outbound-only connections, attack surface
-                        reduction, and why it's essential for modern infrastructure security.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 7 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Cloudflare</span>
-                            <span class="tag">Security</span>
-                            <span class="tag">DevOps</span>
-                            <span class="tag">Zero Trust</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/cloudflare_tunnel.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - PostgreSQL Internals -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 14, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/postgresql_internals.html">PostgreSQL Internals: Understanding Database
-                            Architecture &amp; MVCC</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Deep dive into PostgreSQL's internal architecture covering PGDATA, database clusters, system
-                        catalogs,
-                        schemas, tablespaces, and the Postmaster process. Explore Multi-Version Concurrency Control
-                        (MVCC)
-                        with transaction IDs, isolation levels, and how PostgreSQL achieves high concurrency without
-                        blocking readers.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 15 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">PostgreSQL</span>
-                            <span class="tag">Database Internals</span>
-                            <span class="tag">MVCC</span>
-                            <span class="tag">Transaction Isolation</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/postgresql_internals.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Kubernetes Internals -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 11, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/kubernetes_internals.html">Kubernetes Internals: Resource Management &amp; Kernel
-                            Interaction</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Deep dive into how Kubernetes translates YAML definitions into Linux kernel instructions.
-                        Explore the OOM killer mechanism, CPU throttling with CFS, scheduler filtering and scoring
-                        logic,
-                        and kubelet eviction policies. Learn what really happens under the hood when you set resource
-                        requests and limits.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 12 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Kubernetes</span>
-                            <span class="tag">Linux Kernel</span>
-                            <span class="tag">Container Orchestration</span>
-                            <span class="tag">DevOps</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/kubernetes_internals.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Kubernetes Hands-On -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 11, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/kubernetes_resource_management_hands_on.html">Kubernetes Resource Management:
-                            Hands-On Practice</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        Ready to get your hands dirty? This practical guide walks you through simple exercises to
-                        understand how resource requests and limits work in real scenarios. Learn by doing with
-                        5 beginner-friendly exercises covering QoS classes, memory pressure, CPU throttling, and
-                        resource quotas.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 6 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Kubernetes</span>
-                            <span class="tag">Hands-On</span>
-                            <span class="tag">Tutorial</span>
-                            <span class="tag">DevOps</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/kubernetes_resource_management_hands_on.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - AWS Well-Architected Framework -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> February 6, 2026
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/aws_well_architected_framework.html">AWS Well-Architected Framework</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        A comprehensive guide to AWS Well-Architected Framework covering all six pillars: Operational
-                        Excellence,
-                        Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. Learn the
-                        essential
-                        design principles and best practices for building robust cloud solutions.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 8 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">AWS</span>
-                            <span class="tag">Cloud Architecture</span>
-                            <span class="tag">DevOps</span>
-                            <span class="tag">Best Practices</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/aws_well_architected_framework.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
-
-                <!-- Post - Patient Management -->
-                <article class="blog-post-card">
-                    <time class="post-date">
-                        <i class="far fa-calendar"></i> November 1, 2025
-                    </time>
-                    <h3 class="post-title">
-                        <a href="./blog/page/patient_management_blog_0.html">Building a Microservices Architecture: My
-                            Patient
-                            Management Journey</a>
-                    </h3>
-                    <p class="post-excerpt">
-                        The story behind designing and implementing a microservices-based patient management system
-                        using Spring
-                        Boot, PostgreSQL, Kafka and more.
-                    </p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> 4 min read</span>
-                        <div class="post-tags">
-                            <span class="tag">Spring Boot</span>
-                            <span class="tag">Microservices</span>
-                            <span class="tag">PostgreSQL</span>
-                            <span class="tag">Kafka</span>
-                        </div>
-                    </div>
-                    <a href="./blog/page/patient_management_blog_0.html" class="read-more">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </article>
+                <!-- Dynamic Posts Container -->
+                <div id="blog-posts-container" class="blog-posts-container"></div>
 
             </main>
 
@@ -684,18 +164,8 @@
                 <!-- Popular Tags -->
                 <div class="sidebar-widget">
                     <h3>Popular Tags</h3>
-                    <div class="tag-cloud">
-                        <button type="button" class="cloud-tag" data-tag="AWS">AWS</button>
-                        <button type="button" class="cloud-tag" data-tag="Spring Boot">Spring Boot</button>
-                        <button type="button" class="cloud-tag" data-tag="Microservices">Microservices</button>
-                        <button type="button" class="cloud-tag" data-tag="Architecture">Architecture</button>
-                        <button type="button" class="cloud-tag" data-tag="Kubernetes">Kubernetes</button>
-                        <button type="button" class="cloud-tag" data-tag="PostgreSQL">PostgreSQL</button>
-                        <button type="button" class="cloud-tag" data-tag="Kafka">Kafka</button>
-                        <button type="button" class="cloud-tag" data-tag="Go">Go</button>
-                        <button type="button" class="cloud-tag" data-tag="Security">Security</button>
-                        <button type="button" class="cloud-tag" data-tag="Zero Trust">Zero Trust</button>
-                        <button type="button" class="cloud-tag" data-tag="DevOps">DevOps</button>
+                    <div class="tag-cloud" id="tag-cloud">
+                        <!-- Populated dynamically from window.BLOG_POSTS -->
                     </div>
                 </div>
 
@@ -704,6 +174,65 @@
     </div>
 
     <script>
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // ==============================================================================
+        // DYNAMIC RENDERING FROM posts-data.js (Single Source of Truth)
+        // ==============================================================================
+        function renderBlogPosts() {
+            const container = document.getElementById('blog-posts-container');
+            if (!container || !window.BLOG_POSTS) return;
+
+            container.innerHTML = window.BLOG_POSTS.map(post => `
+                <article class="blog-post-card">
+                    <span class="post-date"><i class="far fa-calendar"></i> ${escapeHTML(post.date)}</span>
+                    <h2 class="post-title"><a href="${escapeHTML(post.href)}">${escapeHTML(post.title)}</a></h2>
+                    <p class="post-excerpt">${escapeHTML(post.excerpt)}</p>
+                    <div class="post-meta">
+                        <span class="reading-time"><i class="far fa-clock"></i> ${escapeHTML(post.readingTime)}</span>
+                        <div class="post-tags">
+                            ${(post.tags || []).map(tag => `<span class="tag" data-tag="${escapeHTML(tag)}">${escapeHTML(tag)}</span>`).join('')}
+                        </div>
+                    </div>
+                    <a href="${escapeHTML(post.href)}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+            `).join('');
+        }
+
+        function renderPopularTags() {
+            const tagCloudEl = document.getElementById('tag-cloud');
+            if (!tagCloudEl || !window.BLOG_POSTS) return;
+
+            const tagCounts = {};
+            window.BLOG_POSTS.forEach(post => {
+                (post.tags || []).forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+            });
+
+            const sortedTags = Object.keys(tagCounts).sort((a, b) => {
+                const diff = tagCounts[b] - tagCounts[a];
+                return diff !== 0 ? diff : a.localeCompare(b);
+            });
+
+            // Top 16 tags
+            const topTags = sortedTags.slice(0, 16);
+
+            tagCloudEl.innerHTML = topTags.map(tag => 
+                `<button type="button" class="cloud-tag" data-tag="${escapeHTML(tag)}">${escapeHTML(tag)}</button>`
+            ).join('');
+        }
+
+        // 1. Render all cards and sidebar tags first
+        renderBlogPosts();
+        renderPopularTags();
+
+        // 2. Query dynamic DOM elements
         const blogCards = Array.from(document.querySelectorAll('.blog-post-card'));
         const popularTagButtons = Array.from(document.querySelectorAll('.cloud-tag'));
         const filterStatus = document.querySelector('.filter-status');
@@ -711,61 +240,122 @@
         const clearFilterButton = document.querySelector('.clear-filter-btn');
         const emptyFilterState = document.querySelector('.empty-filter-state');
 
+        // Apple Search Elements
+        const searchWrapper = document.getElementById('apple-search-wrapper');
+        const searchBox = document.getElementById('apple-search-box');
+        const searchInput = document.getElementById('apple-blog-search');
+        const ghostTextEl = document.getElementById('search-ghost-text');
+        const searchClearBtn = document.getElementById('search-clear-btn');
+        const spotlightDropdown = document.getElementById('spotlight-dropdown');
+        const quickChips = Array.from(document.querySelectorAll('.search-chip'));
+
+        // View Switcher Elements
+        const blogMainEl = document.getElementById('main-content');
+        const viewCardsBtn = document.getElementById('view-cards-btn');
+        const viewCompactBtn = document.getElementById('view-compact-btn');
+        const articlesCountBadge = document.getElementById('articles-count-badge');
+
+        let activeGhostMatch = null;
+        let selectedDropdownIndex = -1;
+        let currentSearchQuery = '';
+
+        // Technical Corpus for Guided Autocomplete
+        const SEARCH_TOPICS = [
+            { name: "Concurrency", icon: "fa-bolt", category: "Architecture" },
+            { name: "Containers", icon: "fa-box", category: "Systems" },
+            { name: "Context Propagation", icon: "fa-code-branch", category: "Systems" },
+            { name: "CQRS", icon: "fa-project-diagram", category: "Architecture" },
+            { name: "Cloudflare", icon: "fa-shield-alt", category: "DevOps & Cloud" },
+            { name: "Cgroups v2", icon: "fa-microchip", category: "Systems" },
+            { name: "Clean Architecture", icon: "fa-cube", category: "Architecture" },
+            { name: "Dead Letter Queue (DLQ)", icon: "fa-envelope-open-text", category: "Architecture" },
+            { name: "Docker", icon: "fa-box-open", category: "Systems" },
+            { name: "Double-Entry Accounting", icon: "fa-file-invoice-dollar", category: "Projects" },
+            { name: "Go", icon: "fa-code", category: "Systems" },
+            { name: "gRPC", icon: "fa-exchange-alt", category: "Architecture" },
+            { name: "Hospital Information System (HIS)", icon: "fa-hospital", category: "Projects" },
+            { name: "HTTP", icon: "fa-network-wired", category: "Systems" },
+            { name: "Java", icon: "fa-code", category: "Projects" },
+            { name: "Kafka", icon: "fa-stream", category: "Architecture" },
+            { name: "Kubernetes", icon: "fa-dharmachakra", category: "DevOps & Cloud" },
+            { name: "Linux Kernel", icon: "fa-terminal", category: "Systems" },
+            { name: "Microservices", icon: "fa-cubes", category: "Architecture" },
+            { name: "Modular Monolith", icon: "fa-layer-group", category: "Projects" },
+            { name: "MVCC", icon: "fa-database", category: "Systems" },
+            { name: "Namespaces", icon: "fa-folder-tree", category: "Systems" },
+            { name: "Outbox Pattern", icon: "fa-paper-plane", category: "Architecture" },
+            { name: "P95 Latency", icon: "fa-tachometer-alt", category: "Architecture" },
+            { name: "Pessimistic Lock", icon: "fa-lock", category: "Projects" },
+            { name: "PostgreSQL", icon: "fa-database", category: "Systems" },
+            { name: "Redis", icon: "fa-server", category: "Projects" },
+            { name: "REST API", icon: "fa-globe", category: "Architecture" },
+            { name: "Saga Pattern", icon: "fa-sitemap", category: "Architecture" },
+            { name: "SecurePay", icon: "fa-credit-card", category: "Projects" },
+            { name: "SpendSync", icon: "fa-wallet", category: "Projects" },
+            { name: "SPIFFE / SPIRE", icon: "fa-id-badge", category: "DevOps & Cloud" },
+            { name: "Spring Boot", icon: "fa-leaf", category: "Architecture" },
+            { name: "Strategy Pattern", icon: "fa-chess", category: "Architecture" },
+            { name: "System Design", icon: "fa-sitemap", category: "Architecture" },
+            { name: "TCP", icon: "fa-network-wired", category: "Systems" },
+            { name: "Zero Trust", icon: "fa-user-shield", category: "DevOps & Cloud" }
+        ];
+
+        // Automatically augment SEARCH_TOPICS with tags from window.BLOG_POSTS
+        const existingTopicNames = new Set(SEARCH_TOPICS.map(t => t.name.toLowerCase()));
+        (window.BLOG_POSTS || []).forEach(post => {
+            (post.tags || []).forEach(tag => {
+                if (!existingTopicNames.has(tag.toLowerCase())) {
+                    SEARCH_TOPICS.push({
+                        name: tag,
+                        icon: "fa-tag",
+                        category: post.category || "General"
+                    });
+                    existingTopicNames.add(tag.toLowerCase());
+                }
+            });
+        });
+
+        // Indexed Articles for Spotlight and Search Guidance
+        const indexedArticles = (window.BLOG_POSTS || []).map((post, idx) => ({
+            card: blogCards[idx],
+            title: post.title,
+            href: post.href,
+            excerpt: post.excerpt,
+            readingTime: post.readingTime,
+            category: post.category || 'General',
+            tags: post.tags || []
+        }));
+
         function getCardTags(card) {
             return Array.from(card.querySelectorAll('.post-tags .tag')).map((tag) =>
                 tag.textContent.trim().toLowerCase()
             );
         }
 
-        function getReadingTimeInMinutes(card) {
-            const readingTimeText = card.querySelector('.reading-time')?.textContent ?? '';
-            const match = readingTimeText.match(/(\d+)/);
-            return match ? Number(match[1]) : 0;
-        }
-
         function populateReadingPicks() {
             const readingPicks = Array.from(document.querySelectorAll('.reading-pick-link'));
+            if (!readingPicks.length || !window.BLOG_POSTS || !window.BLOG_POSTS.length) return;
 
-            if (!readingPicks.length || !blogCards.length) {
-                return;
-            }
+            const postsWithMinutes = window.BLOG_POSTS.map(post => {
+                const match = (post.readingTime || '').match(/(\d+)/);
+                return {
+                    title: post.title,
+                    href: post.href,
+                    minutes: match ? Number(match[1]) : 0
+                };
+            }).filter(p => p.minutes > 0);
 
-            const cardsWithMetadata = blogCards
-                .map((card) => {
-                    const titleLink = card.querySelector('.post-title a');
-                    const minutes = getReadingTimeInMinutes(card);
+            if (!postsWithMinutes.length) return;
 
-                    if (!titleLink || !minutes) {
-                        return null;
-                    }
-
-                    return {
-                        title: titleLink.textContent.trim(),
-                        href: titleLink.getAttribute('href'),
-                        minutes,
-                    };
-                })
-                .filter(Boolean);
-
-            if (!cardsWithMetadata.length) {
-                return;
-            }
-
-            const longest = cardsWithMetadata.reduce((current, item) =>
-                item.minutes > current.minutes ? item : current
-            );
-            const shortest = cardsWithMetadata.reduce((current, item) =>
-                item.minutes < current.minutes ? item : current
-            );
+            const longest = postsWithMinutes.reduce((max, cur) => cur.minutes > max.minutes ? cur : max);
+            const shortest = postsWithMinutes.reduce((min, cur) => cur.minutes < min.minutes ? cur : min);
 
             readingPicks.forEach((link) => {
                 const pickType = link.dataset.pick;
                 const selectedItem = pickType === 'longest' ? longest : shortest;
                 const meta = link.parentElement?.querySelector('.reading-pick-meta');
 
-                if (!selectedItem) {
-                    return;
-                }
+                if (!selectedItem) return;
 
                 link.href = selectedItem.href;
                 link.textContent = selectedItem.title;
@@ -776,32 +366,265 @@
             });
         }
 
-        function updateTagButtonState(activeTag) {
-            popularTagButtons.forEach((button) => {
-                const isActive = button.dataset.tag.toLowerCase() === activeTag;
-                button.classList.toggle('active', isActive);
-                button.setAttribute('aria-pressed', String(isActive));
+        // ==========================================
+        // SMART GHOST AUTOCOMPLETE & GUIDANCE ENGINE
+        // ==========================================
+
+        function updateGhostAutocomplete(query) {
+            if (!query || query.trim().length === 0) {
+                ghostTextEl.innerHTML = '';
+                activeGhostMatch = null;
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+
+            // 1. Check exact prefix match in Topics
+            let matchedTopic = SEARCH_TOPICS.find(t => t.name.toLowerCase().startsWith(lowerQuery));
+
+            // 2. If no topic prefix, check articles
+            if (!matchedTopic) {
+                const matchedArticle = indexedArticles.find(a => 
+                    a.title.toLowerCase().split(/\s+/).some(word => word.startsWith(lowerQuery)) ||
+                    a.tags.some(t => t.toLowerCase().startsWith(lowerQuery))
+                );
+                if (matchedArticle) {
+                    // Try to extract matching tag or title word
+                    const matchingTag = matchedArticle.tags.find(t => t.toLowerCase().startsWith(lowerQuery));
+                    if (matchingTag) {
+                        matchedTopic = { name: matchingTag };
+                    }
+                }
+            }
+
+            if (matchedTopic && matchedTopic.name.toLowerCase().startsWith(lowerQuery)) {
+                const typedPart = query;
+                const suffix = matchedTopic.name.slice(typedPart.length);
+                activeGhostMatch = matchedTopic.name;
+
+                ghostTextEl.innerHTML = 
+                    `<span class="ghost-prefix">${escapeHTML(typedPart)}</span>` +
+                    `<span class="ghost-suffix">${escapeHTML(suffix)}</span>` +
+                    `<span class="ghost-tab-badge">Tab ⇥</span>`;
+            } else {
+                ghostTextEl.innerHTML = '';
+                activeGhostMatch = null;
+            }
+        }
+
+        function acceptGhostAutocomplete() {
+            if (activeGhostMatch) {
+                searchInput.value = activeGhostMatch;
+                ghostTextEl.innerHTML = '';
+                const query = activeGhostMatch;
+                activeGhostMatch = null;
+                applySearch(query);
+                renderSpotlightDropdown(query);
+            }
+        }
+
+        // ==========================================
+        // APPLE SPOTLIGHT DROPDOWN ENGINE
+        // ==========================================
+
+        function renderSpotlightDropdown(query) {
+            const trimmed = (query || '').trim();
+            const lower = trimmed.toLowerCase();
+
+            let matchedTopics = [];
+            let matchedArticles = [];
+
+            if (trimmed.length === 0) {
+                // Default view: popular topics & featured articles
+                matchedTopics = SEARCH_TOPICS.slice(0, 5);
+                matchedArticles = indexedArticles.slice(0, 3);
+            } else {
+                // Filter Topics (prefix match prioritized, then substring)
+                matchedTopics = SEARCH_TOPICS.filter(t => t.name.toLowerCase().includes(lower))
+                    .sort((a, b) => {
+                        const aPrefix = a.name.toLowerCase().startsWith(lower);
+                        const bPrefix = b.name.toLowerCase().startsWith(lower);
+                        if (aPrefix && !bPrefix) return -1;
+                        if (!aPrefix && bPrefix) return 1;
+                        return 0;
+                    })
+                    .slice(0, 4);
+
+                // Filter Articles (title, tags, excerpt)
+                matchedArticles = indexedArticles.filter(a => {
+                    return a.title.toLowerCase().includes(lower) ||
+                           a.tags.some(t => t.toLowerCase().includes(lower)) ||
+                           a.excerpt.toLowerCase().includes(lower);
+                }).slice(0, 4);
+            }
+
+            if (matchedTopics.length === 0 && matchedArticles.length === 0) {
+                spotlightDropdown.innerHTML = `
+                    <div class="spotlight-empty">
+                        <i class="fas fa-search"></i>
+                        <p>No matches found for "<strong>${escapeHTML(trimmed)}</strong>"</p>
+                        <span>Try searching for <em>Containers</em>, <em>Concurrency</em>, <em>Kafka</em>, or <em>Kubernetes</em></span>
+                    </div>
+                `;
+                spotlightDropdown.hidden = false;
+                selectedDropdownIndex = -1;
+                return;
+            }
+
+            let html = '';
+
+            // Topics Group
+            if (matchedTopics.length > 0) {
+                html += `
+                    <div class="spotlight-group">
+                        <div class="spotlight-section-title">${trimmed ? 'Suggested Topics' : 'Trending Topics'}</div>
+                `;
+                matchedTopics.forEach(t => {
+                    html += `
+                        <div class="spotlight-topic-item spotlight-navigable" data-query="${escapeHTML(t.name)}" role="option">
+                            <div class="topic-main">
+                                <i class="fas ${t.icon || 'fa-tag'} topic-icon"></i>
+                                <span>${escapeHTML(t.name)}</span>
+                            </div>
+                            <span class="topic-count">${escapeHTML(t.category)}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Articles Group
+            if (matchedArticles.length > 0) {
+                html += `
+                    <div class="spotlight-group">
+                        <div class="spotlight-section-title">${trimmed ? 'Matching Articles' : 'Recent Articles'}</div>
+                `;
+                matchedArticles.forEach(a => {
+                    html += `
+                        <a href="${a.href}" class="spotlight-article-item spotlight-navigable" role="option">
+                            <div class="article-header">
+                                <div class="article-title">${escapeHTML(a.title)}</div>
+                                <div class="article-badges">
+                                    <span class="article-category">${escapeHTML(a.category)}</span>
+                                    <span class="article-reading">${escapeHTML(a.readingTime)}</span>
+                                </div>
+                            </div>
+                            <div class="article-snippet">${escapeHTML(a.excerpt)}</div>
+                        </a>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Keyboard hints footer
+            html += `
+                <div class="spotlight-footer">
+                    <span>${matchedArticles.length + matchedTopics.length} suggestions</span>
+                    <div class="spotlight-footer-keys">
+                        <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                        <span><kbd>↵</kbd> Select</span>
+                        <span><kbd>Esc</kbd> Close</span>
+                    </div>
+                </div>
+            `;
+
+            spotlightDropdown.innerHTML = html;
+            spotlightDropdown.hidden = false;
+            selectedDropdownIndex = -1;
+
+            // Attach click listeners to topic items
+            spotlightDropdown.querySelectorAll('.spotlight-topic-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const query = item.dataset.query;
+                    searchInput.value = query;
+                    updateGhostAutocomplete('');
+                    applySearch(query);
+                    closeSpotlight();
+                });
             });
         }
 
-        function applyTagFilter(tagName) {
-            const normalizedTag = tagName.toLowerCase();
+        function closeSpotlight() {
+            spotlightDropdown.hidden = true;
+            selectedDropdownIndex = -1;
+            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
+            items.forEach(i => i.classList.remove('active-item'));
+        }
+
+        function highlightDropdownItem(index) {
+            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
+            if (!items.length) return;
+
+            items.forEach((item, idx) => {
+                const isActive = idx === index;
+                item.classList.toggle('active-item', isActive);
+                if (isActive) {
+                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            });
+        }
+
+        // ==========================================
+        // REAL-TIME BLOG SEARCH & FILTER ENGINE
+        // ==========================================
+
+        function applySearch(query) {
+            const normalized = (query || '').trim().toLowerCase();
+            currentSearchQuery = normalized;
+            searchClearBtn.hidden = normalized.length === 0;
+
             let visibleCount = 0;
 
             blogCards.forEach((card) => {
-                const matches = getCardTags(card).includes(normalizedTag);
-                card.hidden = !matches;
-
-                if (matches) {
+                if (!normalized) {
+                    card.hidden = false;
                     visibleCount += 1;
+                    return;
                 }
+
+                const titleText = card.querySelector('.post-title')?.textContent.toLowerCase() ?? '';
+                const excerptText = card.querySelector('.post-excerpt')?.textContent.toLowerCase() ?? '';
+                const tags = getCardTags(card);
+
+                const matches = titleText.includes(normalized) ||
+                                excerptText.includes(normalized) ||
+                                tags.some(t => t.includes(normalized));
+
+                card.hidden = !matches;
+                if (matches) visibleCount += 1;
             });
 
-            updateTagButtonState(normalizedTag);
+            // Update Quick Chips state
+            quickChips.forEach(chip => {
+                const chipQuery = chip.dataset.query.toLowerCase();
+                const isActive = normalized && (chipQuery === normalized || chipQuery.startsWith(normalized));
+                chip.classList.toggle('active', Boolean(isActive));
+            });
 
+            // Update popular tag buttons in sidebar
+            popularTagButtons.forEach(button => {
+                const tag = button.dataset.tag.toLowerCase();
+                const isActive = normalized && (tag === normalized);
+                button.classList.toggle('active', Boolean(isActive));
+                button.setAttribute('aria-pressed', String(Boolean(isActive)));
+            });
+
+            // Update filter status header
             if (filterStatus && filterStatusText) {
-                filterStatus.hidden = false;
-                filterStatusText.textContent = `Showing ${visibleCount} post${visibleCount === 1 ? '' : 's'} for "${tagName}"`;
+                if (normalized) {
+                    filterStatus.hidden = false;
+                    filterStatusText.textContent = `Showing ${visibleCount} post${visibleCount === 1 ? '' : 's'} for "${query}"`;
+                } else {
+                    filterStatus.hidden = true;
+                    filterStatusText.textContent = '';
+                }
+            }
+
+            if (articlesCountBadge) {
+                articlesCountBadge.textContent = normalized
+                    ? `${visibleCount} of ${blogCards.length} Articles`
+                    : `${blogCards.length} Articles`;
             }
 
             if (emptyFilterState) {
@@ -809,47 +632,192 @@
             }
         }
 
-        function clearTagFilter() {
-            blogCards.forEach((card) => {
-                card.hidden = false;
-            });
-
-            popularTagButtons.forEach((button) => {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
-            });
-
-            if (filterStatus && filterStatusText) {
-                filterStatus.hidden = true;
-                filterStatusText.textContent = '';
-            }
-
-            if (emptyFilterState) {
-                emptyFilterState.hidden = true;
-            }
+        function clearSearch() {
+            searchInput.value = '';
+            updateGhostAutocomplete('');
+            searchClearBtn.hidden = true;
+            applySearch('');
+            closeSpotlight();
         }
 
+        // Input Event Listeners
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            updateGhostAutocomplete(value);
+            applySearch(value);
+            renderSpotlightDropdown(value);
+        });
+
+        searchInput.addEventListener('focus', () => {
+            renderSpotlightDropdown(searchInput.value);
+            updateGhostAutocomplete(searchInput.value);
+        });
+
+        searchClearBtn.addEventListener('click', () => {
+            clearSearch();
+            searchInput.focus();
+        });
+
+        // Quick Topic Chips click listener
+        quickChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const query = chip.dataset.query;
+                if (currentSearchQuery === query.toLowerCase()) {
+                    clearSearch();
+                } else {
+                    searchInput.value = query;
+                    updateGhostAutocomplete('');
+                    applySearch(query);
+                    closeSpotlight();
+                }
+            });
+        });
+
+        // Keyboard Navigation
+        searchInput.addEventListener('keydown', (e) => {
+            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
+
+            if (e.key === 'Tab' || (e.key === 'ArrowRight' && searchInput.selectionStart === searchInput.value.length)) {
+                if (activeGhostMatch) {
+                    e.preventDefault();
+                    acceptGhostAutocomplete();
+                    return;
+                }
+            }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (spotlightDropdown.hidden) {
+                    renderSpotlightDropdown(searchInput.value);
+                }
+                if (items.length > 0) {
+                    selectedDropdownIndex = (selectedDropdownIndex + 1) % items.length;
+                    highlightDropdownItem(selectedDropdownIndex);
+                }
+                return;
+            }
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (items.length > 0) {
+                    selectedDropdownIndex = (selectedDropdownIndex - 1 + items.length) % items.length;
+                    highlightDropdownItem(selectedDropdownIndex);
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                if (selectedDropdownIndex >= 0 && items[selectedDropdownIndex]) {
+                    e.preventDefault();
+                    items[selectedDropdownIndex].click();
+                } else if (activeGhostMatch) {
+                    e.preventDefault();
+                    acceptGhostAutocomplete();
+                    closeSpotlight();
+                } else {
+                    closeSpotlight();
+                }
+                return;
+            }
+
+            if (e.key === 'Escape') {
+                closeSpotlight();
+                ghostTextEl.innerHTML = '';
+                searchInput.blur();
+            }
+        });
+
+        // Global Shortcuts: '/' or 'Cmd+K' to focus search
+        document.addEventListener('keydown', (e) => {
+            const isEditing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+
+            if ((e.key === '/' && !isEditing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+                renderSpotlightDropdown(searchInput.value);
+            }
+        });
+
+        // Click outside closes Spotlight
+        document.addEventListener('click', (e) => {
+            if (!searchWrapper.contains(e.target)) {
+                closeSpotlight();
+            }
+        });
+
+        // Sidebar Tag Buttons integration
         popularTagButtons.forEach((button) => {
             button.setAttribute('aria-pressed', 'false');
 
             button.addEventListener('click', () => {
                 const selectedTag = button.dataset.tag;
-                const isAlreadyActive = button.classList.contains('active');
+                if (!selectedTag) return;
 
-                if (!selectedTag) {
-                    return;
+                if (currentSearchQuery === selectedTag.toLowerCase()) {
+                    clearSearch();
+                } else {
+                    searchInput.value = selectedTag;
+                    updateGhostAutocomplete('');
+                    applySearch(selectedTag);
+                    closeSpotlight();
                 }
-
-                if (isAlreadyActive) {
-                    clearTagFilter();
-                    return;
-                }
-
-                applyTagFilter(selectedTag);
             });
         });
 
-        clearFilterButton?.addEventListener('click', clearTagFilter);
+        // Card Tags clickable filter
+        document.querySelectorAll('.post-tags .tag').forEach((tagEl) => {
+            tagEl.style.cursor = 'pointer';
+            tagEl.title = `Filter by ${tagEl.textContent.trim()}`;
+            tagEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tag = tagEl.textContent.trim();
+                searchInput.value = tag;
+                updateGhostAutocomplete('');
+                applySearch(tag);
+                closeSpotlight();
+                if (searchWrapper) {
+                    window.scrollTo({ top: searchWrapper.offsetTop - 30, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ==========================================
+        // VIEW SWITCHER (CARDS VS. COMPACT TIMELINE)
+        // ==========================================
+        function setViewMode(mode) {
+            const isCompact = mode === 'compact';
+            if (blogMainEl) {
+                blogMainEl.classList.toggle('view-compact', isCompact);
+            }
+            if (viewCardsBtn) {
+                viewCardsBtn.classList.toggle('active', !isCompact);
+                viewCardsBtn.setAttribute('aria-pressed', String(!isCompact));
+            }
+            if (viewCompactBtn) {
+                viewCompactBtn.classList.toggle('active', isCompact);
+                viewCompactBtn.setAttribute('aria-pressed', String(isCompact));
+            }
+            try {
+                localStorage.setItem('portfolio_blog_view', mode);
+            } catch (e) {}
+        }
+
+        viewCardsBtn?.addEventListener('click', () => setViewMode('cards'));
+        viewCompactBtn?.addEventListener('click', () => setViewMode('compact'));
+
+        try {
+            const savedView = localStorage.getItem('portfolio_blog_view') || 'cards';
+            setViewMode(savedView);
+        } catch (e) {
+            setViewMode('cards');
+        }
+
+        if (articlesCountBadge) {
+            articlesCountBadge.textContent = `${blogCards.length} Articles`;
+        }
+
+        clearFilterButton?.addEventListener('click', clearSearch);
         populateReadingPicks();
 
         // Fade in animation on scroll

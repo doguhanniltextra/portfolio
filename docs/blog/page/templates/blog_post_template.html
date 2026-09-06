@@ -1,23 +1,32 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post Title - Doguhan Ilter</title>
+    <title>[POST TITLE] - Doguhan Ilter</title>
+    <meta name="description" content="[SHORT SEO DESCRIPTION FOR THE POST]">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../main.css" />
-    <link rel="stylesheet" href="../blog.css" />
-    <link rel="stylesheet" href="post.css" />
+    <link rel="stylesheet" href="../../../main.css" />
+    <link rel="stylesheet" href="../../blog.css" />
+    <link rel="stylesheet" href="../post.css" />
 </head>
 
 <body>
+    <!--
+        HOW TO USE THIS TEMPLATE
+        1. Copy this file and rename it, for example: my_new_post.html
+        2. Replace every [PLACEHOLDER] value below
+        3. Remove any optional sections you do not need
+        4. Add the new post card to blog/index.html
+    -->
+
     <!-- Header -->
     <header class="header">
         <div class="container">
-            
-            <h1><a href="../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+        
+            <h1><a href="../../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
             
             <div class="location">Everything here started with one question: why.</div>
             <div class="social-links">
@@ -32,7 +41,7 @@
     <nav class="nav">
         <div class="nav-container">
             <ul>
-                <li><a href="../../index.html" class="active">Blog</a></li>
+                <li><a href="../../../index.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
@@ -40,143 +49,129 @@
     <!-- Blog Post Content -->
     <div class="container">
         <article class="blog-post">
-            
+
             <!-- Post Header -->
             <header class="post-header">
                 <div class="post-meta-top">
-                    <time datetime="2025-11-01">
-                        <i class="far fa-calendar"></i> Date Here
+                    <time datetime="[YYYY-MM-DD]">
+                        <i class="far fa-calendar"></i> [Month DD, YYYY]
                     </time>
                     <span class="reading-time">
-                        <i class="far fa-clock"></i> X min read
+                        <i class="far fa-clock"></i> [X min read]
                     </span>
                 </div>
-                
-                <h1 class="post-title-main">Main Blog Post Title Goes Here</h1>
-                
+
+                <h1 class="post-title-main">[MAIN POST TITLE]</h1>
+
                 <div class="post-tags-header">
-                    <span class="tag">Tag1</span>
-                    <span class="tag">Tag2</span>
-                    <span class="tag">Tag3</span>
+                    <span class="tag">[Tag 1]</span>
+                    <span class="tag">[Tag 2]</span>
+                    <span class="tag">[Tag 3]</span>
+                    <span class="tag">[Tag 4]</span>
                 </div>
             </header>
 
             <!-- Post Content -->
             <div class="post-content">
-                
-                <!-- Lead Paragraph (Optional) -->
                 <p class="lead">
-                    The lead paragraph goes here. This section will be displayed larger and emphasized.
+                    [Write a short lead paragraph here. This should explain the core idea of the article in 2-4 sentences.]
                 </p>
 
-                <!-- Main Heading -->
-                <h2>Main Heading</h2>
-                
                 <p>
-                    Normal paragraph goes here. Lorem ipsum dolor sit amet...
+                    [Optional intro paragraph. Set the context, the problem, or why this topic matters.]
                 </p>
 
-                <!-- Subheading -->
-                <h3>Subheading</h3>
+                <h2>[Main Section Title]</h2>
 
-                <p>Content continues...</p>
+                <p>
+                    [Write your main explanation here.]
+                </p>
 
-                <!-- List -->
+                <h3>[Subsection Title]</h3>
+
+                <p>
+                    [Continue with supporting details, examples, or lessons learned.]
+                </p>
+
                 <ul>
-                    <li>Item 1</li>
-                    <li>Item 2</li>
-                    <li>Item 3</li>
+                    <li>[Key point one]</li>
+                    <li>[Key point two]</li>
+                    <li>[Key point three]</li>
                 </ul>
 
-                <!-- Info Box -->
+                <!-- Optional info callout -->
                 <div class="callout callout-info">
-                    <strong>💡 Tip:</strong> Info message goes here
+                    <strong>Tip:</strong> [Helpful tip, note, or small explanation.]
                 </div>
 
-                <!-- Warning Box -->
+                <!-- Optional warning callout -->
                 <div class="callout callout-warning">
-                    <strong>⚠️ Warning:</strong> Warning message goes here
+                    <strong>Warning:</strong> [Important caveat, tradeoff, or risk.]
                 </div>
 
-                <!-- Success Box -->
+                <!-- Optional success callout -->
                 <div class="callout callout-success">
-                    <strong>✅ Great:</strong> Success message goes here
+                    <strong>Result:</strong> [Positive outcome, conclusion, or takeaway.]
                 </div>
 
-                <!-- Code Block -->
-                <pre><code class="language-java">
-// Code goes here
+                <h2>[Code Example Section]</h2>
+
+                <pre><code class="language-java">// Replace "language-java" with language-javascript, language-python,
+// language-yaml, language-bash, or another Prism-supported language.
+
 public class Example {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        System.out.println("Replace this sample with your own code.");
     }
 }
                 </code></pre>
 
-                <!-- Icon Boxes -->
+                <!-- Optional architecture / highlight cards -->
                 <div class="architecture-list">
                     <div class="service-item">
-                        <h4><i class="fas fa-check"></i> Box Title</h4>
-                        <p>Description goes here</p>
+                        <h4><i class="fas fa-cube"></i> [Highlight Title]</h4>
+                        <p>[Short explanation for this highlight.]</p>
                     </div>
-                    
+
                     <div class="service-item">
-                        <h4><i class="fas fa-rocket"></i> Another Box</h4>
-                        <p>Another description</p>
+                        <h4><i class="fas fa-gears"></i> [Another Highlight]</h4>
+                        <p>[Short explanation for this one too.]</p>
                     </div>
                 </div>
 
-                <!-- 4-Column Grid -->
+                <!-- Optional feature grid -->
                 <div class="feature-grid">
                     <div class="feature-box">
                         <i class="fas fa-bolt"></i>
-                        <h4>Feature 1</h4>
-                        <p>Description</p>
+                        <h4>[Feature One]</h4>
+                        <p>[Short description]</p>
                     </div>
                     <div class="feature-box">
                         <i class="fas fa-shield-alt"></i>
-                        <h4>Feature 2</h4>
-                        <p>Description</p>
+                        <h4>[Feature Two]</h4>
+                        <p>[Short description]</p>
                     </div>
                     <div class="feature-box">
-                        <i class="fas fa-rocket"></i>
-                        <h4>Feature 3</h4>
-                        <p>Description</p>
-                    </div>
-                    <div class="feature-box">
-                        <i class="fas fa-check"></i>
-                        <h4>Feature 4</h4>
-                        <p>Description</p>
+                        <i class="fas fa-diagram-project"></i>
+                        <h4>[Feature Three]</h4>
+                        <p>[Short description]</p>
                     </div>
                 </div>
 
-                <p>Conclusion paragraph...</p>
+                <h2>[Closing Thoughts]</h2>
 
+                <p>
+                    [Wrap up the article. Summarize the takeaway, lessons learned, or what readers should remember.]
+                </p>
             </div>
 
             <!-- Post Footer -->
             <footer class="post-footer">
-                
-                <!-- Share Buttons -->
-                <div class="share-section">
-                    <h4>Share this article</h4>
-                    <div class="share-buttons">
-                        <a href="#" class="share-btn twitter" target="_blank">
-                            <i class="fab fa-twitter"></i> Twitter
-                        </a>
-                        <a href="#" class="share-btn linkedin" target="_blank">
-                            <i class="fab fa-linkedin"></i> LinkedIn
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Author Section -->
                 <div class="author-section">
                     
                     <div class="author-info">
                         <h4>Doguhan Ilter</h4>
-                        <p>Backend Developer specializing in microservices architecture, cloud-native applications, 
-                           and distributed systems.</p>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
                         <div class="author-social">
                             <a href="https://github.com/doguhanniltextra" target="_blank">
                                 <i class="fab fa-github"></i>
@@ -190,12 +185,11 @@ public class Example {
                         </div>
                     </div>
                 </div>
-
             </footer>
         </article>
     </div>
 
-    <!-- Prism.js for syntax highlighting -->
+    <!-- Prism.js syntax highlighting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>

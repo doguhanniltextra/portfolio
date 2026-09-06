@@ -7,127 +7,127 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux.html</loc>
     <lastmod>2026-09-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_tr.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_tr.html</loc>
     <lastmod>2026-09-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/container_isolation_in_linux_en.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/systems/container_isolation_in_linux_en.html</loc>
     <lastmod>2026-09-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/context_propagation_go.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/systems/context_propagation_go.html</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/the_ledger_project.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/projects/the_ledger_project.html</loc>
     <lastmod>2026-04-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/cqrs_grpc_design_patterns.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/cqrs_grpc_design_patterns.html</loc>
     <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/securepay-overview.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/projects/securepay-overview.html</loc>
     <lastmod>2026-04-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/his_overview.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/projects/his_overview.html</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/strategy_pattern.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/strategy_pattern.html</loc>
     <lastmod>2026-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/why-grpc-over-rest.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/why-grpc-over-rest.html</loc>
     <lastmod>2026-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/dlq_pattern.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/dlq_pattern.html</loc>
     <lastmod>2026-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/outbox_pattern.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/outbox_pattern.html</loc>
     <lastmod>2026-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/p95_latency.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/architecture/p95_latency.html</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/spiffe_spire_deep_dive.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/spiffe_spire_deep_dive.html</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/securepay_architecture.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/projects/securepay_architecture.html</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/cloudflare_tunnel.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/cloudflare_tunnel.html</loc>
     <lastmod>2026-02-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/postgresql_internals.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/systems/postgresql_internals.html</loc>
     <lastmod>2026-02-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_internals.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/kubernetes_internals.html</loc>
     <lastmod>2026-02-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/kubernetes_resource_management_hands_on.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/kubernetes_resource_management_hands_on.html</loc>
     <lastmod>2026-02-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/aws_well_architected_framework.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/aws_well_architected_framework.html</loc>
     <lastmod>2026-02-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/patient_management_blog_0.html</loc>
+    <loc>https://doguhanniltextra.github.io/portfolio/blog/page/projects/patient_management_blog_0.html</loc>
     <lastmod>2025-11-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
