@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lokal Makinede Kubernetes: Hospital Information System - Doguhan Ilter</title>
+    <meta name="description" content="Hospital Information System'i lokalde Kind üzerinde production standartlarında koşturmak: Multi-node topoloji, hardened pod'lar, HashiCorp Vault, NetworkPolicy, Kustomize ve Chaos Mesh ile 6 canlı kaos testi.">
+    <meta name="keywords" content="Kubernetes, Kind, Hospital Information System, Chaos Mesh, DevSecOps, HashiCorp Vault, Kustomize, Spring Boot, Microservices, Zero-Trust, NetworkPolicy, Doğuhan İlter, Doguhan Ilter">
+    <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html">
+    <meta property="og:title" content="Lokal Makinede Kubernetes: Hospital Information System - Doğuhan İlter">
+    <meta property="og:description" content="Hospital Information System'i lokalde Kind üzerinde production standartlarında koşturmak: Multi-node topoloji, hardened pod'lar, HashiCorp Vault, NetworkPolicy, Kustomize ve Chaos Mesh ile 6 canlı kaos testi.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Lokal Makinede Kubernetes: Hospital Information System - Doğuhan İlter">
+    <meta name="twitter:description" content="Hospital Information System'i lokalde Kind üzerinde production standartlarında koşturmak: Multi-node topoloji, hardened pod'lar, HashiCorp Vault, NetworkPolicy, Kustomize ve Chaos Mesh ile 6 canlı kaos testi.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../main.css" />
+    <link rel="stylesheet" href="../../blog.css" />
+    <link rel="stylesheet" href="../post.css" />
+
+    <!-- Schema.org TechArticle Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Lokal Makinede Kubernetes: Hospital Information System",
+      "description": "Hospital Information System'i lokalde Kind üzerinde production standartlarında koşturmak: Multi-node topoloji, hardened pod'lar, HashiCorp Vault, NetworkPolicy, Kustomize ve Chaos Mesh ile 6 canlı kaos testi.",
+      "keywords": ["Kubernetes", "Kind", "Chaos Mesh", "DevSecOps", "Vault", "Kustomize", "Spring Boot", "Microservices"],
+      "inLanguage": "tr",
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": ["Doguhan Ilter", "doguhanniltextra"],
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": "Doguhan Ilter"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html",
+      "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html"
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../../index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-09-26">
+                        <i class="far fa-calendar"></i> September 26, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> ~25 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">Lokal Makinede Kubernetes: Hospital Information System</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Kubernetes</span>
+                    <span class="tag">Kind</span>
+                    <span class="tag">Chaos Mesh</span>
+                    <span class="tag">DevSecOps</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Vault</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <div class="callout callout-info">
+                    <strong>Okuma süresi:</strong> ~25 dk &middot; <strong>Stack:</strong> Java 21 &middot; Spring Boot 3.4 &middot; Kind &middot; Kustomize &middot; HashiCorp Vault &middot; Chaos Mesh &middot; GitHub Actions
+                </div>
+
+                <p>Bakınız:</p>
+                <ul>
+                    <li><a href="https://doguhanniltextra.github.io/hospital-information-system/" target="_blank">https://doguhanniltextra.github.io/hospital-information-system/</a></li>
+                    <li><a href="https://doguhanniltextra.github.io/portfolio/blog/page/projects/his_overview.html">https://doguhanniltextra.github.io/portfolio/blog/page/projects/his_overview.html</a></li>
+                    <li><a href="https://doguhanniltextra.github.io/portfolio/blog/page/architecture/cqrs_grpc_design_patterns.html">https://doguhanniltextra.github.io/portfolio/blog/page/architecture/cqrs_grpc_design_patterns.html</a></li>
+                </ul>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <p class="lead">
+                    Her şey basit bir hasta yönetim servisi prototipiyle başladı. Zamanla dokuz bağımsız mikroservisten oluşan, üç farklı iletişim protokolünü hibrit kullanan ve lokal makinede production standartlarında koşan çok node'lu bir Kubernetes kümesine dönüştü.
+                </p>
+
+                <h2>1. Mimari ve Problem Uzayı</h2>
+
+                <p>
+                    Hospital Information System (HIS); modern bir hastanenin klinik ve idari süreçlerini uçtan uca simüle etmek üzere kurgulanmış dağıtık bir sistem. Hasta kayıtları, randevu yönetimi, hasta yatış (admission), laboratuvar tetkik istemleri, faturalandırma ve bildirim süreçleri, birbirinden bağımsız dağıtılabilen (independently deployable) dokuz ayrı mikroservis üzerinde koşuyor.
+                </p>
+
+                <p>
+                    Her mikroservis kendi etki alanına (bounded context) bütünüyle hükmediyor: bağımsız PostgreSQL veritabanı şemaları, ayrık Kafka topic'leri ve sınırları iyi çizilmiş gRPC kontratları. Servisler arası sınırlar son derece net.
+                </p>
+
+                <h2>2. Lokal Kubernetes Deneyimi: Minikube'dan Kind'e Geçiş ve Çok Node'lu Topoloji</h2>
+
+                <h3>Minikube ile Başlamak: Nerede Tıkandım?</h3>
+
+                <p>
+                    Projeyi Kubernetes ortamına taşırken çoğu geliştirici gibi ilk tercihim <strong>Minikube</strong> oldu. Hızlıca ayağa kalkan, tek bir komutla çalışan ve yerel geliştirmede standart kabul edilen bir araç. Ancak Hospital Information System büyüdükçe Minikube beklentileri karşılayamaz hale geldi:
+                </p>
+
+                <ol>
+                    <li><strong>Ağır Kaynak Tüketimi ve Hantal Çok Node (Multi-Node) Yapısı:</strong> Sistem 9 bağımsız Spring Boot servisi, Kafka kümesi, PostgreSQL, Redis, Vault, Prometheus ve Grafana gibi ağır bileşenlerden oluşuyor. Gerçek bir dağıtık mimariyi simüle etmek için birden fazla node'a ihtiyaç duyduğumuzda, Minikube'un <code>--nodes 3</code> yaklaşımı laptoptaki CPU ve RAM kaynaklarını tüketmeye başladı. Arka planda tam teşekküllü sanal makineler (VM) veya hantal Docker katmanları koşturması lokal makineyi kilitliyordu.</li>
+                    <li><strong>Deklaratif Olmayan Küme Yönetimi:</strong> Ben bu projede her şeyi kod olarak (Infrastructure as Code) versiyonlamak istedik. Minikube'da cluster parametrelerini, her bir node için özel kubelet argümanlarını (örneğin bellek tahliye limitleri, disk temizleme eşikleri) tek bir YAML dosyasıyla deklaratif yönetmek oldukça zorlayıcıydı; işler karmaşık CLI parametrelerine ve bash scriptlerine kalıyordu.</li>
+                    <li><strong>Ağ ve Ingress Sürtünmesi:</strong> Minikube üzerinde Ingress trafiğini lokal makineye yönlendirmek için sürekli arka planda <code>minikube tunnel</code> çalıştırmak gerekiyordu. Bu durum hem otomasyon scriptlerinde hem de CI ortamlarında ek bir kırılma noktası yaratıyordu.</li>
+                </ol>
+
+                <h3>Neden Kind (Kubernetes in Docker)?</h3>
+
+                <p>
+                    Bu tıkanıklıkların ardından rotayı <strong>Kind</strong>'e çevirdim. Kind'ın sunduğu mimari model projenin ihtiyaçlarıyla birebir örtüştü:
+                </p>
+
+                <ul>
+                    <li><strong>Konteyner Tabanlı Düğüm Mimarisi:</strong> Kind, her bir Kubernetes node'unu (control-plane ve worker'ları) doğrudan bağımsız bir Docker konteyneri olarak koşturur. Ağır VM katmanları yoktur. Bu sayede 1 control-plane ve 2 worker node'dan oluşan 3 node'lu bir cluster'ı laptopu yormadan, saniyeler içinde ayağa kaldırabiliyoruz.</li>
+                    <li><strong>Deklaratif <code>kind-config.yaml</code>:</strong> Bütün cluster topolojisi, port eşlemeleri ve kubeadm/kubelet konfigürasyon yamaları tek bir GitOps uyumlu YAML dosyasında yaşar.</li>
+                    <li><strong>Hızlı İmaj Yükleme (<code>kind load docker-image</code>):</strong> Lokal geliştirmede derlediğimiz Docker imajlarını harici bir registry'ye (Docker Hub vb.) push/pull yapmaya gerek kalmadan, doğrudan worker node'ların <code>containerd</code> çalışma zamanına saniyeler içinde enjekte edebiliyorum.</li>
+                    <li><strong>CI/CD Entegrasyonu:</strong> GitHub Actions üzerinde Docker kurulu herhangi bir Linux runner'ında sıfırdan bir Kind cluster'ı ayağa kaldırmak sadece 1-2 dakika sürüyor.</li>
+                </ul>
+
+                <h3>Kind'ın Avantajları ve Dezavantajları (Trade-Off'lar)</h3>
+
+                <p>
+                    Elbette her mimari kararın bir bedeli var. Kind mükemmel bir test ortamı sunsa da beraberinde bazı kısıtlar getirdi:
+                </p>
+
+                <div style="overflow-x: auto; margin: 25px 0;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Kriter</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Minikube</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Kind (Tercihimiz)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Multi-Node Performansı</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Ağır; VM veya yoğun container ek yükü yaratır.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Çok hafif; her node yalın bir Docker konteyneridir.</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Konfigürasyon Şeffaflığı</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">CLI parametreleri ve addon odaklı.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">%100 deklaratif <code>kind-config.yaml</code> ile versiyonlanabilir.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Lokal İmaj Transferi</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><code>eval $(minikube docker-env)</code> veya yavaş cache.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><code>kind load docker-image</code> ile doğrudan ve hızlı.</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Kalıcı Depolama (Storage)</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Hazır disk sürücüleri ve dinamik provisioner desteği güçlü.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Standart <code>local-path</code> kullanır; cluster silindiğinde state tamamen gider (ephemeral).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Ağ / Load Balancer</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><code>minikube tunnel</code> ile sanal external IP sağlar.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Doğal LoadBalancer IP'si yoktur; <code>extraPortMappings</code> veya MetalLB gerektirir.</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Kaynak İzolasyonu</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">VM izolasyonu güçlüdür; host çökmez.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Docker-in-Docker yapısı yoğun disk I/O anında host makineyi ısıtabilir.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Benim için öncelik; CI/CD ile %100 uyumlu, deklaratif ve çok node'lu arıza senaryolarını (failover, drain, anti-affinity) eksiksiz simüle edebilmekti. Bu yüzden kalıcı disk veya harici IP eksikliğini <code>extraPortMappings</code> ve Kustomize yapılandırmalarıyla aşarak Kind'ı tercih ettim.
+                </p>
+
+                <h3>Çok Node'lu Topoloji: Neden Tek Node Yetmez?</h3>
+
+                <p>
+                    Tüm sistemi tek node'lu bir Kubernetes kümesinde çalıştırmak, dağıtık sistemlerin en can alıcı hata senaryolarını maskeler:
+                </p>
+
+                <ul>
+                    <li><strong>Pod Anti-Affinity</strong> kurallarını test edemezsiniz; çünkü pod'un yerleşebileceği alternatif bir node yoktur.</li>
+                    <li><strong>Node Drain ve Eviction</strong> davranışlarını deneyimleyemezsiniz; yükü sırtlayacak ikinci bir worker node bulunmaz.</li>
+                    <li><strong>Gerçek Failover:</strong> Bir makine aniden çöktüğünde diğer node'daki replikanın kesintisiz hizmet vermesi senaryosu tek node ile fiziksel olarak doğrulanamaz.</li>
+                </ul>
+
+                <p>Bu gereksinimleri karşılayan cluster konfigürasyonum:</p>
+
+                <pre><code class="language-yaml"># kubernetes/kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: his-local
+
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+      - containerPort: 443
+        hostPort: 443
+
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            eviction-hard: "memory.available<300Mi,nodefs.available<5%"
+            image-gc-high-threshold: "85"
+            image-gc-low-threshold: "80"
+
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            eviction-hard: "memory.available<300Mi,nodefs.available<5%"
+            image-gc-high-threshold: "85"
+            image-gc-low-threshold: "80"
+
+networking:
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"</code></pre>
+
+                <h3>Bilinçli yapılandırma kararları:</h3>
+
+                <ul>
+                    <li><strong><code>eviction-hard: memory.available&lt;300Mi</code>:</strong> Kullanılabilir bellek 300 MiB sınırının altına indiği anda kubelet pod'ları tahliye etmeye (evict) başlar. Lokal ortamda bu sınırı kasten dar tuttum; amacım, ilerleyen bölümlerde göreceğimiz disk ve bellek baskısı senaryolarında kubelet'in koruma refleksini net bir şekilde gözlemleyebilmekti.</li>
+                    <li><strong><code>image-gc-high-threshold: 85</code>:</strong> Disk doluluğu %85'e ulaştığında Docker imaj çöpleri temizlenir ve hedef %80'e çekilir. Geliştirme yaptığım kişisel bilgisayarda disk alanının tükenmesini engellemek için kritik bir önlem.</li>
+                    <li><strong>Control-plane Port Yönlendirmeleri:</strong> Nginx Ingress Controller'ın host makinenin 80 ve 443 portlarını doğrudan karşılayabilmesi ve cluster sınırında TLS sonlandırması yapabilmesi sağlandı.</li>
+                </ul>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>3. Hardened Pod'lar: Sıfırdan Güvenlik Mimarisi</h2>
+
+                <p>
+                    Bu cluster'daki tüm servisler (dokuzunun tamamı) katı bir güvenlik tabanını (security baseline) paylaşır. Hiçbir container root yetkisiyle ayağa kalkamaz, konteynerin ana dosya sistemine yazamaz ve gereksiz Linux çekirdek yetkilerini (capabilities) elinde tutamaz.
+                </p>
+
+                <pre><code class="language-yaml"># Pod seviyesinde güvenlik bağlamı
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault      # Çekirdek seviyesinde zararlı sistem çağrılarını filtreler
+
+# Container seviyesinde güvenlik bağlamı
+securityContext:
+  readOnlyRootFilesystem: true          # Volume'lar haricinde disk yazma tamamen engellendi
+  allowPrivilegeEscalation: false       # İşlemlerin üst yetki kazanması engellendi
+  capabilities:
+    drop: [ALL]                         # Tüm varsayılan Linux yetkileri soyuldu</code></pre>
+
+                <h3><code>readOnlyRootFilesystem</code> açmazı ve çözümü</h3>
+
+                <p>
+                    Spring Boot, gömülü Tomcat'in geçici dosyaları ve JVM çalışma alanı için doğası gereği <code>/tmp</code> dizinine yazma ihtiyacı duyar. Kök dosya sistemini salt okunur (<code>readOnlyRootFilesystem: true</code>) yaptığınız an uygulama daha açılışta çöker.
+                </p>
+
+                <p>
+                    Bunu çözmek için yalnızca <code>/tmp</code> dizinine özel, boyutu sınırlandırılmış bir <code>emptyDir</code> bağladım:
+                </p>
+
+                <pre><code class="language-yaml">volumes:
+  - name: tmp-volume
+    emptyDir:
+      sizeLimit: 100Mi    # Kubelet bu limiti denetler; aşılırsa pod derhal tahliye edilir
+
+volumeMounts:
+  - name: tmp-volume
+    mountPath: /tmp</code></pre>
+
+                <p>
+                    Buradaki <code>sizeLimit: 100Mi</code> değeri, güvenlik ve kaynak yönetimi açısından kilit önemde. Nitekim ilerleyen kaos testleri bölümünde bu alanı kasten doldurup kubelet'in pod'u nasıl güvenle tahliye ettiğini bizzat deneyimleyeceğiz.
+                </p>
+
+                <h3>Üç aşamalı Health Probe mimarisi</h3>
+
+                <p>
+                    Ağır bir Spring Boot/JVM servisinin tamamen ayağa kalkıp istek karşılayabilir duruma gelmesi 30 ila 90 saniye arasında sürebilir. Eğer bu süreçte yalnızca klasik bir <code>livenessProbe</code> kullanırsanız, Kubernetes uygulamanın Spring context'ini yüklemekte olduğunu fark edemez; servisin kilitlendiğini varsayıp konteyneri sürekli yeniden başlatır (restart döngüsü).
+                </p>
+
+                <p>
+                    Bunu önlemek için üç aşamalı bir probe kurgusu uyguladım:
+                </p>
+
+                <pre><code class="language-yaml">startupProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  failureThreshold: 30     # 30 × 5s = 150 saniyelik güvenli açılış toleransı
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: http
+  periodSeconds: 10
+  failureThreshold: 3      # Art arda 3 başarısız denemede (30s) pod yeniden başlatılır
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  periodSeconds: 5
+  failureThreshold: 2      # 10s boyunca hazır değilse pod trafik dağıtımından çıkarılır</code></pre>
+
+                <p>
+                    <code>startupProbe</code>, servis ayağa kalkana kadar diğer iki kontrolü tamamen kilit altında tutar. Servis ilk kez sağlıklı sinyali verdiğinde startup probe ömrünü tamamlar ve yerini liveness ile readiness kontrollerine devreder. Böylece soğuk açılış (cold start) kaynaklı çöküşler tamamen engellenir.
+                </p>
+
+                <h3>Kesintisiz Geçiş İçin: Graceful Shutdown</h3>
+
+                <pre><code class="language-yaml">lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 5"]
+terminationGracePeriodSeconds: 45</code></pre>
+
+                <p>
+                    Kubernetes bir pod'u sonlandırırken, pod'un Service Endpoint listesinden çıkarılması ile konteynere kapatma sinyalinin iletilmesi süreçleri birbirine paralel ve asenkron ilerler. Eğer pod <code>SIGTERM</code> sinyalini alır almaz kapanırsa, <code>kube-proxy</code>'nin node'lardaki <code>iptables</code> kurallarını güncellemesine kadar geçen milisaniyeler boyunca istemci istekleri ölü pod'a yönlendirilmeye devam eder. Bu da kullanıcıya <code>502 Bad Gateway</code> olarak yansır.
+                </p>
+
+                <p>
+                    <code>preStop</code> içine yerleştirdiğimiz 5 saniyelik <code>sleep</code> gecikmesi, pod kapanma sürecine girmeden önce ağ katmanının pod IP'sini tüm routing tablolarından güvenle temizlemesi için tampon bir süre sağlar.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>4. Secret Yönetimi: HashiCorp Vault + External Secrets Operator</h2>
+
+                <p>
+                    Bu projede tek bir parola dahi düz metin (plain text) olarak saklanmaz. Git repository'sinde base64 ile dahi kodlanmış hiçbir Kubernetes <code>Secret</code> nesnesi göremezsiniz. Bütün gizli parametreler HashiCorp Vault ve External Secrets Operator (ESO) ikilisiyle yönetilir.
+                </p>
+
+                <h3>Çalışma mantığı nasıl işliyor?</h3>
+
+                <p>
+                    Her servis için iki temel kaynak tanımlanır: Vault bağlantısını kuran <code>SecretStore</code> ve ilgili veriyi eşleyen <code>ExternalSecret</code>.
+                </p>
+
+                <pre><code class="language-yaml"># SecretStore: ESO'ya Vault ile nasıl konuşacağını bildirir
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: admission-service-vault-store
+spec:
+  provider:
+    vault:
+      server: "http://vault.vault.svc.cluster.local:8200"
+      path: "secret"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "admission-service-role"       # İlgili servisin Vault rolü
+          serviceAccountRef:
+            name: admission-service-sa         # Kimlik doğrulamada kullanılan ServiceAccount</code></pre>
+
+                <pre><code class="language-yaml"># ExternalSecret: Vault dizinlerini Kubernetes Secret alanlarına eşler
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: admission-service-vault-store
+  target:
+    name: admission-service-secret
+    creationPolicy: Owner
+  data:
+    - secretKey: SPRING_DATASOURCE_WRITE_PASSWORD
+      remoteRef:
+        key: hospital/admission-service/db
+        property: password
+    - secretKey: APP_SECRET
+      remoteRef:
+        key: hospital/shared/jwt
+        property: app_secret
+    - secretKey: INTERNAL_SERVICE_TOKEN
+      remoteRef:
+        key: hospital/shared/internal-auth
+        property: internal_token</code></pre>
+
+                <p>
+                    ESO, tanımlanan <code>refreshInterval: 1h</code> periyoduyla Vault'u yoklar. Vault tarafında bir veritabanı parolası veya token döndürüldüğünde (rotate edildiğinde), Kubernetes Secret nesneleri otomatik olarak güncellenir.
+                </p>
+
+                <h3>En az yetki prensibi (Least Privilege)</h3>
+
+                <pre><code class="language-yaml">apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admission-service-sa
+automountServiceAccountToken: false   # Token pod içerisine otomatik bağlanmaz</code></pre>
+
+                <p>
+                    Her servisin kendine ait bir <code>ServiceAccount</code>'u bulunur ve Vault tarafında yalnızca ilgili servisin path'ine (örneğin <code>hospital/admission-service/*</code>) okuma yetkisi tanımlıdır. Yani <code>admission-service</code>, istese dahi <code>billing-service</code>'in veritabanı parolasını okuyamaz.
+                </p>
+
+                <p>
+                    Ayrıca <code>automountServiceAccountToken: false</code> yapılandırmasıyla bu hassas token'ın container dosya sistemine otomatik mount edilmesi engellenir; token yalnızca kontrol düzleminde kimlik doğrulama için kullanılır.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>5. Zero-Trust Ağ: NetworkPolicy ile Mikro-Segmentasyon</h2>
+
+                <p>
+                    Kubernetes'te varsayılan olarak tüm pod'lar diğer tüm pod'larla hiçbir engelle karşılaşmadan konuşabilir. Bu durum, ele geçirilen tek bir servisin tüm cluster içi ağda rahatça at koşturabileceği (lateral movement) anlamına gelir.
+                </p>
+
+                <p>
+                    Bu riski sıfıra indirmek amacıyla her servise sıkı Ingress ve Egress kuralları tanımladım:
+                </p>
+
+                <pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: admission-service-netpol
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: admission-service
+  policyTypes: [Ingress, Egress]
+
+  ingress:
+    # Yalnızca API Gateway bu servise HTTP trafiği gönderebilir
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: api-gateway
+      ports:
+        - port: 8086
+    # Prometheus, monitoring namespace'inden metrik toplayabilir
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8086
+
+  egress:
+    # CoreDNS — servis keşfi için şart
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+    # HashiCorp Vault — Secret senkronizasyonu için
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: vault
+      ports:
+        - port: 8200
+    # Veri katmanı bağımlılıkları
+    - ports: [{port: 5432}]   # PostgreSQL
+    - ports: [{port: 6379}]   # Redis
+    - ports: [{port: 9092}]   # Kafka
+    # İzinli gRPC hedefleri
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: patient-management
+      ports: [{port: 9090}]
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: doctor-service
+      ports: [{port: 9005}]</code></pre>
+
+                <p>
+                    Bu politika sayesinde izin listesinde (whitelist) yer almayan tüm bağlantı girişimleri, CNI eklentisi tarafından çekirdek (<code>iptables</code>) seviyesinde anında ve sessizce engellenir (DROP edilir).
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>6. Yüksek Erişilebilirlik: Anti-Affinity, PDB ve HPA</h2>
+
+                <h3>Pod Anti-Affinity</h3>
+
+                <p>
+                    Aynı servise ait pod'ların tek bir sunucuya kümelenmesi, o sunucu çöktüğünde tüm servisin devre dışı kalması demektir. Bunu engellemek için anti-affinity kurallarından faydalandım:
+                </p>
+
+                <pre><code class="language-yaml">affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: [admission-service]</code></pre>
+
+                <p>
+                    Buradaki <code>topologyKey: kubernetes.io/hostname</code> kuralı, scheduler'a aynı servise ait replikaları mümkün olduğunca farklı host'lara dağıtması gerektiğini bildirir. <code>preferredDuringScheduling...</code> altında <code>weight: 100</code> vererek bunu esnek ama en yüksek öncelikli bir tercih haline getiriyoruz; yani scheduler başka çaresi kalmadığı (örneğin kümede başka boş node kalmadığı) durumlar haricinde iki replikayı asla aynı worker üzerine koymaz.
+                </p>
+
+                <p>
+                    Böylece örneğin <code>his-local-worker2</code> donanımsal olarak çökse bile, <code>his-local-worker</code> üzerindeki diğer replika kesintisiz şekilde trafiği karşılamaya devam eder.
+                </p>
+
+                <h3>Pod Disruption Budget (PDB)</h3>
+
+                <pre><code class="language-yaml">apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: admission-service-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: admission-service</code></pre>
+
+                <p>
+                    <code>minAvailable: 1</code> tanımı, Kubernetes kontrol düzlemi ile aramızdaki bağlayıcı bir sözleşmedir. Bir bakım anında bir node için <code>kubectl drain</code> komutu çalıştırıldığında, Eviction API bu bütçeyi denetler. Eğer ilgili pod'u kapatmak ayaktaki replika sayısını 1'in altına düşürecekse, Kubernetes o pod'un tahliyesini kesinlikle reddeder.
+                </p>
+
+                <p>
+                    Drain işlemi, diğer node üzerindeki yeni replika ayağa kalkıp readiness probe testini geçene kadar bekletilir; yeni pod hazır olduğunda eski pod kapatılır. Bakım çalışmalarında sıfır kesintiyi (zero-downtime) sağlayan kritik mekanizma tam olarak budur.
+                </p>
+
+                <h3>Horizontal Pod Autoscaler (HPA)</h3>
+
+                <pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: admission-service
+  minReplicas: 1   # Production ortamında 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80</code></pre>
+
+                <p>
+                    Replikaların ortalama CPU kullanımı %70'i veya bellek tüketimi %80'i aştığında, HPA pod sayısını <code>maxReplicas</code> tavanına kadar dinamik olarak ölçekler. Yük hafiflediğinde ise ani dalgalanmaları (thrashing) önlemek amacıyla belirlenen soğuma süresini bekler ve kaynakları kademeli olarak serbest bırakır.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>7. Konfigürasyon Yönetimi: Kustomize base/overlays</h2>
+
+                <p>
+                    Tüm Kubernetes manifest'leri <code>kubernetes/base/apps/&lt;servis&gt;/</code> dizini altında tek bir merkezde toplanır. Farklı ortamlar (development, staging, prod) ise bu temel şablonları override ederek türetilir:
+                </p>
+
+                <pre><code>kubernetes/
+├── base/
+│   └── apps/
+│       ├── admission-service/
+│       │   ├── deployment.yaml
+│       │   ├── hpa.yaml
+│       │   ├── pdb.yaml
+│       │   ├── network-policy.yaml
+│       │   ├── external-secret.yaml
+│       │   ├── configmap.yaml
+│       │   ├── service.yaml
+│       │   └── serviceaccount.yaml
+│       └── ... (diğer 8 servis)
+└── overlays/
+    ├── local/        # minReplicas: 1, kısıtlı kaynak limitleri
+    ├── staging/
+    └── prod/         # minReplicas: 2, tam kaynak limitleri, aktif PDB</code></pre>
+
+                <p>
+                    Örneğin <code>local</code> overlay dizini, geliştirme ortamında laptoptaki bellek baskısını hafifletmek adına HPA'lardaki <code>minReplicas</code> değerini 2'den 1'e çeker. <code>prod</code> overlay ise CI/CD hattından gelen güncel imaj etiketlerini enjekte eder. Tek bir satır YAML kodunu bile mükerrer yazmadan ortamlarımızı yönetebiliyorum.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>8. DevSecOps Pipeline: Build → Scan → GitOps</h2>
+
+                <p>
+                    Tüm mikroservisler, ortak bir GitHub Actions yeniden kullanılabilir iş akışını (<code>reusable-service-ci.yml</code>) tetikler. Süreç üç ana aşamadan oluşur:
+                </p>
+
+                <pre><code>┌──────────────────────────────────────┐
+│  Aşama 1: Kalite ve Birim Testler    │
+│  mvn clean test -B                   │
+└──────────────────┬───────────────────┘
+                   │ (başarılıysa)
+┌──────────────────▼───────────────────┐
+│  Aşama 2: İmaj Derleme ve Güvenlik   │
+│  1. docker buildx → local daemon     │
+│  2. trivy image --severity HIGH,CRIT │
+│  3. push :sha-&lt;commit&gt; + :latest     │
+└──────────────────┬───────────────────┘
+                   │ (başarılıysa)
+┌──────────────────▼───────────────────┐
+│  Aşama 3: GitOps ve Şema Doğrulama   │
+│  1. kustomize edit set image :&lt;sha&gt;  │
+│  2. git commit + push [skip ci]      │
+│  3. kustomize build → render yaml    │
+│  4. kubeconform --strict v1.31.0     │
+└──────────────────────────────────────┘</code></pre>
+
+                <h3>Değişmez (Immutable) İmaj Etiketleri</h3>
+
+                <pre><code class="language-bash">SHORT_SHA="sha-$(git rev-parse --short HEAD)"
+kustomize edit set image doguhannilt/admission-service=doguhannilt/admission-service:${SHORT_SHA}
+git commit -m "chore(gitops): update admission-service to ${SHORT_SHA} [skip ci]"</code></pre>
+
+                <p>
+                    Production ortamında asla <code>latest</code> etiketi kullanılmaz. Her deployment doğrudan ilgili git commit karmasına (hash) izlenebilir. Olası bir geri alma (rollback) işlemi, ilgili commit'i revert edip manifest'i tekrar uygulamaktan ibarettir.
+                </p>
+
+                <h3>Trivy ile Güvenlik Açığı Taraması</h3>
+
+                <pre><code class="language-bash">trivy image \
+  --scanners vuln \
+  --severity HIGH,CRITICAL \
+  --exit-code 0 \
+  doguhannilt/admission-service:sha-abc1234</code></pre>
+
+                <p>
+                    Derlenen imajlar Trivy ile taranarak HIGH ve CRITICAL düzeyindeki güvenlik açıkları CI loglarında raporlanır; böylece güvenlik zafiyetleri üretime çıkmadan tespit edilir.
+                </p>
+
+                <h3>Kubeconform ile Katı Şema Denetimi</h3>
+
+                <pre><code class="language-bash">kubeconform \
+  -strict \
+  -ignore-missing-schemas \
+  -kubernetes-version 1.31.0 \
+  -schema-location default \
+  -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+  /tmp/rendered-manifests.yaml</code></pre>
+
+                <p>
+                    Kubernetes'in standart şeması <code>ExternalSecret</code> veya <code>SecretStore</code> gibi özel kaynakları tanımaz. Datree'nin CRD kataloğunu harici şema konumu olarak gösterip <code>-strict</code> modunu açarak, hatalı alan veya yazım yanlışlarının cluster'a uygulanmadan önce pipeline'da yakalanmasını garantiye aldık.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>9. Gözlemlenebilirlik: Prometheus + Grafana</h2>
+
+                <p>
+                    Her servis pod'u Prometheus tarafından taranabilmesi için gerekli annotation'ları barındırır:
+                </p>
+
+                <pre><code class="language-yaml">annotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "8086"</code></pre>
+
+                <p>
+                    Spring Boot Actuator ve Micrometer kütüphanesi sayesinde tüm metrikler standart Prometheus formatında dışa aktarılır. Grafana panolarımızda özellikle şu metrikleri canlı takip ediyorum:
+                </p>
+
+                <ul>
+                    <li>Pod başına JVM Heap ve Non-Heap bellek tüketimi</li>
+                    <li>HTTP endpoint'lerine göre istek hacmi, hata oranları (4xx, 5xx) ve P95/P99 gecikme süreleri</li>
+                    <li>Topic ve partition bazında Kafka consumer lag değerleri</li>
+                    <li>Pod yeniden başlama (restart) frekansları</li>
+                    <li>Worker node'lar üzerindeki CPU ve bellek doygunlukları</li>
+                </ul>
+
+                <p>
+                    Aşağıdaki kaos testleri sırasında bu paneller, sistemin arıza anındaki davranışını ve kendini toparlama (self-healing) sürecini saniyesi saniyesine izlememi sağladı.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>10. Chaos Engineering</h2>
+
+                <p>
+                    Kaos mühendisliğini lafta bırakmak istemedim; CNCF çatısı altındaki <strong>Chaos Mesh</strong>'i cluster'a kurup sistemin gerçek yük altında hatalara nasıl direndiğini altı farklı senaryoyla test ettim. <code>Chaos Daemon</code>, her worker node'da privileged modda çalışarak çekirdek düzeyinde arızalar (<code>iptables DROP</code>, <code>cgroup</code> sınırları, <code>SIGKILL</code>) enjekte etti.
+                </p>
+
+                <p>
+                    Tüm testler canlı cluster üzerinde, HTTP trafiği akarken icra edildi.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 1: Chaos Mesh Kurulumu ve Doğrulama</h3>
+
+                <p>
+                    Chaos Mesh, Helm kullanılarak <code>chaos-mesh</code> namespace'ine kuruldu ve kontrol paneli <code>localhost:2333</code> üzerinden erişime açıldı. DaemonSet pod'larının Linux çekirdeğine müdahale edebilmek için ihtiyaç duyduğu ayrıcalıklar sağlandı; güvenlik amacıyla erişim yetkileri sadece <code>his</code> namespace'i ile sınırlandırıldı.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 2: Pod Kill ve Failover Dayanıklılığı</h3>
+
+                <p><strong>Senaryo:</strong> <code>PodChaos</code> kaynağı ile çalışan iki <code>api-gateway</code> pod'undan birini aniden öldürdük.</p>
+
+                <pre><code class="language-yaml">apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: test-lb-failover
+  namespace: his
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces: [his]
+    labelSelectors:
+      app.kubernetes.io/name: api-gateway</code></pre>
+
+                <p><strong>Gözlemlenen Sonuç:</strong></p>
+
+                <pre><code class="language-bash">NAME                          READY   STATUS    NODE                AGE
+api-gateway-c5f85cfc9-6klb6   1/1     Running   his-local-worker    80m   ← Ayakta kaldı, tüm yükü sırtladı
+api-gateway-c5f85cfc9-cjmx5   1/1     Running   his-local-worker2   26s   ← 26 saniyede self-heal oldu</code></pre>
+
+                <p>
+                    <code>his-local-worker</code> üzerindeki ayakta kalan replika, yeni pod'un hazır hale geldiği 26 saniyelik toparlanma süresince gelen tüm trafiği tek başına karşıladı. <strong>Tek bir <code>502</code> hatası dahi üretilmedi.</strong> 26 saniye sonunda yeni pod <code>Ready</code> durumuna ulaştı ve <code>kube-proxy</code> trafiği tekrar %50/%50 paylaştırmaya başladı.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 3: Network Partition (Ağ İzolasyonu)</h3>
+
+                <p><strong>Senaryo:</strong> <code>his-local-worker2</code> üzerindeki gateway pod'una 30 saniye süresince çift yönlü ağ izolasyonu uyguladım.</p>
+
+                <pre><code class="language-yaml">apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+spec:
+  action: partition
+  direction: both
+  duration: 30s
+  mode: all
+  selector:
+    pods:
+      his: [api-gateway-c5f85cfc9-cjmx5]</code></pre>
+
+                <p>
+                    <strong>Ne yaşandı?</strong> Chaos Daemon hedef pod'un tüm paketlerine <code>iptables DROP</code> uyguladı. Pod sağlık kontrollerine yanıt veremez hale gelince <code>readinessProbe</code> derhal başarısızlığa düştü. <code>kube-proxy</code> bu pod'u servis yönlendirme listesinden anında çıkardı. Bütün trafik sorunsuz şekilde diğer node'daki pod'a aktı. 30 saniye sonra ağ yasağı kalktığında pod kendini toparladı, probe testlerini geçti ve tek bir yeniden başlatmaya dahi gerek kalmadan otomatik olarak tekrar trafiğe dahil oldu.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 4: Canlı Trafik Altında Gateway ve Auth Failover</h3>
+
+                <p>
+                    <strong>Senaryo:</strong> <code>localhost:4004/api/auth/login</code> endpoint'ine saniyede 10 HTTP POST isteği gönderen bir yük scripti çalıştırdık. Tam 40. istek anında <code>auth-service</code> pod'unu uçuş sırasında (mid-flight) zorla öldürdüm.
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>Önemli İpucu:</strong> Bu tür testlerde doğrudan <code>kubectl port-forward</code> ile pod'a bağlanmak büyük bir yanılgıdır. Port-forward bir load balancer değildir; pod'un IP'sine açılan yalın bir TCP tünelidir. O pod öldüğünde tünel çöker ve doğrudan <code>Connection Refused</code> alırsınız. Gerçek test, trafiğin <code>api-gateway</code> ve <code>kube-proxy</code> yönlendirmelerinden geçtiği senaryodur.
+                </div>
+
+                <p><strong>Yük Testi Sonuçları:</strong></p>
+
+                <pre><code>Toplam İstek Sayısı           : 120
+Başarılı Yanıt (200 OK)       : 80   (%66.7)
+Rate Limit Yanıtı (429)       : 40   (%33.3 — Redis Token Bucket, 5 RPS sınırı)
+Bağlantı Hatası / 502         : 0    (%0 — sıfır kesinti!)
+
+Normal Seviye Ortalama Gecikme: 16.8ms  (P95: 34.4ms)
+Kaos Esnası Ortalama Gecikme  : 23.5ms  (Anlık zirve: 76.7ms)</code></pre>
+
+                <p>
+                    Görülen 429 kodlu yanıtlar bir hata değil; Gateway arkasındaki Redis Token Bucket algoritmasının 5 RPS sınırını aşan istekleri bilinçli olarak reddetmesidir. Pod'un öldürüldüğü anda gecikmede yaşanan 76.7 milisaniyelik anlık sıçrama, birkaç saniye içinde tekrar 16ms bandına geriledi.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 5: Ephemeral Storage Disk Baskısı (DiskPressure)</h3>
+
+                <p>
+                    <strong>Senaryo:</strong> <code>sizeLimit: 100Mi</code> olarak kısıtladığımız <code>/tmp</code> <code>emptyDir</code> alanına kasıtlı olarak 150 MB veri bastım.
+                </p>
+
+                <pre><code class="language-bash">kubectl exec auth-service-7bcd8d878f-pbxk2 -n his -- \
+  /bin/sh -c "dd if=/dev/zero of=/tmp/overflow.dat bs=1M count=150"</code></pre>
+
+                <p><strong>Kubelet'in tepkisi:</strong></p>
+
+                <pre><code>Events:
+  Warning  Evicted  53s  kubelet  Usage of EmptyDir volume "tmp-volume" exceeds the limit "100Mi".
+  Normal   Killing  53s  kubelet  Stopping container auth-service</code></pre>
+
+                <p><strong>Tahliye sonrası durum:</strong></p>
+
+                <pre><code>auth-service-7bcd8d878f-pbxk2   0/1   Error     7m   ← Tahliye edildi
+auth-service-7bcd8d878f-cnv52   1/1   Running   41s  ← Temiz diskle yeni pod doğdu
+auth-service-7bcd8d878f-rjj79   1/1   Running   62m  ← Diğer worker'daki kopya etkilenmedi</code></pre>
+
+                <p>
+                    <code>readOnlyRootFilesystem: true</code> kısıtlamasının hayati rolü burada ortaya çıktı: Eğer konteynerin ana dosya sistemi salt okunur olmasaydı, kontrolsüz bir işlem worker node'un tüm diskini doldurabilir ve o sunucudaki bütün servisleri çökertebilirdi. Bu kısıtlama sayesinde hasar sadece 100 MB'lık geçici alanla sınırlandırıldı ve kubelet sorunlu pod'u derhal tahliye etti.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kaos Senaryosu 6: Node Drain ile Sıfır Kesintili Bakım</h3>
+
+                <p>
+                    <strong>Senaryo:</strong> <code>his-local-worker2</code> node'unu tamamen drain ederek fiziksel bir sunucunun bakım amacıyla kapatılması senaryosunu canlandırdım.
+                </p>
+
+                <pre><code class="language-bash">kubectl drain his-local-worker2 --ignore-daemonsets --delete-emptydir-data</code></pre>
+
+                <p><strong>İşlem sırası:</strong></p>
+
+                <pre><code>node/his-local-worker2 cordoned
+evicting pod his/auth-service-7bcd8d878f-rjj79
+evicting pod his/api-gateway-c5f85cfc9-cjmx5
+evicting pod monitoring/prometheus-55c978cfd4-vjqwq
+evicting pod monitoring/grafana-c9765dc87-25j66
+node/his-local-worker2 drained</code></pre>
+
+                <p><strong>Tahliye sonrasında pod yerleşimi:</strong></p>
+
+                <pre><code>NAME                                   NODE               AGE    STATUS
+api-gateway-c5f85cfc9-6klb6            his-local-worker   107m   Running  ← Zaten buradaydı
+api-gateway-c5f85cfc9-wkts9            his-local-worker   26s    Running  ← Taşındı ve ayağa kalktı
+auth-service-7bcd8d878f-cnv52          his-local-worker   6m     Running  ← Zaten buradaydı
+auth-service-7bcd8d878f-q9rqz          his-local-worker   26s    Running  ← Taşındı ve ayağa kalktı
+patient-management-578d4ccc78-lk56k    his-local-worker   107m   Running  ← Dokunulmadı
+appointment-service-6d4c59746d-fts9w   his-local-worker   71m    Running  ← Dokunulmadı</code></pre>
+
+                <p>
+                    Tüm servisler yaklaşık 26 saniye içerisinde tek bir worker üzerinde güvenle toplandı. <code>PodDisruptionBudget</code> (<code>minAvailable: 1</code>) kuralı sayesinde, diğer node'daki yeni replika ayağa kalkıp readiness testini geçene kadar eski pod'un silinmesine izin verilmedi. Bakım süresince kullanıcı trafiğinde tek bir kayıp bile yaşanmadı.
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>11. Çıkarılan Dersler ve Sırada Ne Var?</h2>
+
+                <h3>Sahada bizzat doğrulanan gerçekler:</h3>
+
+                <ol>
+                    <li><strong><code>startupProbe</code> ve <code>livenessProbe</code> ayrımı JVM için pazarlık kabul etmez.</strong> Ağır Spring Boot servislerinde startup probe kullanmamak, cold start esnasında bitmek bilmeyen pod restart döngülerine davetiye çıkarır.</li>
+                    <li><strong><code>preStop: sleep 5</code> küçük ama can kurtaran bir detaydır.</strong> Bu bekleme süresi olmadan yapılan her rolling update işleminde, ağ yönlendirme tabloları güncellenene kadar geçen sürede istemcilerinize <code>502</code> hatası fırlatırsınız.</li>
+                    <li><strong>Anti-Affinity ve PDB etle tırnak gibidir.</strong> Biri pod'ları farklı sunuculara yayarken diğeri tahliye anında hizmet sürekliliğini teminat altına alır; tek başlarına eksik kalırlar.</li>
+                    <li><strong>External Secrets Operator büyük bir yükü omuzlar.</strong> Git üzerinde şifreli dahi olsa secret tutmak potansiyel bir risktir. Vault + ESO entegrasyonu sayesinde kod tabanında tek bir hassas veri barındırmadan dinamik rotasyon sağlayabiliyoruz.</li>
+                </ol>
+
+                <h3>Karşılaşılan teknik zorluklar:</h3>
+
+                <ul>
+                    <li><strong>Lokal Kind kümesinde bellek yönetimi:</strong> Dokuz Spring Boot servisi, Kafka, PostgreSQL, Redis, Vault, Prometheus ve Grafana bileşenlerini bir arada çalıştırmak ciddi RAM tüketir. Geliştirme ortamı için hazırladığımız <code>local</code> overlay'inde replika sayısını 1'e düşürmek bu baskıyı yönetilebilir kıldı.</li>
+                    <li><strong>Kubeconform ve CRD şema doğrulama:</strong> Standart doğrulama araçları Vault veya ESO gibi üçüncü parti CRD'leri tanımaz. Datree'nin şema kataloğunu entegre etmeden yapılan testler sahte bir güven hissi yaratabilir.</li>
+                </ul>
+
+                <h3>Yol Haritası (Sıradaki Adımlar):</h3>
+
+                <div style="overflow-x: auto; margin: 25px 0;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Hedef</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Gerekçe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Istio / Linkerd Service Mesh</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Uygulama koduna dokunmadan servisler arasında mTLS, gelişmiş trafik yönetimi ve distributed tracing</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>ArgoCD</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Manuel veya yarı-otonom <code>kubectl apply</code> adımları yerine tam teşekküllü GitOps senkronizasyonu</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <p>
+                    <em>Projenin kaynak kodlarına, Kubernetes manifest'lerine, CI/CD iş akışlarına ve kaos test senaryolarına <a href="https://github.com/doguhanniltextra/hospital-information-system" target="_blank">GitHub Repository</a> üzerinden erişebilirsiniz.</em>
+                </p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=Lokal%20Makinede%20Kubernetes%3A%20Hospital%20Information%20System&url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/lokal_makinede_kubernetes_his.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>

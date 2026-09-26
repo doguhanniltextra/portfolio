@@ -20,6 +20,15 @@
 
 window.BLOG_POSTS = [
     {
+        title: "Lokal Makinede Kubernetes: Hospital Information System",
+        href: "./blog/page/devops-cloud/lokal_makinede_kubernetes_his.html",
+        date: "September 26, 2026",
+        readingTime: "25 min read",
+        excerpt: "9 mikroservisli Hospital Information System'i lokalde Kind üzerinde production standartlarında koşturmak: Multi-node cluster topolojisi, hardened pod'lar, HashiCorp Vault ile secret yönetimi, NetworkPolicy mikro-segmentasyonu, anti-affinity, PDB, Kustomize ve Chaos Mesh ile 6 canlı kaos testi.",
+        category: "DevOps & Cloud",
+        tags: ["Kubernetes", "Kind", "Chaos Mesh", "DevSecOps", "Spring Boot", "Vault"]
+    },
+    {
         title: "Container Nedir? Linux Kernel'inin Sağladığı İzolasyonu Sıfırdan Anlamak",
         href: "./blog/page/systems/container_isolation_in_linux.html",
         date: "September 5, 2026",
@@ -198,14 +207,6 @@ window.BLOG_POSTS = [
         excerpt: "A comprehensive guide to AWS Well-Architected Framework covering all six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.",
         category: "DevOps & Cloud",
         tags: ["AWS", "Cloud Architecture", "DevOps", "Best Practices"]
-    },
-    {
-        title: "Building a Microservices Architecture: My Patient Management Journey",
-        href: "./blog/page/projects/patient_management_blog_0.html",
-        date: "November 1, 2025",
-        readingTime: "4 min read",
-        excerpt: "The story behind designing and implementing a microservices-based patient management system using Spring Boot, PostgreSQL, Kafka and more.",
-        category: "Projects",
-        tags: ["Spring Boot", "Microservices", "PostgreSQL", "Kafka"]
     }
 ];
+
