@@ -20,6 +20,15 @@
 
 window.BLOG_POSTS = [
     {
+        title: "ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment",
+        href: "./blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html",
+        date: "October 10, 2026",
+        readingTime: "10 min read",
+        excerpt: "Kubernetes dünyasında Pod'ların kopyalarını ayakta tutan bir ReplicaSet varken neden Deployment nesnesi getirildi? İmaj güncellemelerindeki pod template çıkmazı, rollback ve versiyon hafızasının yokluğu ve bir üst akıl olarak Deployment controller anatomisi.",
+        category: "DevOps & Cloud",
+        tags: ["Kubernetes", "ReplicaSet", "Deployment", "DevOps", "Container Orchestration"]
+    },
+    {
         title: "Lokal Makinede Kubernetes: Hospital Information System",
         href: "./blog/page/devops-cloud/lokal_makinede_kubernetes_his.html",
         date: "September 26, 2026",

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment - Doguhan Ilter</title>
+    <meta name="description" content="Kubernetes'te Pod'ları ayakta tutan bir ReplicaSet varken neden Deployment nesnesi getirildi? İmaj güncellemelerindeki pod template çıkmazı, rollback eksikliği ve bir üst akıl olarak Deployment controller anatomisi.">
+    <meta name="keywords" content="Kubernetes, ReplicaSet, Deployment, Pod, ReplicationController, Container Orchestration, DevOps, Cloud Native, Doğuhan İlter, Doguhan Ilter">
+    <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html">
+    <meta property="og:title" content="ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment - Doğuhan İlter">
+    <meta property="og:description" content="Kubernetes'te Pod'ları ayakta tutan bir ReplicaSet varken neden Deployment nesnesi getirildi? İmaj güncellemelerindeki pod template çıkmazı, rollback eksikliği ve bir üst akıl olarak Deployment controller anatomisi.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment - Doğuhan İlter">
+    <meta name="twitter:description" content="Kubernetes'te Pod'ları ayakta tutan bir ReplicaSet varken neden Deployment nesnesi getirildi? İmaj güncellemelerindeki pod template çıkmazı, rollback eksikliği ve bir üst akıl olarak Deployment controller anatomisi.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../main.css" />
+    <link rel="stylesheet" href="../../blog.css" />
+    <link rel="stylesheet" href="../post.css" />
+
+    <!-- Schema.org TechArticle Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment",
+      "description": "Kubernetes'te Pod'ları ayakta tutan bir ReplicaSet varken neden Deployment nesnesi getirildi? İmaj güncellemelerindeki pod template çıkmazı, rollback eksikliği ve bir üst akıl olarak Deployment controller anatomisi.",
+      "keywords": ["Kubernetes", "ReplicaSet", "Deployment", "Pod", "ReplicationController", "Container Orchestration", "DevOps"],
+      "inLanguage": "tr",
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": ["Doguhan Ilter", "doguhanniltextra"],
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": "Doguhan Ilter"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html",
+      "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html"
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../../index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-10-10">
+                        <i class="far fa-calendar"></i> October 10, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 10 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">Kubernetes</span>
+                    <span class="tag">ReplicaSet</span>
+                    <span class="tag">Deployment</span>
+                    <span class="tag">DevOps</span>
+                    <span class="tag">Container Orchestration</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <h2>Giriş: Yine O Soruyla Başlayalım: "Neden?"</h2>
+
+                <p>Kubernetes dünyasına ilk adım attığınızda önünüze standart bir nesne hiyerarşisi konur:</p>
+                <ol>
+                    <li>En altta konteynerleri saran <strong>Pod</strong>,</li>
+                    <li>Pod'ların kopyalarını yöneten <strong>ReplicaSet</strong>,</li>
+                    <li>Ve en tepede her gün yazdığımız <strong>Deployment</strong>.</li>
+                </ol>
+
+                <p>Peki hiç durup şunu düşündünüz mü? Kubernetes ekibi, birden fazla kopyayı (replica) ayakta tutabilen, self-healing yeteneğine sahip bir <strong>ReplicaSet</strong> koymuşken neden mimariye bir katman daha ekleyip <strong>Deployment</strong> nesnesini getirdi?</p>
+
+                <p>ReplicaSet nerede yetersiz kaldı? Hangi operasyonel gereksinimler bizi ReplicaSet'i doğrudan kullanmaktan vazgeçirip onu bir "arka plan işçisine" dönüştürmeye yöneltti?</p>
+
+                <p>Tarihsel olarak, Kubernetes'in ilk dönemlerinde (2015-2016 civarı) Pod kopyalarını <strong>ReplicationController</strong> yönetiyordu. Sonraki erken 1.x sürümlerinde sorumluluklar ikiye bölündü: Pod kopyalarını ve set-based etiket seçicileri yönetme görevi <strong>ReplicaSet</strong>'e, sürüm güncellemeleri ve dağıtım yaşam döngüsü ise <strong>Deployment</strong>'a verildi. Yani "önce uzun yıllar ReplicaSet kullanıldı, tıkandığı için Deployment icat edildi" gibi katı bir kronolojiden ziyade, ReplicationController'ın sınırlarından ders çıkarılarak kurgulanmış bilinçli bir sorumluluk ayrımı söz konusudur.</p>
+
+                <p>Bu yazıda ReplicaSet'in tek başına bir dağıtım aracı olarak neden yetersiz kaldığını, Deployment controller'ın arka plandaki uzlaşma (reconciliation) sürecini ve bu iki katmanın anatomisini inceleyeceğiz.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>1. Ölçeği Netleştirelim: Pod ve ReplicaSet Nerede Duruyor?</h2>
+
+                <pre><code class="language-text">+-------------------------------------------------------+
+|                      Deployment                       |
+|  (Yaşam Döngüsü, Sürüm Geçişleri, Rollback, Strateji) |
++-------------------------------------------------------+
+                           │
+                           ▼
++-------------------------------------------------------+
+|                      ReplicaSet                       |
+|      (Tek Görev: Sayıyı ve Kimliği Sabit Tutmak)      |
++-------------------------------------------------------+
+                           │
+                           ▼
++-------------------------------------------------------+
+|                         Pod                           |
+|       (Konteynerleri Saran Geçici / Ephemeral Atom)   |
++-------------------------------------------------------+</code></pre>
+
+                <h3>Pod: Doğası Gereği Fani ve Yalnız</h3>
+
+                <p>Kubernetes'in atomik birimi Pod'dur. Ancak Pod'un doğasında kritik bir zaaf vardır: <strong>fani (ephemeral)</strong> olması.</p>
+
+                <p>Sıkça yapılan bir kavram karmaşasını düzeltelim: Konteyner içindeki uygulamanın çökmesi (process exit, segfault ya da bellek tükenmesiyle OOMKilled), Pod nesnesini doğrudan yok etmez. Pod'un <code>restartPolicy</code> kuralına göre kubelet, çöken konteyneri aynı node üzerinde yeniden başlatır. Bu süreçte <code>restartCount</code> artar, konteyner sık sık çöküyorsa Pod <code>CrashLoopBackOff</code> durumuna geçer. Ancak Pod nesnesi ve IP adresi varlığını sürdürür.</p>
+
+                <p>Arkasında controller bulunmayan yalın bir Pod'un (bare pod) gerçekten kaybolduğu ve geri dönmediği senaryolar şunlardır:</p>
+                <ul>
+                    <li>Pod'un koştuğu node'un donanımsal veya ağ olarak çökmesi (node failure / unreachable),</li>
+                    <li>Node üzerindeki bellek veya disk baskısı nedeniyle Pod'un tahliye edilmesi (eviction),</li>
+                    <li>Pod'un açıkça silinmesi.</li>
+                </ul>
+
+                <p>Tek başına bir Pod tanımladıysanız ve node çökerse, Kubernetes o Pod'u başka bir sağlıklı node'da yeniden ayağa kaldırmaz. Kendi kendini çoğaltamaz, trafik arttığında 3 kopyaya çıkamaz.</p>
+
+                <h3>ReplicaSet: Mükemmel Bir Sayı Sayıcı ve Gardiyan</h3>
+
+                <p>Bu sahipsizliğe çözüm olarak (ve ReplicationController'ın set-based selector destekleyen modern ardılı olarak) <strong>ReplicaSet</strong> geldi. Varoluş amacı net bir kurala dayanır:</p>
+
+                <blockquote>
+                    <p><em>"Belirtilen etiketlere (labels) sahip Pod'ların sayısını, <code>spec.replicas</code> değerinde tutmak."</em></p>
+                </blockquote>
+
+                <p>Bunu tipik bir <strong>Reconciliation Loop (Uzlaştırma Döngüsü)</strong> ile yapar:</p>
+                <ol>
+                    <li><code>etcd</code>'deki <strong>Desired State</strong> (İstenen Durum): Örneğin <code>replicas: 3</code>.</li>
+                    <li>Kümedeki <strong>Current State</strong> (Mevcut Durum): Selector ile eşleşen canlı Pod sayısı.</li>
+                    <li>Arada fark var mı?
+                        <ul>
+                            <li>Mevcut sayı 2 ise: Yeni bir Pod oluştur.</li>
+                            <li>Mevcut sayı 4 ise: Fazlalık bir Pod'u sil.</li>
+                            <li>Mevcut sayı 3 ise: Hiçbir şey yapma.</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <p>Bir node çöktüğünde, kontrol düzlemi varsayılan zaman aşımı sürelerinin ardından (node'un "unreachable" işaretlenmesi ve taint tabanlı tahliye için <code>tolerationSeconds</code>, varsayılan olarak 300 saniye) o node'daki Pod'ları tahliye eder. ReplicaSet controller eksilen Pod'u fark edince sağlıklı bir node üzerinde yenisini yaratır (self-healing). Yani bu süreç anlık değil, varsayılan ayarlarla birkaç dakika sürebilir.</p>
+
+                <p>Madem Pod'larımızı yaşatıyor, sayısını garanti ediyor ve scale edebiliyor, <strong>o zaman sorun neydi?</strong></p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>2. ReplicaSet Nerede Tıkandı? (Kusursuz Bir Bekçi, Kısıtlı Bir Operatör)</h2>
+
+                <p>ReplicaSet muazzam bir bekçidir. Ancak iş en hayati operasyona, yani <strong>sürüm güncellemesine</strong> geldiğinde tek başına yetersiz kalır.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Problem 1: İmaj Güncellemesi Çıkmazı (The Pod Template Trap)</h3>
+
+                <p>Üretimde <code>v1.0.0</code> imajını koşturan bir ReplicaSet'imiz olsun:</p>
+
+                <pre><code class="language-yaml">apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: payment-rs
+  labels:
+    app: payment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+      - name: payment-api
+        image: myregistry/payment:v1.0.0</code></pre>
+
+                <p>Ekip <code>v2.0.0</code> imajını hazırladı ve YAML'daki <code>image</code> alanını güncelledik:</p>
+
+                <pre><code class="language-yaml">      containers:
+      - name: payment-api
+        image: myregistry/payment:v2.0.0 # Güncelledik!</code></pre>
+
+                <p>Ardından:</p>
+
+                <pre><code class="language-bash">kubectl apply -f payment-rs.yaml</code></pre>
+
+                <p>Peki kümede ne oldu? <strong>Kelimenin tam anlamıyla hiçbir şey.</strong></p>
+
+                <p>Çünkü ReplicaSet controller yalnızca şuna bakar: <em>"Selector'ım <code>app: payment</code>. Kümede bu etikete sahip kaç Pod var? 3. İstenen kaç? 3. Görev tamam."</em></p>
+
+                <p>ReplicaSet controller, <strong>halihazırda çalışan Pod'ların şablona (template) uyup uymadığını denetlemez.</strong> <code>template</code> yalnızca <strong>yeni</strong> bir Pod yaratılması gerektiğinde referans alınan bir kalıptır. Mevcut Pod'lar yaşadığı sürece <code>v2.0.0</code> devreye girmez.</p>
+
+                <p>Yeni imajı devreye almak için çalışan 3 Pod'u tek tek elle silmeniz gerekir (<code>kubectl delete pod ...</code>). Siz sildikçe ReplicaSet eksilen Pod'u yeni şablondan yaratır. Modern bir orkestrasyonda bu kabul edilebilir bir dağıtım süreci değildir.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Problem 2: Eski Dünyaya Dönüş (İmperatif Scriptler Çıkmazı)</h3>
+
+                <p>Kubernetes'in ilk dönemlerinde, ReplicationController kullanılırken güncellemeler için <code>kubectl rolling-update</code> adında bir CLI komutu vardı. Bu komut yalnızca ReplicationController ile çalışıyordu, ReplicaSet'i desteklemiyordu ve sonraki sürümlerde kaldırıldı. Mantığı kabaca şöyleydi:</p>
+
+                <ol>
+                    <li><code>payment-rc-v1</code> adında bir ReplicationController koşuyor (3 replica).</li>
+                    <li>İstemci tarafında <code>payment-rc-v2</code> adında yeni bir ReplicationController oluşturuluyor.</li>
+                    <li><code>kubectl</code> istemcisi imperatif olarak şunları yapıyordu:
+                        <ul>
+                            <li>Yeni controller'ın replica sayısını 1 artır,</li>
+                            <li>Pod'un ayağa kalkmasını bekle,</li>
+                            <li>Eski controller'ın replica sayısını 1 azalt,</li>
+                            <li>...</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <p>Bu yaklaşımın iki yapısal problemi vardı:</p>
+
+                <h4>1. İstemci Taraflı (Client-Side) Kırılganlık</h4>
+                <p>Güncelleme süreci kontrol düzleminde değil, <strong>istemcinin makinesindeki CLI oturumunda</strong> yürütülüyordu. Güncellemenin ortasında bağlantınız kopsa veya terminal kapansa dağıtım yarıda kalır, sistem yarı v1 yarı v2 durumunda askıda kalırdı.</p>
+
+                <h4>2. Deklaratif Felsefenin İhlali</h4>
+                <p>Kubernetes'in temel yaklaşımı şudur: <em>"Bana adım adım ne yapacağımı anlatma (imperatif); sistemin son halinin ne olmasını istediğini söyle (deklaratif), gerisini kontrol düzlemine bırak."</em> Rolling-update ise baştan sona imperatif bir süreç yönetimiydi.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Problem 3: Geri Alma (Rollback) ve Versiyon Hafızasının Olmaması</h3>
+
+                <p><code>v2.0.0</code> kodunda kritik bir hata çıktı ve acilen <code>v1.0.0</code>'a dönmeniz gerekiyor. ReplicaSet'in kendi içinde bir <strong>Revision History (Sürüm Geçmişi)</strong> kavramı yoktur. Hangi sürümden nereye geçildiğini, bir önceki <code>template</code>'in ne olduğunu hatırlamaz.</p>
+
+                <p>Eski imaj etiketini bulup YAML'ı elle düzenlemeniz ya da nesneleri imperatif olarak yeniden ölçeklemeniz gerekir. Kesinti sırasında yapılan bu tür manuel müdahaleler ciddi hata payı taşır.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Problem 4: Dağıtım Stratejilerinin Yokluğu</h3>
+
+                <p>Gerçek dünyada güncelleme için tek bir kalıp yetmez:</p>
+                <ul>
+                    <li><strong>Kademeli Güncelleme (RollingUpdate):</strong> Eski Pod'lar adım adım kapanırken yenileri adım adım devreye girsin.</li>
+                    <li><strong>Yeniden Oluşturma (Recreate):</strong> Veritabanı kilitleri veya paylaşımlı kaynaklar yüzünden iki sürümün aynı anda çalışmaması gerekiyorsa önce eskiler kapansın, sonra yeniler açılsın.</li>
+                    <li><strong>Kapasite ve Kullanılabilirlik Limitleri (<code>maxSurge</code> / <code>maxUnavailable</code>):</strong> Güncelleme sırasında ekstra kaynak kullanımı ve minimum aktif kapasite hassas biçimde kontrol edilsin.</li>
+                </ul>
+
+                <p>ReplicaSet seviyesinde bu stratejileri ve sınırları yönetecek bir mekanizma yoktur. ReplicaSet yalnızca hedeflenen sayıyı denetler.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>3. Çözüm: Bir Üst Akıl Olarak Deployment (Controller of Controllers)</h2>
+
+                <p>Kubernetes mimarları, sayı koruma mantığını (ReplicaSet) karmaşıklaştırmak yerine <strong>onun üst katmanına yeni bir orkestratör yerleştirdi: Deployment.</strong></p>
+
+                <blockquote>
+                    <p><strong>Deployment doğrudan Pod oluşturmaz ve Pod yönetmez.</strong><br>
+                    <strong>Deployment, ReplicaSet'leri yöneten bir "Controller of Controllers"dır.</strong></p>
+                </blockquote>
+
+                <pre><code class="language-text">+-------------------------------------------------------------+
+|                     Deployment Controller                   |
+|                   (Orkestrasyonun Beyni)                    |
++-------------------------------------------------------------+
+               │                               │
+       Kademeli Küçültür                Kademeli Büyütür
+               │                               │
+               ▼                               ▼
++-----------------------------+ +-----------------------------+
+|      Old ReplicaSet         | |      New ReplicaSet         |
+|  (hash: 7d6b9f4b4 - v1.0)   | |  (hash: 5c8f8b7a1 - v2.0)   |
+|   replicas: 3 -> 2 -> 0     | |   replicas: 0 -> 1 -> 3     |
++-----------------------------+ +-----------------------------+
+         │           │                     │           │
+         ▼           ▼                     ▼           ▼
+      [Pod v1]    [Pod v1]              [Pod v2]    [Pod v2]</code></pre>
+
+                <h3>Pod-Template-Hash: Kimliklendirmenin Anahtarı</h3>
+
+                <p>Bir Deployment yazdığınızda, Deployment controller <code>spec.template</code> alanının özetini (hash) hesaplar. Örneğin hash <code>7d6b9f4b4</code> olsun. Deployment bu hash ile bir ReplicaSet oluşturur:</p>
+
+                <p><code>&lt;deployment-adi&gt;-7d6b9f4b4</code></p>
+
+                <p>Bu ReplicaSet'in yönettiği Pod'lar da şu etiketi alır:</p>
+
+                <p><code>pod-template-hash: 7d6b9f4b4</code></p>
+
+                <p>Bu sayede:</p>
+                <ol>
+                    <li>ReplicaSet hangi Pod'ların kendisine ait olduğunu bu etiketle ayırt eder.</li>
+                    <li>Deployment hangi ReplicaSet'in hangi şablon sürümünü temsil ettiğini bu hash üzerinden takip eder.</li>
+                </ol>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Rolling Update Anatomisi: maxSurge ve maxUnavailable</h3>
+
+                <p>Deployment'ta imajı <code>v2.0.0</code> yaptığınızda süreç istemcide değil, <code>kube-controller-manager</code> içindeki <strong>Deployment Controller</strong> tarafından kontrol düzleminde yürütülür:</p>
+
+                <ol>
+                    <li><strong>Yeni ReplicaSet'in oluşturulması:</strong> Controller yeni şablonun hash'ini hesaplar ve başlangıçta <code>replicas: 0</code> olan yeni bir ReplicaSet açar.</li>
+                    <li><strong>Kapasite ve yuvarlama matematiği:</strong> Varsayılan değerler <code>maxSurge: 25%</code> ve <code>maxUnavailable: 25%</code>'tir. Burada kritik bir kural var:
+                        <ul>
+                            <li><strong><code>maxSurge</code> yukarı yuvarlanır.</strong></li>
+                            <li><strong><code>maxUnavailable</code> aşağı yuvarlanır.</strong></li>
+                        </ul>
+                        <code>replicas: 3</code> için:
+                        <ul>
+                            <li><code>maxSurge</code> (%25): 3 &times; 0.25 = 0.75 &rarr; yukarı yuvarlanır &rarr; <strong>1</strong>. En fazla 3 + 1 = 4 Pod ayakta olabilir.</li>
+                            <li><code>maxUnavailable</code> (%25): 3 &times; 0.25 = 0.75 &rarr; aşağı yuvarlanır &rarr; <strong>0</strong>. Her zaman en az 3 Pod hazır olmalıdır.</li>
+                        </ul>
+                        Pratikte bu, eski Pod'lardan biri kapatılmadan önce yeni ReplicaSet'ten en az 1 Pod'un ayağa kalkıp hazır hale gelmesi gerektiği anlamına gelir.
+                    </li>
+                    <li><strong>Eşzamanlı orkestrasyon:</strong> Controller, yeni ReplicaSet'i büyütme ve eskisini küçültme işlemlerini katı sıralı adımlarla değil, belirlenen limitler dahilinde uzlaştırma döngüsüyle yönetir. Yeni Pod'lar hazır hale geldikçe eski ReplicaSet küçülür.</li>
+                </ol>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Kesinti ve Risk İddialarını Gerçekçi Okumak: Probe'lar ve Graceful Shutdown</h3>
+
+                <p>Literatürde sıkça "sıfır kesinti" ifadesi geçer, ancak bu kendiliğinden gelen bir garanti değildir:</p>
+
+                <ol>
+                    <li><strong><code>readinessProbe</code> zorunluluğu:</strong> Bir Pod için <code>readinessProbe</code> tanımlanmadıysa, konteyner process'i çalıştığı an Kubernetes Pod'u "Ready" sayar ve Service endpoint'lerine ekler. Oysa uygulamanın (örneğin Spring Boot ya da Go backend) ayağa kalkması, veritabanı havuzunu bağlaması birkaç saniye alabilir. Probe olmadan yapılan geçişte kullanıcılar 502/503 veya bağlantı reddi görebilir. Minimum kesinti ancak doğru kurgulanmış probe'larla mümkündür.</li>
+                    <li><strong>Graceful shutdown:</strong> Eski Pod kapatılırken Kubernetes <code>SIGTERM</code> gönderir. Uygulamanın işlemekte olduğu istekleri tamamlayabilmesi için uygun bir <code>terminationGracePeriodSeconds</code> ve sinyal yakalama mekanizması gerekir. Ayrıca Pod endpoint listesinden çıkarılırken uygulamanın kısa bir süre daha trafik alabildiği bir yarış durumu vardır. Bu yüzden pratikte <code>preStop</code> hook'u ve uygun bekleme süreleri kullanılır.</li>
+                    <li><strong>Geriye dönük uyumluluk:</strong> Yeni sürüm veritabanında geriye uyumsuz bir şema değişikliği yaptıysa, orkestrasyon ne kadar kusursuz olursa olsun sistem kesintiye uğrayabilir.</li>
+                </ol>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Rollback Mekanizması: Eski ReplicaSet Neden Silinmez?</h3>
+
+                <p>Güncelleme tamamlandığında eski ReplicaSet silinmez. Replica sayısı <code>0</code> yapılır, ancak <code>etcd</code> üzerinde bir tanım kaydı olarak varlığını sürdürür. Deployment, <code>spec.revisionHistoryLimit</code> (varsayılan: 10) kadar eski ReplicaSet'i saklar. Acil durumda:</p>
+
+                <pre><code class="language-bash">kubectl rollout undo deployment payment-deploy</code></pre>
+
+                <div class="callout callout-info" style="background: #f8f9fa; border-left: 4px solid #2b5ea7; padding: 15px; margin: 20px 0;">
+                    <strong>Not:</strong> <code>kubectl rollout undo</code> imperatif bir kolaylık komutudur. Deployment'ın pod şablonunu önceki revision'a döndürür. Şablon aynı olduğu için hash de aynıdır ve Deployment controller eski ReplicaSet'i yeniden devreye alarak olağan bir rolling update yürütür. Yani rollback da <code>maxSurge</code> / <code>maxUnavailable</code> kurallarına tabidir.<br><br>
+                    Modern <strong>GitOps</strong> yaklaşımında ise deklaratif rollback, ilgili commit'in geri alınması (<code>git revert</code>) ve güncellenmiş manifestonun kümeye tekrar uygulanmasıyla yapılır.
+                </div>
+
+                <p>Ayrıca bir rollback, uygulama kodunu eski sürüme döndürse bile veritabanında yapılmış migration'ları otomatik olarak geri almaz.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>4. Canlıda Görelim: ReplicaSet vs. Deployment Güncellemesi</h2>
+
+                <p>Çakışma olmaması için iki deneyde farklı etiketler kullanıyoruz.</p>
+
+                <h3>Deney 1: Doğrudan ReplicaSet ile Güncelleme Girişimi</h3>
+
+                <pre><code class="language-yaml"># test-rs.yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: demo-rs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-rs-app
+  template:
+    metadata:
+      labels:
+        app: demo-rs-app
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.24</code></pre>
+
+                <pre><code class="language-bash">$ kubectl apply -f test-rs.yaml
+replicaset.apps/demo-rs created
+
+$ kubectl get pods -l app=demo-rs-app -o jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}{end}'
+nginx:1.24
+nginx:1.24</code></pre>
+
+                <p>YAML'da imajı <code>nginx:1.25</code> yapıp tekrar <code>apply</code> edelim:</p>
+
+                <pre><code class="language-bash">$ kubectl apply -f test-rs.yaml
+replicaset.apps/demo-rs configured
+
+$ kubectl get pods -l app=demo-rs-app -o jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}{end}'
+nginx:1.24
+nginx:1.24</code></pre>
+
+                <p>Pod'lar h&acirc;l&acirc; <code>1.24</code>. ReplicaSet mevcut Pod'ları güncellemez. Şimdi Problem 1'i kanıtlayalım, Pod'lardan birini silelim:</p>
+
+                <pre><code class="language-bash">$ POD_NAME=$(kubectl get pods -l app=demo-rs-app -o jsonpath='{.items[0].metadata.name}')
+$ kubectl delete pod $POD_NAME
+pod "demo-rs-xxxxx" deleted
+
+$ kubectl get pods -l app=demo-rs-app -o jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}{end}'
+nginx:1.24
+nginx:1.25</code></pre>
+
+                <p>ReplicaSet, silinen Pod'un yerine yeni şablondaki (<code>1.25</code>) imajla bir Pod yarattı, diğer Pod ise <code>1.24</code>'te kaldı. Güncellemeyi tamamlamak için tüm Pod'ları tek tek silmeniz gerekir.</p>
+
+                <p>Temizlik:</p>
+
+                <pre><code class="language-bash">$ kubectl delete -f test-rs.yaml</code></pre>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Deney 2: Aynı Senaryoyu Deployment ile Çalıştırmak</h3>
+
+                <pre><code class="language-yaml"># test-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-deploy-app
+  template:
+    metadata:
+      labels:
+        app: demo-deploy-app
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.24</code></pre>
+
+                <pre><code class="language-bash">$ kubectl apply -f test-deploy.yaml
+deployment.apps/demo-deploy created
+
+$ kubectl get rs -l app=demo-deploy-app
+NAME                     DESIRED   CURRENT   READY   AGE
+demo-deploy-689b7d967b   2         2         2       10s</code></pre>
+
+                <p>Deklaratif yönteme sadık kalarak YAML'da imajı <code>nginx:1.25</code> yapıp tekrar <code>apply</code> edelim (<code>kubectl set image</code> de kullanılabilir, ancak deklaratif yaklaşım manifesto'yu güncellemektir):</p>
+
+                <pre><code class="language-bash"># YAML'da nginx:1.25 yapıldıktan sonra:
+$ kubectl apply -f test-deploy.yaml
+deployment.apps/demo-deploy configured
+
+$ kubectl rollout status deployment/demo-deploy
+deployment "demo-deploy" successfully rolled out
+
+$ kubectl get rs -l app=demo-deploy-app
+NAME                     DESIRED   CURRENT   READY   AGE
+demo-deploy-689b7d967b   0         0         0       40s  <-- Eski RS 0'a çekildi, geçmişte saklanıyor
+demo-deploy-847959b87d   2         2         2       15s  <-- Yeni RS devraldı</code></pre>
+
+                <p><code>rollout status</code> komutu, güncelleme tamamlanana kadar bekler. Böylece <code>get rs</code> çıktısında yarım kalmış bir ara durum görmezsiniz. Deployment controller eski ReplicaSet'in replica sayısını <code>0</code>'a indirirken yeni ReplicaSet üzerinden <code>nginx:1.25</code> sürümünü kademeli olarak devreye aldı.</p>
+
+                <p>Temizlik:</p>
+
+                <pre><code class="language-bash">$ kubectl delete -f test-deploy.yaml</code></pre>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>5. Karşılaştırma Tablosu: ReplicaSet vs. Deployment</h2>
+
+                <div style="overflow-x: auto; margin: 25px 0;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Kriter</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">ReplicaSet</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: #1a1a1a; border: 1px solid #e0e0e0;">Deployment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Temel Amacı</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Belirli sayıda Pod'un hayatta kalmasını sağlamak.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Uygulama yaşam döngüsünü, sürümlerini ve dağıtımlarını yönetmek.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Yönettiği Varlık</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Doğrudan Pod'lar.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">ReplicaSet'ler.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>İmaj Güncellemesi</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Çalışan Pod'ları güncellemez; Pod'lar silinene kadar şablon değişikliği etkisizdir.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Otomatik rolling update başlatır, kademeli olarak yeni Pod'lara geçer.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Rollback Desteği</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Yoktur. Önceki durum geçmişini tutmaz.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Vardır. Eski ReplicaSet'leri saklayarak hızlı geri dönüş sunar.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Dağıtım Stratejileri</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Yoktur. Yalnızca istenen sayıyı hedefler.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><code>RollingUpdate</code>, <code>Recreate</code>, <code>maxSurge</code>, <code>maxUnavailable</code>.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Orkestrasyon Yeri</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">ReplicaSet Controller (yalnızca sayı koruma)</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Kontrol düzlemindeki Deployment Controller</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;"><strong>Doğrudan Kullanım</strong></td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Neredeyse hiçbir zaman önerilmez.</td>
+                                <td style="padding: 10px 16px; border: 1px solid #e0e0e0;">Stateless iş yükleri için standart ana nesne.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>6. Peki ReplicaSet Neden H&acirc;l&acirc; Var?</h2>
+
+                <p>Önce net cevap: <strong>Pratikte neredeyse hiç doğrudan ReplicaSet yazmayız.</strong> Deployment zaten sizin yerinize ReplicaSet'leri oluşturur ve yönetir. Doğrudan ReplicaSet yalnızca kendi dağıtım mantığını yazan custom controller'larda (Argo Rollouts gibi) ya da öğrenme amaçlı anlamlıdır.</p>
+
+                <p>Peki neden ayrı bir nesne olarak duruyor?</p>
+
+                <ol>
+                    <li><strong>Sorumlulukların ayrımı:</strong> Pod sayısını sabit tutma işi (ReplicaSet Controller) ile sürüm güncelleme stratejisi işi (Deployment Controller) birbirinden bağımsız modüllerdir. Deployment mantığı ne kadar gelişirse gelişsin, Pod'ların temel hayatta kalma mekanizması yalın kalır.</li>
+                    <li><strong>Genişletilebilirlik:</strong> Kendi özel dağıtım mantığınızı (örneğin gelişmiş bir Canary/Blue-Green operatörü) kurmak isterseniz Deployment'ı kullanmak zorunda değilsiniz. Alt seviyedeki ReplicaSet'leri yöneten kendi controller'ınızı yazabilirsiniz.</li>
+                </ol>
+
+                <p>Günlük operasyonlarda ve standart mikroservis dağıtımlarında tercih edilmesi gereken nesne her zaman Deployment'tır.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>Son Söz / Çıkarımlar</h2>
+
+                <p>Kubernetes'teki soyutlama katmanları rastlantısal değildir. Her biri, altındaki yapının sınırlarını aşmak için tasarlanmış bilinçli bir mühendislik kararıdır:</p>
+
+                <ul>
+                    <li>Pod fani olduğu ve tek başına node kayıplarına direnemediği için <strong>ReplicaSet</strong> (ve selefi ReplicationController) tasarlandı.</li>
+                    <li>ReplicaSet sürüm geçişlerini, rollback hafızasını ve dağıtım stratejilerini yönetemediği için bir üst orkestratör olarak <strong>Deployment</strong> tasarlandı.</li>
+                </ul>
+
+                <p>Bir aracı yalnızca hazır komutlarla kullanmak ile arkasındaki mimari dinamikleri bilmek arasındaki fark tam burada ortaya çıkar.</p>
+
+                <p>Okuduğunuz için teşekkür ederim.</p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=ReplicaSet%20Neden%20Yetersiz%20Kald%C4%B1%3F%20Bir%20Orkestrasyon%20Katman%C4%B1n%C4%B1n%20Do%C4%9Fu%C5%9Fu%20ve%20Deployment&url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+
+</html>
