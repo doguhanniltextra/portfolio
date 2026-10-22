@@ -8,9 +8,6 @@
     <meta name="description" content="Dead Letter Queues explained — what they are, why every event-driven system needs them, and how I used the Retry-then-DLT strategy in my Hospital Information System's billing service.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../main.css" />
-    <link rel="stylesheet" href="../../blog.css" />
-    <link rel="stylesheet" href="../post.css" />
     <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
     <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/architecture/dlq_pattern.html">
     <meta property="og:title" content="What is DLQ and How I Used It - Doğuhan İlter">
@@ -57,6 +54,7 @@
   "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/architecture/dlq_pattern.html"
 }
     </script>
+    <link rel="stylesheet" href="../../../terminal-theme.css" />
 </head>
 
 <body>
@@ -267,6 +265,8 @@ public DefaultErrorHandler errorHandler(KafkaTemplate&lt;String, Object&gt; kafk
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <!-- Dynamic Terminal Layout Engine -->
+    <script src="../../../layout.js"></script>
 </body>
 
 </html>

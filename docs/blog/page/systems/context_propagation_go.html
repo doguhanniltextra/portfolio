@@ -9,9 +9,6 @@
         content="How I learned Go context propagation from scratch while trying to contribute to an open-source project, and what happens when you miss the PR but keep the knowledge.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../main.css" />
-    <link rel="stylesheet" href="../../blog.css" />
-    <link rel="stylesheet" href="../post.css" />
     <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
     <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/systems/context_propagation_go.html">
     <meta property="og:title" content="Context Propagation in Go: What I Learned From a Missed PR - Doğuhan İlter">
@@ -59,6 +56,7 @@
   "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/systems/context_propagation_go.html"
 }
     </script>
+    <link rel="stylesheet" href="../../../terminal-theme.css" />
 </head>
 
 <body>
@@ -389,6 +387,8 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 
+    <!-- Dynamic Terminal Layout Engine -->
+    <script src="../../../layout.js"></script>
 </body>
 
 </html>

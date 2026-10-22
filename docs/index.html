@@ -18,11 +18,10 @@
     <meta name="twitter:title" content="Doğuhan İlter - Blogs & Portfolio">
     <meta name="twitter:description"
         content="Technical writings and deep dives on distributed systems, kernel internals, and backend architecture by Doğuhan İlter.">
-    <title>Doguhan Ilter - Blogs</title>
+    <title>Doguhan Ilter - Engineering Notes & Blog</title>
     <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./main.css" />
-    <link rel="stylesheet" href="./blog/blog.css" />
+    <link rel="stylesheet" href="./terminal-theme.css" />
     <script src="./blog/posts-data.js?v=20260926"></script>
 
     <!-- Google Analytics -->
@@ -59,124 +58,140 @@
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header" role="banner">
-        <div class="container">
-            <h1>Doguhan Ilter</h1>
-            <div class="location">Everything here started with one question: why.</div>
-            <div class="social-links" role="navigation" aria-label="Social media links">
-                <a href="mailto:doguhannilt@email.com" aria-label="Send email to doguhannilt@email.com"><i
-                        class="fas fa-envelope" aria-hidden="true"></i><span class="sr-only">Email</span></a>
-                <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank" rel="noopener noreferrer"
-                    aria-label="Visit LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i><span
-                        class="sr-only">LinkedIn</span></a>
-                <a href="https://github.com/doguhanniltextra" target="_blank" rel="noopener noreferrer"
-                    aria-label="Visit GitHub profile"><i class="fab fa-github" aria-hidden="true"></i><span
-                        class="sr-only">GitHub</span></a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Blog Content -->
-    <div class="container">
-        <div class="blog-header">
-            <h2>Blogs</h2>
-            <p class="blog-subtitle">Thoughts on everything I find interesting</p>
-        </div>
-
-        <!-- Apple-Style Intelligent Guided Search -->
-        <div class="apple-search-wrapper" id="apple-search-wrapper">
-            <div class="apple-search-box" id="apple-search-box">
-                <i class="fas fa-search search-icon" aria-hidden="true"></i>
-                <div class="input-ghost-container">
-                    <input type="text" id="apple-blog-search" class="apple-search-input" placeholder="Search concepts, topics, tech (e.g. Concurrency, Kernel)..." autocomplete="off" spellcheck="false" aria-label="Search articles and topics" />
-                    <div class="search-ghost-text" id="search-ghost-text" aria-hidden="true"></div>
-                </div>
-                <div class="search-actions">
-                    <button type="button" class="search-clear-btn" id="search-clear-btn" hidden aria-label="Clear search">✕</button>
-                    <span class="search-kbd-hint" title="Press / or ⌘K to search"><kbd>/</kbd></span>
-                </div>
-            </div>
-
-            <!-- Quick Guided Topic Chips -->
-            <div class="search-quick-chips" aria-label="Popular search topics">
-                <span class="chips-label">Popular:</span>
-                <button type="button" class="search-chip" data-query="Containers">Containers</button>
-                <button type="button" class="search-chip" data-query="Concurrency">Concurrency</button>
-                <button type="button" class="search-chip" data-query="Kafka">Kafka</button>
-                <button type="button" class="search-chip" data-query="PostgreSQL">PostgreSQL</button>
-                <button type="button" class="search-chip" data-query="Zero Trust">Zero Trust</button>
-                <button type="button" class="search-chip" data-query="Kubernetes">Kubernetes</button>
-                <button type="button" class="search-chip" data-query="Go">Go</button>
-            </div>
-
-            <!-- Apple Spotlight Floating Dropdown -->
-            <div class="spotlight-dropdown" id="spotlight-dropdown" hidden role="listbox" aria-label="Search suggestions">
-                <!-- Populated dynamically via JS -->
-            </div>
-        </div>
-
-        <div class="blog-layout">
-            <!-- Main Blog Posts -->
-            <main class="blog-main" id="main-content" role="main">
-                <div class="blog-view-toolbar">
-                    <span class="articles-count-badge" id="articles-count-badge">22 Articles</span>
-                    <div class="view-switcher" role="group" aria-label="View switcher">
-                        <button type="button" class="view-switch-btn active" id="view-cards-btn" data-view="cards" title="Card View" aria-pressed="true">
-                            <i class="fas fa-th-large"></i> <span>Cards</span>
-                        </button>
-                        <button type="button" class="view-switch-btn" id="view-compact-btn" data-view="compact" title="Timeline View" aria-pressed="false">
-                            <i class="fas fa-list-ul"></i> <span>Timeline</span>
-                        </button>
+    <div class="app-shell">
+        <!-- Left Sidebar Navigation -->
+        <aside class="site-sidebar">
+            <div>
+                <a href="./index.html" class="profile-card">
+                    <div class="profile-avatar">D</div>
+                    <div class="profile-info">
+                        <span class="profile-name">Doguhan Ilter</span>
+                        <span class="profile-role">Software Engineer</span>
                     </div>
+                </a>
+
+                <nav class="nav-menu" aria-label="Main Navigation">
+                    <a href="./index.html" class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        <span>HOME</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="social-links-list">
+                    <a href="https://github.com/doguhanniltextra" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <span>GITHUB</span>
+                        <span class="arrow">&rarr;</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <span>LINKEDIN</span>
+                        <span class="arrow">&rarr;</span>
+                    </a>
+                    <a href="mailto:doguhannilt@email.com" class="social-link">
+                        <span>EMAIL</span>
+                        <span class="arrow">&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-wrapper">
+            <div class="content-container">
+
+                <!-- Header / Intro -->
+                <header class="index-header">
+                    <span class="index-meta-label">// WRITINGS & SYSTEM NOTES</span>
+                    <h1 class="index-title">Engineering Notes</h1>
+                    <p class="index-subtitle">Thoughts on distributed systems, Linux kernel internals, Kubernetes, and backend architecture. Everything here started with one question: why.</p>
+                </header>
+
+                <!-- Minimalist Terminal Search Box -->
+                <div class="terminal-search-box">
+                    <i class="fas fa-search terminal-search-icon" aria-hidden="true"></i>
+                    <input type="text" id="blog-search-input" class="terminal-search-input"
+                        placeholder="Search concepts, topics, tech (e.g. Concurrency, Kernel, Kubernetes)..."
+                        autocomplete="off" spellcheck="false" aria-label="Search articles" />
+                    <span class="search-kbd-badge" title="Press / to search"><kbd>/</kbd></span>
                 </div>
 
-                <div class="filter-status" aria-live="polite" hidden>
-                    <span class="filter-status-text"></span>
-                    <button type="button" class="clear-filter-btn">Clear filter</button>
+                <!-- Topic Filter Chips -->
+                <div class="terminal-chips-bar" id="topic-chips-bar" aria-label="Filter by topic">
+                    <button type="button" class="terminal-chip active" data-topic="all">all</button>
+                    <button type="button" class="terminal-chip" data-topic="Kubernetes">kubernetes</button>
+                    <button type="button" class="terminal-chip" data-topic="Containers">containers</button>
+                    <button type="button" class="terminal-chip" data-topic="Concurrency">concurrency</button>
+                    <button type="button" class="terminal-chip" data-topic="Linux">linux</button>
+                    <button type="button" class="terminal-chip" data-topic="Go">go</button>
+                    <button type="button" class="terminal-chip" data-topic="PostgreSQL">postgresql</button>
+                    <button type="button" class="terminal-chip" data-topic="Kafka">kafka</button>
                 </div>
-                <div class="empty-filter-state" aria-live="polite" hidden>
-                    <h3>No posts found</h3>
-                    <p>There are no blog posts matching this filter yet. Try another tag or clear the current filter.</p>
+
+                <!-- Articles Feed -->
+                <div class="posts-feed" id="posts-feed">
+                    <!-- Populated dynamically via JS -->
                 </div>
 
-                <!-- Dynamic Posts Container -->
-                <div id="blog-posts-container" class="blog-posts-container"></div>
+                <div id="no-results" style="display: none; padding: 40px 0; text-align: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 13px;">
+                    // No articles found matching your query.
+                </div>
 
-            </main>
+            </div>
+        </main>
 
-            <!-- Sidebar -->
-            <aside class="blog-sidebar">
+        <!-- Right Aside (Widgets & Stats) -->
+        <aside class="site-aside">
+            <div class="aside-top">
+                <!-- Metrics Card -->
+                <div class="aside-metric-card">
+                    <span class="metric-number" id="metric-total-posts">22</span>
+                    <span class="metric-label">Articles Published</span>
+                </div>
 
-                <!-- Reading Picks -->
-                <div class="sidebar-widget">
-                    <h3>Reading Picks</h3>
-                    <ul class="reading-picks-list">
-                        <li class="reading-pick-item">
-                            <span class="reading-pick-label">Longest article</span>
-                            <a href="#" class="reading-pick-link" data-pick="longest"></a>
-                            <span class="reading-pick-meta"></span>
+                <!-- Reading Picks Widget -->
+                <div class="toc-widget">
+                    <span class="toc-title">FEATURED WRITINGS</span>
+                    <ul class="aside-picks-list" id="aside-picks-list">
+                        <li>
+                            <a href="./blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html" class="aside-pick-link">
+                                ReplicaSet Neden Yetersiz Kaldı?
+                                <span class="aside-pick-tag">#kubernetes · 10 min</span>
+                            </a>
                         </li>
-                        <li class="reading-pick-item">
-                            <span class="reading-pick-label">Shortest article</span>
-                            <a href="#" class="reading-pick-link" data-pick="shortest"></a>
-                            <span class="reading-pick-meta"></span>
+                        <li>
+                            <a href="./blog/page/linux-kernel/cgroups_ile_kaynak_sinirlandirma.html" class="aside-pick-link">
+                                Linux Cgroups v2 ile Kaynak Sınırlandırma
+                                <span class="aside-pick-tag">#linux · 12 min</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="./blog/page/architecture/concurrency_vs_parallelism.html" class="aside-pick-link">
+                                Concurrency vs Parallelism Derinlemesine
+                                <span class="aside-pick-tag">#concurrency · 8 min</span>
+                            </a>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Popular Tags -->
-                <div class="sidebar-widget">
-                    <h3>Popular Tags</h3>
-                    <div class="tag-cloud" id="tag-cloud">
-                        <!-- Populated dynamically from window.BLOG_POSTS -->
+                <!-- Popular Tags List -->
+                <div class="toc-widget">
+                    <span class="toc-title">CORE TOPICS</span>
+                    <div class="article-tags" id="aside-tags-list" style="margin-top: 4px;">
+                        <!-- Generated via JS -->
                     </div>
                 </div>
+            </div>
 
-            </aside>
-        </div>
+            <div class="aside-footer">
+                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+                    &copy; 2026 DOGUHAN ILTER
+                </span>
+            </div>
+        </aside>
     </div>
 
+    <!-- Dynamic Posts Renderer & Search Logic -->
     <script>
         function escapeHTML(str) {
             if (!str) return '';
@@ -185,664 +200,102 @@
             );
         }
 
-        // ==============================================================================
-        // DYNAMIC RENDERING FROM posts-data.js (Single Source of Truth)
-        // ==============================================================================
-        function renderBlogPosts() {
-            const container = document.getElementById('blog-posts-container');
-            if (!container || !window.BLOG_POSTS) return;
+        document.addEventListener('DOMContentLoaded', () => {
+            const posts = window.BLOG_POSTS || [];
+            const feedEl = document.getElementById('posts-feed');
+            const searchInput = document.getElementById('blog-search-input');
+            const noResultsEl = document.getElementById('no-results');
+            const topicChips = document.querySelectorAll('.terminal-chip');
+            const metricTotalPosts = document.getElementById('metric-total-posts');
+            const asideTagsList = document.getElementById('aside-tags-list');
 
-            container.innerHTML = window.BLOG_POSTS.map(post => `
-                <article class="blog-post-card">
-                    <span class="post-date"><i class="far fa-calendar"></i> ${escapeHTML(post.date)}</span>
-                    <h2 class="post-title"><a href="${escapeHTML(post.href)}">${escapeHTML(post.title)}</a></h2>
-                    <p class="post-excerpt">${escapeHTML(post.excerpt)}</p>
-                    <div class="post-meta">
-                        <span class="reading-time"><i class="far fa-clock"></i> ${escapeHTML(post.readingTime)}</span>
-                        <div class="post-tags">
-                            ${(post.tags || []).map(tag => `<span class="tag" data-tag="${escapeHTML(tag)}">${escapeHTML(tag)}</span>`).join('')}
-                        </div>
-                    </div>
-                    <a href="${escapeHTML(post.href)}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
-                </article>
-            `).join('');
-        }
+            if (metricTotalPosts) {
+                metricTotalPosts.textContent = posts.length;
+            }
 
-        function renderPopularTags() {
-            const tagCloudEl = document.getElementById('tag-cloud');
-            if (!tagCloudEl || !window.BLOG_POSTS) return;
+            let activeTopic = 'all';
+            let searchQuery = '';
 
-            const tagCounts = {};
-            window.BLOG_POSTS.forEach(post => {
-                (post.tags || []).forEach(tag => {
-                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            function renderFeed() {
+                const filtered = posts.filter(post => {
+                    const matchesTopic = activeTopic === 'all' || 
+                        (post.tags && post.tags.some(t => t.toLowerCase() === activeTopic.toLowerCase()));
+                    
+                    const q = searchQuery.toLowerCase().trim();
+                    const matchesSearch = !q || 
+                        post.title.toLowerCase().includes(q) ||
+                        post.excerpt.toLowerCase().includes(q) ||
+                        (post.tags && post.tags.some(t => t.toLowerCase().includes(q)));
+
+                    return matchesTopic && matchesSearch;
                 });
-            });
 
-            const sortedTags = Object.keys(tagCounts).sort((a, b) => {
-                const diff = tagCounts[b] - tagCounts[a];
-                return diff !== 0 ? diff : a.localeCompare(b);
-            });
-
-            // Top 16 tags
-            const topTags = sortedTags.slice(0, 16);
-
-            tagCloudEl.innerHTML = topTags.map(tag => 
-                `<button type="button" class="cloud-tag" data-tag="${escapeHTML(tag)}">${escapeHTML(tag)}</button>`
-            ).join('');
-        }
-
-        // 1. Render all cards and sidebar tags first
-        renderBlogPosts();
-        renderPopularTags();
-
-        // 2. Query dynamic DOM elements
-        const blogCards = Array.from(document.querySelectorAll('.blog-post-card'));
-        const popularTagButtons = Array.from(document.querySelectorAll('.cloud-tag'));
-        const filterStatus = document.querySelector('.filter-status');
-        const filterStatusText = document.querySelector('.filter-status-text');
-        const clearFilterButton = document.querySelector('.clear-filter-btn');
-        const emptyFilterState = document.querySelector('.empty-filter-state');
-
-        // Apple Search Elements
-        const searchWrapper = document.getElementById('apple-search-wrapper');
-        const searchBox = document.getElementById('apple-search-box');
-        const searchInput = document.getElementById('apple-blog-search');
-        const ghostTextEl = document.getElementById('search-ghost-text');
-        const searchClearBtn = document.getElementById('search-clear-btn');
-        const spotlightDropdown = document.getElementById('spotlight-dropdown');
-        const quickChips = Array.from(document.querySelectorAll('.search-chip'));
-
-        // View Switcher Elements
-        const blogMainEl = document.getElementById('main-content');
-        const viewCardsBtn = document.getElementById('view-cards-btn');
-        const viewCompactBtn = document.getElementById('view-compact-btn');
-        const articlesCountBadge = document.getElementById('articles-count-badge');
-
-        let activeGhostMatch = null;
-        let selectedDropdownIndex = -1;
-        let currentSearchQuery = '';
-
-        // Technical Corpus for Guided Autocomplete
-        const SEARCH_TOPICS = [
-            { name: "Concurrency", icon: "fa-bolt", category: "Architecture" },
-            { name: "Containers", icon: "fa-box", category: "Systems" },
-            { name: "Context Propagation", icon: "fa-code-branch", category: "Systems" },
-            { name: "CQRS", icon: "fa-project-diagram", category: "Architecture" },
-            { name: "Cloudflare", icon: "fa-shield-alt", category: "DevOps & Cloud" },
-            { name: "Cgroups v2", icon: "fa-microchip", category: "Systems" },
-            { name: "Clean Architecture", icon: "fa-cube", category: "Architecture" },
-            { name: "Dead Letter Queue (DLQ)", icon: "fa-envelope-open-text", category: "Architecture" },
-            { name: "Deployment", icon: "fa-cubes", category: "DevOps & Cloud" },
-            { name: "Docker", icon: "fa-box-open", category: "Systems" },
-            { name: "Double-Entry Accounting", icon: "fa-file-invoice-dollar", category: "Projects" },
-            { name: "Go", icon: "fa-code", category: "Systems" },
-            { name: "gRPC", icon: "fa-exchange-alt", category: "Architecture" },
-            { name: "Hospital Information System (HIS)", icon: "fa-hospital", category: "Projects" },
-            { name: "HTTP", icon: "fa-network-wired", category: "Systems" },
-            { name: "Java", icon: "fa-code", category: "Projects" },
-            { name: "Kafka", icon: "fa-stream", category: "Architecture" },
-            { name: "Kubernetes", icon: "fa-dharmachakra", category: "DevOps & Cloud" },
-            { name: "Linux Kernel", icon: "fa-terminal", category: "Systems" },
-            { name: "Microservices", icon: "fa-cubes", category: "Architecture" },
-            { name: "Modular Monolith", icon: "fa-layer-group", category: "Projects" },
-            { name: "MVCC", icon: "fa-database", category: "Systems" },
-            { name: "Namespaces", icon: "fa-folder-tree", category: "Systems" },
-            { name: "Outbox Pattern", icon: "fa-paper-plane", category: "Architecture" },
-            { name: "P95 Latency", icon: "fa-tachometer-alt", category: "Architecture" },
-            { name: "Pessimistic Lock", icon: "fa-lock", category: "Projects" },
-            { name: "PostgreSQL", icon: "fa-database", category: "Systems" },
-            { name: "Redis", icon: "fa-server", category: "Projects" },
-            { name: "ReplicaSet", icon: "fa-clone", category: "DevOps & Cloud" },
-            { name: "REST API", icon: "fa-globe", category: "Architecture" },
-            { name: "Saga Pattern", icon: "fa-sitemap", category: "Architecture" },
-            { name: "SecurePay", icon: "fa-credit-card", category: "Projects" },
-            { name: "SpendSync", icon: "fa-wallet", category: "Projects" },
-            { name: "SPIFFE / SPIRE", icon: "fa-id-badge", category: "DevOps & Cloud" },
-            { name: "Spring Boot", icon: "fa-leaf", category: "Architecture" },
-            { name: "Strategy Pattern", icon: "fa-chess", category: "Architecture" },
-            { name: "System Design", icon: "fa-sitemap", category: "Architecture" },
-            { name: "TCP", icon: "fa-network-wired", category: "Systems" },
-            { name: "Zero Trust", icon: "fa-user-shield", category: "DevOps & Cloud" }
-        ];
-
-        // Automatically augment SEARCH_TOPICS with tags from window.BLOG_POSTS
-        const existingTopicNames = new Set(SEARCH_TOPICS.map(t => t.name.toLowerCase()));
-        (window.BLOG_POSTS || []).forEach(post => {
-            (post.tags || []).forEach(tag => {
-                if (!existingTopicNames.has(tag.toLowerCase())) {
-                    SEARCH_TOPICS.push({
-                        name: tag,
-                        icon: "fa-tag",
-                        category: post.category || "General"
-                    });
-                    existingTopicNames.add(tag.toLowerCase());
-                }
-            });
-        });
-
-        // Indexed Articles for Spotlight and Search Guidance
-        const indexedArticles = (window.BLOG_POSTS || []).map((post, idx) => ({
-            card: blogCards[idx],
-            title: post.title,
-            href: post.href,
-            excerpt: post.excerpt,
-            readingTime: post.readingTime,
-            category: post.category || 'General',
-            tags: post.tags || []
-        }));
-
-        function getCardTags(card) {
-            return Array.from(card.querySelectorAll('.post-tags .tag')).map((tag) =>
-                tag.textContent.trim().toLowerCase()
-            );
-        }
-
-        function populateReadingPicks() {
-            const readingPicks = Array.from(document.querySelectorAll('.reading-pick-link'));
-            if (!readingPicks.length || !window.BLOG_POSTS || !window.BLOG_POSTS.length) return;
-
-            const postsWithMinutes = window.BLOG_POSTS.map(post => {
-                const match = (post.readingTime || '').match(/(\d+)/);
-                return {
-                    title: post.title,
-                    href: post.href,
-                    minutes: match ? Number(match[1]) : 0
-                };
-            }).filter(p => p.minutes > 0);
-
-            if (!postsWithMinutes.length) return;
-
-            const longest = postsWithMinutes.reduce((max, cur) => cur.minutes > max.minutes ? cur : max);
-            const shortest = postsWithMinutes.reduce((min, cur) => cur.minutes < min.minutes ? cur : min);
-
-            readingPicks.forEach((link) => {
-                const pickType = link.dataset.pick;
-                const selectedItem = pickType === 'longest' ? longest : shortest;
-                const meta = link.parentElement?.querySelector('.reading-pick-meta');
-
-                if (!selectedItem) return;
-
-                link.href = selectedItem.href;
-                link.textContent = selectedItem.title;
-
-                if (meta) {
-                    meta.textContent = `${selectedItem.minutes} min read`;
-                }
-            });
-        }
-
-        // ==========================================
-        // SMART GHOST AUTOCOMPLETE & GUIDANCE ENGINE
-        // ==========================================
-
-        function updateGhostAutocomplete(query) {
-            if (!query || query.trim().length === 0) {
-                ghostTextEl.innerHTML = '';
-                activeGhostMatch = null;
-                return;
-            }
-
-            const lowerQuery = query.toLowerCase();
-
-            // 1. Check exact prefix match in Topics
-            let matchedTopic = SEARCH_TOPICS.find(t => t.name.toLowerCase().startsWith(lowerQuery));
-
-            // 2. If no topic prefix, check articles
-            if (!matchedTopic) {
-                const matchedArticle = indexedArticles.find(a => 
-                    a.title.toLowerCase().split(/\s+/).some(word => word.startsWith(lowerQuery)) ||
-                    a.tags.some(t => t.toLowerCase().startsWith(lowerQuery))
-                );
-                if (matchedArticle) {
-                    // Try to extract matching tag or title word
-                    const matchingTag = matchedArticle.tags.find(t => t.toLowerCase().startsWith(lowerQuery));
-                    if (matchingTag) {
-                        matchedTopic = { name: matchingTag };
-                    }
-                }
-            }
-
-            if (matchedTopic && matchedTopic.name.toLowerCase().startsWith(lowerQuery)) {
-                const typedPart = query;
-                const suffix = matchedTopic.name.slice(typedPart.length);
-                activeGhostMatch = matchedTopic.name;
-
-                ghostTextEl.innerHTML = 
-                    `<span class="ghost-prefix">${escapeHTML(typedPart)}</span>` +
-                    `<span class="ghost-suffix">${escapeHTML(suffix)}</span>` +
-                    `<span class="ghost-tab-badge">Tab ⇥</span>`;
-            } else {
-                ghostTextEl.innerHTML = '';
-                activeGhostMatch = null;
-            }
-        }
-
-        function acceptGhostAutocomplete() {
-            if (activeGhostMatch) {
-                searchInput.value = activeGhostMatch;
-                ghostTextEl.innerHTML = '';
-                const query = activeGhostMatch;
-                activeGhostMatch = null;
-                applySearch(query);
-                renderSpotlightDropdown(query);
-            }
-        }
-
-        // ==========================================
-        // APPLE SPOTLIGHT DROPDOWN ENGINE
-        // ==========================================
-
-        function renderSpotlightDropdown(query) {
-            const trimmed = (query || '').trim();
-            const lower = trimmed.toLowerCase();
-
-            let matchedTopics = [];
-            let matchedArticles = [];
-
-            if (trimmed.length === 0) {
-                // Default view: popular topics & featured articles
-                matchedTopics = SEARCH_TOPICS.slice(0, 5);
-                matchedArticles = indexedArticles.slice(0, 3);
-            } else {
-                // Filter Topics (prefix match prioritized, then substring)
-                matchedTopics = SEARCH_TOPICS.filter(t => t.name.toLowerCase().includes(lower))
-                    .sort((a, b) => {
-                        const aPrefix = a.name.toLowerCase().startsWith(lower);
-                        const bPrefix = b.name.toLowerCase().startsWith(lower);
-                        if (aPrefix && !bPrefix) return -1;
-                        if (!aPrefix && bPrefix) return 1;
-                        return 0;
-                    })
-                    .slice(0, 4);
-
-                // Filter Articles (title, tags, excerpt)
-                matchedArticles = indexedArticles.filter(a => {
-                    return a.title.toLowerCase().includes(lower) ||
-                           a.tags.some(t => t.toLowerCase().includes(lower)) ||
-                           a.excerpt.toLowerCase().includes(lower);
-                }).slice(0, 4);
-            }
-
-            if (matchedTopics.length === 0 && matchedArticles.length === 0) {
-                spotlightDropdown.innerHTML = `
-                    <div class="spotlight-empty">
-                        <i class="fas fa-search"></i>
-                        <p>No matches found for "<strong>${escapeHTML(trimmed)}</strong>"</p>
-                        <span>Try searching for <em>Containers</em>, <em>Concurrency</em>, <em>Kafka</em>, or <em>Kubernetes</em></span>
-                    </div>
-                `;
-                spotlightDropdown.hidden = false;
-                selectedDropdownIndex = -1;
-                return;
-            }
-
-            let html = '';
-
-            // Topics Group
-            if (matchedTopics.length > 0) {
-                html += `
-                    <div class="spotlight-group">
-                        <div class="spotlight-section-title">${trimmed ? 'Suggested Topics' : 'Trending Topics'}</div>
-                `;
-                matchedTopics.forEach(t => {
-                    html += `
-                        <div class="spotlight-topic-item spotlight-navigable" data-query="${escapeHTML(t.name)}" role="option">
-                            <div class="topic-main">
-                                <i class="fas ${t.icon || 'fa-tag'} topic-icon"></i>
-                                <span>${escapeHTML(t.name)}</span>
-                            </div>
-                            <span class="topic-count">${escapeHTML(t.category)}</span>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-
-            // Articles Group
-            if (matchedArticles.length > 0) {
-                html += `
-                    <div class="spotlight-group">
-                        <div class="spotlight-section-title">${trimmed ? 'Matching Articles' : 'Recent Articles'}</div>
-                `;
-                matchedArticles.forEach(a => {
-                    html += `
-                        <a href="${a.href}" class="spotlight-article-item spotlight-navigable" role="option">
-                            <div class="article-header">
-                                <div class="article-title">${escapeHTML(a.title)}</div>
-                                <div class="article-badges">
-                                    <span class="article-category">${escapeHTML(a.category)}</span>
-                                    <span class="article-reading">${escapeHTML(a.readingTime)}</span>
-                                </div>
-                            </div>
-                            <div class="article-snippet">${escapeHTML(a.excerpt)}</div>
-                        </a>
-                    `;
-                });
-                html += `</div>`;
-            }
-
-            // Keyboard hints footer
-            html += `
-                <div class="spotlight-footer">
-                    <span>${matchedArticles.length + matchedTopics.length} suggestions</span>
-                    <div class="spotlight-footer-keys">
-                        <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
-                        <span><kbd>↵</kbd> Select</span>
-                        <span><kbd>Esc</kbd> Close</span>
-                    </div>
-                </div>
-            `;
-
-            spotlightDropdown.innerHTML = html;
-            spotlightDropdown.hidden = false;
-            selectedDropdownIndex = -1;
-
-            // Attach click listeners to topic items
-            spotlightDropdown.querySelectorAll('.spotlight-topic-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const query = item.dataset.query;
-                    searchInput.value = query;
-                    updateGhostAutocomplete('');
-                    applySearch(query);
-                    closeSpotlight();
-                });
-            });
-        }
-
-        function closeSpotlight() {
-            spotlightDropdown.hidden = true;
-            selectedDropdownIndex = -1;
-            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
-            items.forEach(i => i.classList.remove('active-item'));
-        }
-
-        function highlightDropdownItem(index) {
-            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
-            if (!items.length) return;
-
-            items.forEach((item, idx) => {
-                const isActive = idx === index;
-                item.classList.toggle('active-item', isActive);
-                if (isActive) {
-                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                }
-            });
-        }
-
-        // ==========================================
-        // REAL-TIME BLOG SEARCH & FILTER ENGINE
-        // ==========================================
-
-        function applySearch(query) {
-            const normalized = (query || '').trim().toLowerCase();
-            currentSearchQuery = normalized;
-            searchClearBtn.hidden = normalized.length === 0;
-
-            let visibleCount = 0;
-
-            blogCards.forEach((card) => {
-                if (!normalized) {
-                    card.hidden = false;
-                    visibleCount += 1;
+                if (filtered.length === 0) {
+                    feedEl.innerHTML = '';
+                    noResultsEl.style.display = 'block';
                     return;
                 }
 
-                const titleText = card.querySelector('.post-title')?.textContent.toLowerCase() ?? '';
-                const excerptText = card.querySelector('.post-excerpt')?.textContent.toLowerCase() ?? '';
-                const tags = getCardTags(card);
-
-                const matches = titleText.includes(normalized) ||
-                                excerptText.includes(normalized) ||
-                                tags.some(t => t.includes(normalized));
-
-                card.hidden = !matches;
-                if (matches) visibleCount += 1;
-            });
-
-            // Update Quick Chips state
-            quickChips.forEach(chip => {
-                const chipQuery = chip.dataset.query.toLowerCase();
-                const isActive = normalized && (chipQuery === normalized || chipQuery.startsWith(normalized));
-                chip.classList.toggle('active', Boolean(isActive));
-            });
-
-            // Update popular tag buttons in sidebar
-            popularTagButtons.forEach(button => {
-                const tag = button.dataset.tag.toLowerCase();
-                const isActive = normalized && (tag === normalized);
-                button.classList.toggle('active', Boolean(isActive));
-                button.setAttribute('aria-pressed', String(Boolean(isActive)));
-            });
-
-            // Update filter status header
-            if (filterStatus && filterStatusText) {
-                if (normalized) {
-                    filterStatus.hidden = false;
-                    filterStatusText.textContent = `Showing ${visibleCount} post${visibleCount === 1 ? '' : 's'} for "${query}"`;
-                } else {
-                    filterStatus.hidden = true;
-                    filterStatusText.textContent = '';
-                }
+                noResultsEl.style.display = 'none';
+                feedEl.innerHTML = filtered.map(post => `
+                    <a href="${escapeHTML(post.href)}" class="post-row-card">
+                        <div class="post-row-top">
+                            <span>${escapeHTML(post.date)}</span>
+                            <span>${escapeHTML(post.readingTime)}</span>
+                        </div>
+                        <h2 class="post-row-title">${escapeHTML(post.title)}</h2>
+                        <p class="post-row-excerpt">${escapeHTML(post.excerpt)}</p>
+                        <div class="post-row-footer">
+                            <div class="post-row-tags">
+                                ${(post.tags || []).slice(0, 4).map(tag => `
+                                    <span class="tag-badge">${escapeHTML(tag.toLowerCase())}</span>
+                                `).join('')}
+                            </div>
+                            <span class="post-row-arrow">
+                                Read article <span>&rarr;</span>
+                            </span>
+                        </div>
+                    </a>
+                `).join('');
             }
 
-            if (articlesCountBadge) {
-                articlesCountBadge.textContent = normalized
-                    ? `${visibleCount} of ${blogCards.length} Articles`
-                    : `${blogCards.length} Articles`;
-            }
-
-            if (emptyFilterState) {
-                emptyFilterState.hidden = visibleCount !== 0;
-            }
-        }
-
-        function clearSearch() {
-            searchInput.value = '';
-            updateGhostAutocomplete('');
-            searchClearBtn.hidden = true;
-            applySearch('');
-            closeSpotlight();
-        }
-
-        // Input Event Listeners
-        searchInput.addEventListener('input', (e) => {
-            const value = e.target.value;
-            updateGhostAutocomplete(value);
-            applySearch(value);
-            renderSpotlightDropdown(value);
-        });
-
-        searchInput.addEventListener('focus', () => {
-            renderSpotlightDropdown(searchInput.value);
-            updateGhostAutocomplete(searchInput.value);
-        });
-
-        searchClearBtn.addEventListener('click', () => {
-            clearSearch();
-            searchInput.focus();
-        });
-
-        // Quick Topic Chips click listener
-        quickChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                const query = chip.dataset.query;
-                if (currentSearchQuery === query.toLowerCase()) {
-                    clearSearch();
-                } else {
-                    searchInput.value = query;
-                    updateGhostAutocomplete('');
-                    applySearch(query);
-                    closeSpotlight();
-                }
-            });
-        });
-
-        // Keyboard Navigation
-        searchInput.addEventListener('keydown', (e) => {
-            const items = spotlightDropdown.querySelectorAll('.spotlight-navigable');
-
-            if (e.key === 'Tab' || (e.key === 'ArrowRight' && searchInput.selectionStart === searchInput.value.length)) {
-                if (activeGhostMatch) {
+            // Keyboard shortcut '/' to search
+            window.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement !== searchInput) {
                     e.preventDefault();
-                    acceptGhostAutocomplete();
-                    return;
-                }
-            }
-
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (spotlightDropdown.hidden) {
-                    renderSpotlightDropdown(searchInput.value);
-                }
-                if (items.length > 0) {
-                    selectedDropdownIndex = (selectedDropdownIndex + 1) % items.length;
-                    highlightDropdownItem(selectedDropdownIndex);
-                }
-                return;
-            }
-
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (items.length > 0) {
-                    selectedDropdownIndex = (selectedDropdownIndex - 1 + items.length) % items.length;
-                    highlightDropdownItem(selectedDropdownIndex);
-                }
-                return;
-            }
-
-            if (e.key === 'Enter') {
-                if (selectedDropdownIndex >= 0 && items[selectedDropdownIndex]) {
-                    e.preventDefault();
-                    items[selectedDropdownIndex].click();
-                } else if (activeGhostMatch) {
-                    e.preventDefault();
-                    acceptGhostAutocomplete();
-                    closeSpotlight();
-                } else {
-                    closeSpotlight();
-                }
-                return;
-            }
-
-            if (e.key === 'Escape') {
-                closeSpotlight();
-                ghostTextEl.innerHTML = '';
-                searchInput.blur();
-            }
-        });
-
-        // Global Shortcuts: '/' or 'Cmd+K' to focus search
-        document.addEventListener('keydown', (e) => {
-            const isEditing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
-
-            if ((e.key === '/' && !isEditing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
-                e.preventDefault();
-                searchInput.focus();
-                searchInput.select();
-                renderSpotlightDropdown(searchInput.value);
-            }
-        });
-
-        // Click outside closes Spotlight
-        document.addEventListener('click', (e) => {
-            if (!searchWrapper.contains(e.target)) {
-                closeSpotlight();
-            }
-        });
-
-        // Sidebar Tag Buttons integration
-        popularTagButtons.forEach((button) => {
-            button.setAttribute('aria-pressed', 'false');
-
-            button.addEventListener('click', () => {
-                const selectedTag = button.dataset.tag;
-                if (!selectedTag) return;
-
-                if (currentSearchQuery === selectedTag.toLowerCase()) {
-                    clearSearch();
-                } else {
-                    searchInput.value = selectedTag;
-                    updateGhostAutocomplete('');
-                    applySearch(selectedTag);
-                    closeSpotlight();
+                    searchInput.focus();
                 }
             });
-        });
 
-        // Card Tags clickable filter
-        document.querySelectorAll('.post-tags .tag').forEach((tagEl) => {
-            tagEl.style.cursor = 'pointer';
-            tagEl.title = `Filter by ${tagEl.textContent.trim()}`;
-            tagEl.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tag = tagEl.textContent.trim();
-                searchInput.value = tag;
-                updateGhostAutocomplete('');
-                applySearch(tag);
-                closeSpotlight();
-                if (searchWrapper) {
-                    window.scrollTo({ top: searchWrapper.offsetTop - 30, behavior: 'smooth' });
-                }
+            // Search input listener
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value;
+                    renderFeed();
+                });
+            }
+
+            // Topic chip listeners
+            topicChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    topicChips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    activeTopic = chip.dataset.topic;
+                    renderFeed();
+                });
             });
-        });
 
-        // ==========================================
-        // VIEW SWITCHER (CARDS VS. COMPACT TIMELINE)
-        // ==========================================
-        function setViewMode(mode) {
-            const isCompact = mode === 'compact';
-            if (blogMainEl) {
-                blogMainEl.classList.toggle('view-compact', isCompact);
+            // Populate aside core tags
+            if (asideTagsList) {
+                const uniqueTags = [...new Set(posts.flatMap(p => p.tags || []))].slice(0, 8);
+                asideTagsList.innerHTML = uniqueTags.map(tag => `
+                    <button type="button" class="tag-badge" style="cursor: pointer;" onclick="document.querySelector('[data-topic=\\'${tag}\\']')?.click() || (document.getElementById('blog-search-input').value = '${tag}', document.getElementById('blog-search-input').dispatchEvent(new Event('input')))">
+                        ${tag.toLowerCase()}
+                    </button>
+                `).join('');
             }
-            if (viewCardsBtn) {
-                viewCardsBtn.classList.toggle('active', !isCompact);
-                viewCardsBtn.setAttribute('aria-pressed', String(!isCompact));
-            }
-            if (viewCompactBtn) {
-                viewCompactBtn.classList.toggle('active', isCompact);
-                viewCompactBtn.setAttribute('aria-pressed', String(isCompact));
-            }
-            try {
-                localStorage.setItem('portfolio_blog_view', mode);
-            } catch (e) {}
-        }
 
-        viewCardsBtn?.addEventListener('click', () => setViewMode('cards'));
-        viewCompactBtn?.addEventListener('click', () => setViewMode('compact'));
-
-        try {
-            const savedView = localStorage.getItem('portfolio_blog_view') || 'cards';
-            setViewMode(savedView);
-        } catch (e) {
-            setViewMode('cards');
-        }
-
-        if (articlesCountBadge) {
-            articlesCountBadge.textContent = `${blogCards.length} Articles`;
-        }
-
-        clearFilterButton?.addEventListener('click', clearSearch);
-        populateReadingPicks();
-
-        // Fade in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function (entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
+            renderFeed();
         });
     </script>
 </body>
