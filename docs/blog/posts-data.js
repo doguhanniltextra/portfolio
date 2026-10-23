@@ -20,6 +20,15 @@
 
 window.BLOG_POSTS = [
     {
+        title: "ECS Fargate Yerine EC2 on ECS Tercih Edersek?",
+        href: "./blog/page/devops-cloud/neden_ec2_on_ecs.html",
+        date: "October 23, 2026",
+        readingTime: "12 min read",
+        excerpt: "Bir projeyi AWS üzerinde canlıya alırken ECS Fargate yerine EC2 on ECS tercih edersek nasıl bir altyapı yükünü üstleniyoruz? Multi-AZ spread, dynamic port mapping, capacity provider ve least privilege IAM ile uygulamalı bir altyapı deneyi.",
+        category: "DevOps & Cloud",
+        tags: ["AWS", "ECS", "EC2", "Fargate", "Terraform", "Docker", "Go"]
+    },
+    {
         title: "ReplicaSet Neden Yetersiz Kaldı? Bir Orkestrasyon Katmanının Doğuşu ve Deployment",
         href: "./blog/page/devops-cloud/replicaset_neden_yetersiz_kaldi.html",
         date: "October 10, 2026",

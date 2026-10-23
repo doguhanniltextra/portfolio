@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECS Fargate Yerine EC2 on ECS Tercih Edersek? - Doguhan Ilter</title>
+    <meta name="description" content="ECS Fargate yerine EC2 on ECS tercih edildiğinde ortaya çıkan altyapı dinamikleri: Multi-AZ dağıtım, dynamic port mapping, capacity provider, SSM ile SSH'sız yönetim ve least privilege IAM.">
+    <meta name="keywords" content="AWS, ECS, EC2, Fargate, Terraform, Docker, Go, Cloud Architecture, DevOps, Doguhan Ilter, Doğuhan İlter">
+    <meta name="author" content="Doğuhan İlter (Doguhan Ilter)">
+    <link rel="canonical" href="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html">
+    <meta property="og:title" content="ECS Fargate Yerine EC2 on ECS Tercih Edersek? - Doğuhan İlter">
+    <meta property="og:description" content="ECS Fargate yerine EC2 on ECS tercih edildiğinde ortaya çıkan altyapı dinamikleri: Multi-AZ dağıtım, dynamic port mapping, capacity provider, SSM ile SSH'sız yönetim ve least privilege IAM.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ECS Fargate Yerine EC2 on ECS Tercih Edersek? - Doğuhan İlter">
+    <meta name="twitter:description" content="ECS Fargate yerine EC2 on ECS tercih edildiğinde ortaya çıkan altyapı dinamikleri: Multi-AZ dağıtım, dynamic port mapping, capacity provider, SSM ile SSH'sız yönetim ve least privilege IAM.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../terminal-theme.css" />
+
+    <!-- Schema.org TechArticle Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "ECS Fargate Yerine EC2 on ECS Tercih Edersek?",
+      "description": "ECS Fargate yerine EC2 on ECS tercih edildiğinde ortaya çıkan altyapı dinamikleri: Multi-AZ dağıtım, dynamic port mapping, capacity provider, SSM ile SSH'sız yönetim ve least privilege IAM.",
+      "keywords": ["AWS", "ECS", "EC2", "Fargate", "Terraform", "Docker", "Go", "Cloud Architecture", "DevOps"],
+      "inLanguage": "tr",
+      "author": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": ["Doguhan Ilter", "doguhanniltextra"],
+        "url": "https://doguhanniltextra.github.io/portfolio/",
+        "sameAs": [
+          "https://www.linkedin.com/in/doguhan-ilter/",
+          "https://github.com/doguhanniltextra"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Doğuhan İlter",
+        "alternateName": "Doguhan Ilter"
+      },
+      "url": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html",
+      "mainEntityOfPage": "https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html"
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><a href="../../../index.html" style="color: inherit; text-decoration: none;">Doguhan Ilter</a></h1>
+            <div class="location">Everything here started with one question: why.</div>
+            <div class="social-links">
+                <a href="mailto:doguhannilt@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/doguhan-ilter/" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/doguhanniltextra" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../../../index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <div class="container">
+        <article class="blog-post">
+
+            <!-- Post Header -->
+            <header class="post-header">
+                <div class="post-meta-top">
+                    <time datetime="2026-10-23">
+                        <i class="far fa-calendar"></i> October 23, 2026
+                    </time>
+                    <span class="reading-time">
+                        <i class="far fa-clock"></i> 12 min read
+                    </span>
+                </div>
+
+                <h1 class="post-title-main">ECS Fargate Yerine EC2 on ECS Tercih Edersek?</h1>
+
+                <div class="post-tags-header">
+                    <span class="tag">AWS</span>
+                    <span class="tag">ECS</span>
+                    <span class="tag">EC2</span>
+                    <span class="tag">Fargate</span>
+                    <span class="tag">Terraform</span>
+                    <span class="tag">Docker</span>
+                    <span class="tag">Go</span>
+                </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="post-content">
+
+                <p>Bir projeyi AWS bulut yapısı üzerinden canlıya almak istediğim zaman container seçimim çoğunlukla ECS Fargate ya da ECS Fargate Spot oluyor. Bunun sebepleri ise aslında çok açık:</p>
+                <ul>
+                    <li>Altyapı sorunlarının tamamını AWS'e yığıyorsunuz, bu sayede tek odak noktanız uygulamayı geliştirmek oluyor.</li>
+                    <li>Geliştirdiğiniz servis eğer ki sürekli trafik altında değilse ve maliyet açısından ucuza kaçmak istiyorsanız iyi bir seçim oluyor.</li>
+                </ul>
+
+                <p>Ancak geliştirdiğimiz servisler ya da beklediğimiz trade-off'lar bazen bu kadar basit olmayabiliyor. Örneğin eğer ki istekleriniz aşağıdaki maddelerden birisiyse Fargate o kadar da iyi bir seçim olmaktan çıkıyor:</p>
+                <ul>
+                    <li>Uygulamanız GPU veya özel donanım gereksinimi taşıyorsa Fargate kullanamıyorsunuz; örneğin ML inference, video işleme gibi.</li>
+                    <li>Uygulamanız sadece Linux container'ı üzerinde değil de Windows üzerinde de çalışacaksa Fargate'de bu çok sınırlı.</li>
+                    <li>Mevcut olarak bir EC2 yatırımınız varsa, doğrudan uygulamanızı o ECS'e kayıt etmek daha mantıklı oluyor.</li>
+                    <li>Compliance açısından regulated bir sektörde bulunuyorsanız (finans, sağlık gibi) "hangi fiziksel instance'da çalışıyor?" sorunu çok önemli.</li>
+                </ul>
+
+                <p>Yani evet, bu listedeki sebeplerin her biri çok önemli olsa da ben daha basit bir merakla bu blog'u yazıyorum: Fargate'i uzun zamandır kullanıyorum ancak nasıl bir altyapı uğraşısını AWS'e yıktığımla o kadar da ilgilenmemiştim. Ürünleri geliştirmek ve dağıtıma hazır hale gelmek hem kişisel olarak hem de şirket açısından daha öncelikli oluyordu. Bu deneyi tam olarak bu yüzden kurdum, altyapıyı kurcalamak için.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>Deney Gereksinimleri</h2>
+
+                <p>Bu deneyi hem yerelde çalıştırmak hem de AWS üzerine sıfırdan kurmak için bilgisayarınızda şu araçların kurulu ve yapılandırılmış olması gerekiyor:</p>
+
+                <h3>Lokal Geliştirme ve Altyapı Araçları</h3>
+                <ul>
+                    <li><strong>Terraform (&gt;= 1.10):</strong> Tüm AWS altyapısını (VPC, ECS Cluster, Auto Scaling Group, ALB, RDS PostgreSQL, S3, Secrets Manager) ayağa kaldırmak için.</li>
+                    <li><strong>AWS CLI (v2):</strong> AWS hesabınızla iletişim kurmak, kimlik doğrulaması yapmak ve ECR'a Docker login olmak için (<code>aws configure</code>).</li>
+                    <li><strong>Docker &amp; Docker Compose:</strong>
+                        <ul>
+                            <li>Go uygulamasını containerize edip ECR'a göndermek,</li>
+                            <li>Altyapıya çıkmadan önce yerelde PostgreSQL ile uygulamayı test etmek (<code>docker-compose up</code>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Go (&gt;= 1.23 / 1.24)</strong> <em>(Opsiyonel)</em>: Uygulamayı container dışı çalıştırmak, unit testleri koşmak veya kodu kurcalamak isterseniz.</li>
+                    <li><strong>curl veya HTTP Client (Postman/Bruno/vs.):</strong> ALB endpoint'ine ve API'ye test istekleri (<code>/notes</code>, <code>/health</code>) atmak için.</li>
+                </ul>
+
+                <h3>2. AWS Tarafı Gereksinimleri</h3>
+                <ul>
+                    <li><strong>Aktif bir AWS Hesabı:</strong> Gerekli kaynakları (özellikle VPC, EC2, RDS, NAT Gateway, ALB, ECR) oluşturabilecek yetkide bir IAM kullanıcısı ve Access Key'leri.</li>
+                    <li><strong>Terraform State Bucket (S3):</strong> <code>provider.tf</code> dosyasında remote state kullandığımız için önceden oluşturulmuş bir S3 bucket'ı <em>(isterseniz geçici olarak local backend de kullanabilirsiniz)</em>.</li>
+                </ul>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>Proje</h2>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="../image/neden_ecs_on_ecs.png" alt="EC2 on ECS Mimari Tasarımı" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                </div>
+
+                <p>Oluşturacağımız uygulama Golang ile yazılmış bir CRUD olacak, yapacağı tek şey istek kabul etmek ve bazı istekleri AWS SDK yoluyla belirttiğimiz S3 objesine log tutma maksadıyla göndermek.</p>
+
+                <p>Bulut mimarisinde ise:</p>
+
+                <ul>
+                    <li>Region olarak eu-north-1 | Stockholm seçeceğiz.</li>
+                    <li>High Availability'i simüle etmek amacıyla 2 Availability Zone kullanacağız, ancak bunu sadece EC2 için uygulayacağız; RDS için bu mevcut olmayacak.</li>
+                    <li>İkişer tane Public/Private Subnet'imiz olacak.</li>
+                    <li>Her Private Subnet'de bir EC2 t3.micro instance'si çalışacak ve içerisinde oluşturduğumuz uygulamayı container olarak çalıştıracağız.</li>
+                    <li>Container'ları Elastic Container Registry (ECR)'den NAT Gateway yardımıyla çekeceğiz.</li>
+                    <li>Secrets Manager kullanarak şifre saklama simülasyonu yapacağız.</li>
+                    <li>S3 kullanarak uygulama içerisinde üretilen logları saklayacağız.</li>
+                    <li>CloudWatch Logs ile gözlemleyeceğiz.</li>
+                </ul>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>Hands-On</h2>
+
+                <h3>Uygulama</h3>
+
+                <p>Deneyimizin merkezinde Go ile yazılmış ve PostgreSQL ile konuşan hafif bir CRUD API yer alıyor. Ancak buradaki amacımız sıradan bir CRUD yazmak değil; <strong>altyapının gerçekten tasarlandığı gibi çalıştığını uygulamadan kanıtlamak.</strong></p>
+
+                <p>Bu yüzden uygulamayı yazarken doğrudan AWS ortamı ve mimariyle konuşan 3 kritik yetenek ekledim:</p>
+
+                <h4>"Ben Hangi AZ'deyim?"</h4>
+
+                <p>High Availability hedefimizin tutup tutmadığını, ALB'nin istekleri iki farklı Availability Zone'a (<code>eu-north-1a</code> ve <code>eu-north-1b</code>) gerçekten dağıtıp dağıtmadığını deney adına çıplak gözle görebilmem gerekiyordu.</p>
+
+                <p>AWS ECS, container içine otomatik olarak <code>ECS_CONTAINER_METADATA_URI_V4</code> adında bir ortam değişkeni bırakır. Uygulamamız ayağa kalktığında ve istek geldiğinde bu endpoint'e giderek hangi Task ARN ve fiziksel AZ'de çalıştığını anlık olarak öğreniyor:</p>
+
+<pre><code class="language-go">// ecs_metadata.go
+func getECSMeta() ECSMeta {
+	metaURL := os.Getenv("ECS_CONTAINER_METADATA_URI_V4")
+	if metaURL == "" {
+		return ECSMeta{TaskARN: "local", AvailabilityZone: "local"}
+	}
+
+	client := http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(metaURL + "/task")
+	if err != nil {
+		return ECSMeta{TaskARN: "unknown", AvailabilityZone: "unknown"}
+	}
+	defer resp.Body.Close()
+
+	var meta ECSMeta
+	json.NewDecoder(resp.Body).Decode(&meta)
+	return meta
+}</code></pre>
+
+                <h4>Secrets Yönetimi</h4>
+
+                <p>Uygulamanın dış dünyadan gelen istekleri doğrulamak için bir <code>X-API-Key</code> koruması var. Peki bu secret'ı container'a nasıl vereceğiz? Mimaride iki yöntemi de destekleyecek hibrit bir yapı kurdum:</p>
+                <ul>
+                    <li><strong>Yöntem A (Environment Injection):</strong> Terraform tarafında secret'ı doğrudan container environment'ına güvenle paslamak.</li>
+                    <li><strong>Yöntem B (AWS SDK Secrets Manager):</strong> Uygulama boot edilirken <code>API_KEY_SECRET_ARN</code> üzerinden Secrets Manager API'sini çağırıp secret değerini dinamik okumak.</li>
+                </ul>
+
+<pre><code class="language-go">// secrets.go (Özet)
+func loadSecrets(ctx context.Context) (*AppSecrets, error) {
+	// Yöntem A: Doğrudan env olarak enjekte edildiyse
+	if envKey := os.Getenv("API_KEY"); envKey != "" {
+		return &AppSecrets{APIKey: envKey}, nil
+	}
+
+	// Yöntem B: ARN verildiyse AWS SDK ile Secrets Manager'dan çek
+	if secretArn := os.Getenv("API_KEY_SECRET_ARN"); secretArn != "" {
+		cfg, _ := config.LoadDefaultConfig(ctx)
+		client := secretsmanager.NewFromConfig(cfg)
+		result, err := client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
+			SecretId: &secretArn,
+		})
+		// ...
+		return &AppSecrets{APIKey: *result.SecretString}, nil
+	}
+
+	// Local geliştirme fallback'i
+	return &AppSecrets{APIKey: "super-secret-api-key-2026"}, nil
+}</code></pre>
+
+                <h4>S3 Audit Logger &amp; ECS Task IAM Rolü</h4>
+
+                <p>Uygulamaya gelen her CRUD isteğini (Request ID, IP, User-Agent, AZ, Task ARN ve yanıt süresiyle birlikte) S3 bucket'ımıza tarih bazlı hiyerarşik JSON objeleri olarak kaydediyorum: <code>requests/YYYY/MM/DD/HH-MM-SS_&lt;uuid&gt;.json</code>.</p>
+
+                <p>Buradaki en kritik mimari detay <strong>IAM yetkilendirmesi</strong>: Uygulamanın S3'e yazabilmesi için EC2 sunucusunun kendisine (<code>EC2 Instance Profile</code>) geniş yetkiler vermek yerine, sadece container'ın kendisine <strong>ECS Task Role</strong> üzerinden S3 yetkisi verdim (<em>Least Privilege</em> prensibi). İstek gecikmesini etkilememesi için de log yazımını bir goroutine ile asenkron yürütüyorum:</p>
+
+<pre><code class="language-go">// middleware.go
+go logger.WriteLog(context.Background(), entry)</code></pre>
+
+                <h4>4. Üretim Seviyesi Dockerfile</h4>
+
+                <p>Container imajını olabildiğince ufak (~15 MB) ve güvenli tutmak için multi-stage build ve non-root kullanıcı yaklaşımı uyguladım:</p>
+
+<pre><code class="language-dockerfile"># Stage 1: Build
+FROM golang:1.24-alpine AS builder
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /bin/server .
+
+# Stage 2: Runtime
+FROM alpine:3.20
+RUN apk --no-cache add ca-certificates wget
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+WORKDIR /app
+COPY --from=builder /bin/server /app/server
+USER appuser
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:8080/health || exit 1
+ENTRYPOINT ["/app/server"]</code></pre>
+
+                <blockquote>
+                    <p><strong>Kaynak Kodlar:</strong> CRUD handler'ları, veritabanı migration'ları ve yerel PostgreSQL test ortamı (<code>docker-compose.yml</code>) dahil projenin tüm kaynak kodlarına <a href="https://github.com/doguhanniltextra/go-ecs-ec2-lab" target="_blank" rel="noopener noreferrer">GitHub Reposu üzerinden</a> ulaşabilirsiniz.</p>
+                </blockquote>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Altyapı (Terraform)</h3>
+
+                <p>Mimariyi oluştururken temel önceliğim <strong>yüksek erişilebilirlik (Multi-AZ)</strong>, <strong>sıfır doğrudan internet erişimi (Private Subnetler)</strong> ve <strong>akıllı kaynak dağıtımı</strong> oldu.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h4>1. Ağ Yapısı ve Subnet Dağıtımı</h4>
+
+                <p>Tüm altyapıyı Stockholm (<code>eu-north-1</code>) bölgesinde ve 2 farklı Availability Zone (<code>eu-north-1a</code> ve <code>eu-north-1b</code>) üzerinde kurguladım:</p>
+
+                <ul>
+                    <li><strong>2 Adet Public Subnet:</strong> Yalnızca dış dünyayı karşılayan Application Load Balancer (ALB) ve giden trafiğe çıkış sağlayan NAT Gateway bu subnet'lerde barınıyor.</li>
+                    <li><strong>2 Adet Private Subnet:</strong> EC2 instance'larımız ve RDS veritabanımız bu subnet'lerde yer alıyor.</li>
+                </ul>
+
+                <blockquote>
+                    <p><strong>Kritik Güvenlik Kuralı:</strong> EC2 sunucularına kesinlikle <strong>Public IP atanmıyor</strong> (<code>associate_public_ip_address = false</code>). Dış dünyadan sunuculara doğrudan erişim imkansız; sadece ALB'den gelen trafiği kabul ediyorlar. Dışarıya olan internet ihtiyaçlarını (ECR'dan imaj çekmek, SSM ile konuşmak) ise tek bir NAT Gateway üzerinden karşılıyorlar.</p>
+                </blockquote>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h4>2. EC2 Filosu: Bir EC2 Sunucusu Nasıl "ECS Worker"ı Olur?</h4>
+
+                <p>Bir EC2 sunucusunu başlatıp içine rastgele Docker kurmak onu bir ECS Cluster'ın işçisi yapmaya yetmez. Burada birbiriyle kenetlenen 3 kritik bileşen kullandım:</p>
+
+                <h5>A. En Güncel ECS-Optimized AMI'yi Dinamik Çekmek</h5>
+
+                <p>Hardcoded (statik) bir AMI ID'si yazmak altyapıyı hızla eskitir. Bunun yerine AWS Systems Manager (SSM) Parameter Store üzerinden AWS'in önerdiği en güncel <strong>Amazon Linux 2023 ECS-Optimized</strong> imajını dinamik çektim:</p>
+
+<pre><code class="language-hcl"># asg.tf
+data "aws_ssm_parameter" "ecs_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+}</code></pre>
+
+                <p>Bu AMI'nin içinde Docker engine, AWS ECS Agent ve gerekli daemon'lar önceden kurulu ve optimize edilmiş olarak geliyor.</p>
+
+                <h5>B. Launch Template ve User Data</h5>
+
+                <p>EC2'lerin hangi özelliklerle ayağa kalkacağını tanımladığımız Launch Template üzerinde iki kritik karar aldım:</p>
+                <ol>
+                    <li><strong>SSH (Port 22) Portunu Tamamen Kapatmak:</strong> Sunuculara SSH anahtarı tanımlamadım ve Security Group'ta port 22'yi açmadım. Sunucu içine girmek gerekirse <code>AmazonSSMManagedInstanceCore</code> IAM yetkisi sayesinde <strong>AWS Systems Manager (SSM) Session Manager</strong> üzerinden tarayıcıdan/CLI'dan güvenli shell oturumu açıyoruz.</li>
+                    <li><strong>Cluster Kaydı (User Data):</strong> EC2 ayağa kalktığında içindeki ECS Agent'ın <em>"Ben kime hizmet edeceğim?"</em> sorusunun cevabını User Data ile veriyoruz:</li>
+                </ol>
+
+<pre><code class="language-hcl"># asg.tf
+resource "aws_launch_template" "ecs_lt" {
+  name_prefix   = "go-experiment-ecs-lt-"
+  image_id      = data.aws_ssm_parameter.ecs_ami.value
+  instance_type = "t3.micro"
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ecs_instance_profile.arn
+  }
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.ecs_ec2_sg.id]
+  }
+
+  # ECS Agent'a hangi cluster'a kaydolacağını bildiren sihirli satır:
+  user_data = base64encode(&lt;&lt;-EOF
+    #!/bin/bash
+    echo "ECS_CLUSTER=${var.ecs_cluster_name}" &gt;&gt; /etc/ecs/ecs.config
+  EOF
+  )
+}</code></pre>
+
+                <h5>C. Auto Scaling Group (ASG) &amp; Multi-AZ Dağıtımı</h5>
+
+                <p>EC2 sunucularının fiziksel olarak nerede yaşayacağını ASG yönetiyor:</p>
+
+<pre><code class="language-hcl"># asg.tf
+resource "aws_autoscaling_group" "ecs_asg" {
+  name_prefix         = "go-experiment-asg-"
+  vpc_zone_identifier = [aws_subnet.private_1a.id, aws_subnet.private_1b.id]
+
+  min_size         = 1
+  desired_capacity = 2
+  max_size         = 4
+
+  launch_template {
+    id      = aws_launch_template.ecs_lt.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = "true"
+    propagate_at_launch = true
+  }
+}</code></pre>
+
+                <ul>
+                    <li><code>vpc_zone_identifier</code>: ASG'ye iki farklı Private Subnet verdik. ASG <code>desired_capacity = 2</code> olduğunda sunucuları otomatik olarak bir tane <code>eu-north-1a</code>'ya, bir tane de <code>eu-north-1b</code>'ye yerleştirir.</li>
+                    <li><code>AmazonECSManaged = true</code>: ECS Capacity Provider'ın bu ASG'yi otomatik olarak ölçekleyebilmesi için zorunlu AWS etiketidir.</li>
+                </ul>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h4>3. ECS Capacity Provider &amp; Task Dağıtım Stratejisi (Placement Strategy)</h4>
+
+                <p>EC2 sunucuları hazır, peki container'lar bu sunuculara nasıl yerleştirilecek?</p>
+
+                <h5>A. ECS Capacity Provider (Kapasite Köprüsü)</h5>
+
+                <p>ASG ile ECS Cluster arasına <strong>Capacity Provider</strong> koyarak ECS'in sunucu ihtiyacını otomatik yönetmesini sağladım:</p>
+
+<pre><code class="language-hcl"># ecs.tf
+resource "aws_ecs_capacity_provider" "main" {
+  name = "go-experiment-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.ecs_asg.arn
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+  }
+}</code></pre>
+
+                <p>Bu sayede eğer yarın ECS Service'imizdeki task sayısını 2'den 6'ya çıkarırsak, ECS Cluster kapasite yetersizliğini anlayıp ASG'ye <em>"Bana yeni EC2 aç"</em> emrini kendisi verebiliyor.</p>
+
+                <h5>B. Multi-AZ Spread (Availability Zone Dağıtımı)</h5>
+
+                <p>En kritik deney noktalarından biri: <strong>Container'larımızın iki farklı AZ'deki iki farklı EC2'ye eşit dağılmasını garanti altına almak.</strong></p>
+
+                <p>Bunu ECS Service üzerinde tanımladığımız <code>ordered_placement_strategy</code> ile sağladım:</p>
+
+<pre><code class="language-hcl"># ecs.tf
+resource "aws_ecs_service" "app" {
+  name            = "go-crud-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 2
+
+  # Task'ları rastgele koyma, Availability Zone'lara eşit dağıt:
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "attribute:ecs.availability-zone"
+  }
+  
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app_tg.arn
+    container_name   = "go-crud-app"
+    container_port   = 8080
+  }
+}</code></pre>
+
+                <p><code>type = "spread"</code> ve <code>field = "attribute:ecs.availability-zone"</code> kuralı sayesinde ECS scheduler, 1. task'ı A bölgesindeki EC2'ye, 2. task'ı ise B bölgesindeki EC2'ye zorunlu olarak dağıtır. Stockholm'ün bir veri merkezi havaya uçsa bile uygulamamız sıfır kesintiyle çalışmaya devam eder.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h4>4. Dynamic Port Mapping &amp; Security Group İzolasyonu</h4>
+
+                <p>EC2 üzerinde container koştururken karşılaşılan en klasik sorun port çakışmasıdır. Tek bir EC2'de birden fazla container çalışırsa (örneğin rolling update sırasında yeni container eskisinin yanına açıldığında), ikisi de aynı anda <code>8080</code> portunu dinleyemez.</p>
+
+                <p>Bunu çözmek için <strong>Dynamic Port Mapping</strong> kullandım:</p>
+
+<pre><code class="language-hcl"># ecs.tf (Task Definition)
+network_mode = "bridge"
+
+portMappings = [
+  {
+    containerPort = 8080
+    hostPort      = 0  # 0 verilince Docker EC2 üzerinde dinamik rastgele bir port tahsis eder!
+    protocol      = "tcp"
+  }
+]</code></pre>
+
+                <p><code>hostPort = 0</code> tanımlandığında Docker, host üzerinde ephemeral aralıktan (32768 - 65535) rastgele bir port açar (örneğin <code>38491</code> ve <code>49152</code>). ECS Agent bu portu otomatik olarak <strong>Application Load Balancer Target Group</strong>'una bildirir. ALB de gelen trafiği bu dinamik portlara sorunsuz iletir.</p>
+
+                <h5>Security Group İncisi (SG Referencing)</h5>
+
+                <p>Peki güvenlik grubunda bu geniş port aralığını (32768-65535) internete mi açacağız? <strong>Kesinlikle hayır.</strong></p>
+
+<pre><code class="language-hcl"># security_groups.tf
+resource "aws_security_group" "ecs_ec2_sg" {
+  name   = "go-experiment-ecs-ec2-sg"
+  vpc_id = aws_vpc.main.id
+
+  # Sadece ve sadece ALB Security Group'undan gelen dinamik portlara izin ver:
+  ingress {
+    from_port       = 32768
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id] # SG Referencing!
+  }
+}</code></pre>
+
+                <p>IP adresi ya da CIDR bloğu yerine doğrudan <code>security_groups = [aws_security_group.alb_sg.id]</code> referansı verdik. Bu sayede VPC içindeki başka hiçbir sunucu veya dış internet bu portlara erişemez; sadece ALB erişebilir.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h4>5. IAM Rollerinin Hassas Ayrımı (3 Farklı Rol)</h4>
+
+                <p>Fargate'te genellikle 2 rol konuşulurken EC2 on ECS dünyasında 3 farklı IAM aktörü bulunur:</p>
+
+                <ol>
+                    <li><strong>EC2 Instance Profile (<code>AmazonEC2ContainerServiceforEC2Role</code> + <code>AmazonSSMManagedInstanceCore</code>):</strong> EC2 sunucusunun kendi kimliğidir. Sadece ECS Agent'ın cluster ile el sıkışması ve bizim SSM üzerinden SSH'sız sunucuya bağlanabilmemiz içindir.</li>
+                    <li><strong>ECS Task Execution Role:</strong> Container henüz ayağa kalkarken ECS Control Plane tarafından kullanılır. ECR'dan imajı çeker, CloudWatch'a log grubunu açar ve Secrets Manager'dan şifreleri alıp ortama aktarır.</li>
+                    <li><strong>ECS Task Role:</strong> Container'ın içinde çalışan Go kodumuzun kendi kimliğidir. Kodumuzun S3 bucket'ına log basabilmesi için sadece bu role S3 PutObject yetkisi verdik. Sunucu (EC2) S3'e erişemez ama içindeki container erişebilir.</li>
+                </ol>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Dağıtım ve Çalıştırma (Deployment)</h3>
+
+                <p>ECS Service'in sağlıklı bir şekilde container'ları başlatabilmesi için ECR'da derlenmiş bir Docker imajının bulunması gerekir. Ancak o ECR deposunu da henüz Terraform oluşturmadı.</p>
+
+                <h4>1. ECR ve Temel Altyapının Kurulması</h4>
+
+                <p>Öncelikle Terraform ile altyapıyı ayağa kaldırıyoruz:</p>
+
+<pre><code class="language-bash">cd terraform
+terraform init
+terraform apply</code></pre>
+
+                <p>Terraform çalıştığında bize uygulamanın ECR adresini ve ALB DNS adresini çıktı (output) olarak veriyor:</p>
+
+<pre><code class="language-text">Outputs:
+alb_dns_name = "go-experiment-alb-783582650.eu-north-1.elb.amazonaws.com"
+ecr_repository_url = "783582650549.dkr.ecr.eu-north-1.amazonaws.com/go-experiment-ecr-repo"
+s3_request_logs_bucket = "go-experiment-request-logs-783582650549"</code></pre>
+
+                <h4>2. Docker İmajının Derlenmesi ve ECR'a Gönderilmesi</h4>
+
+                <p>ECR repomuz oluştuktan sonra Go uygulamamızı build edip AWS'e push'luyoruz:</p>
+
+<pre><code class="language-bash"># ECR'a Docker login olmak
+aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 783582650549.dkr.ecr.eu-north-1.amazonaws.com
+
+# İmajı build etmek ve etiketlemek
+docker build -t go-crud-app ../app
+docker tag go-crud-app:latest 783582650549.dkr.ecr.eu-north-1.amazonaws.com/go-experiment-ecr-repo:latest
+
+# ECR'a push'lamak
+docker push 783582650549.dkr.ecr.eu-north-1.amazonaws.com/go-experiment-ecr-repo:latest</code></pre>
+
+                <p>İmaj ECR'a ulaştığı anda, arka tarafta bekleyen ECS Service yeni task'ları çekmeye başlar ve iki EC2 instance'ımız üzerinde container'larımız canlıya geçer.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Deneyin Doğrulanması (Verification)</h3>
+
+                <h4>1. Test: Multi-AZ ve Load Balancing Kanıtı</h4>
+
+                <p>Stockholm bölgesindeki 2 farklı Availability Zone'a (<code>eu-north-1a</code> ve <code>eu-north-1b</code>) kurduğumuz EC2'lerin ve container'ların trafiği eşit paylaştığını doğrulamak için ALB DNS adresine peş peşe iki istek atıyoruz:</p>
+
+<pre><code class="language-bash"># 1. İstek
+curl -i -H "X-API-Key: super-secret-api-key-2026" \
+  http://go-experiment-alb-783582650.eu-north-1.elb.amazonaws.com/items</code></pre>
+
+                <p>CloudWatch loglarına veya uygulamanın ürettiği log kaydına baktığımızda:</p>
+
+<pre><code class="language-text">[INIT] ECS Task: arn:aws:ecs:eu-north-1:...:task/go-experiment-cluster/9a1b2c3d | AZ: eu-north-1a
+[AUTH] OK - GET /items
+[S3LOG] Yazıldı: s3://go-experiment-request-logs-.../requests/2026/10/23/15-40-12_uuid1.json</code></pre>
+
+                <p>Hemen ardından 2. isteği gönderiyoruz:</p>
+
+<pre><code class="language-bash"># 2. İstek
+curl -i -H "X-API-Key: super-secret-api-key-2026" \
+  http://go-experiment-alb-783582650.eu-north-1.elb.amazonaws.com/items</code></pre>
+
+                <p>Ve ikinci isteğin karşılandığı yer:</p>
+
+<pre><code class="language-text">[INIT] ECS Task: arn:aws:ecs:eu-north-1:...:task/go-experiment-cluster/4e5f6a7b | AZ: eu-north-1b
+[AUTH] OK - GET /items
+[S3LOG] Yazıldı: s3://go-experiment-request-logs-.../requests/2026/10/23/15-40-14_uuid2.json</code></pre>
+
+                <p><strong>Sonuç:</strong> Application Load Balancer, <code>eu-north-1a</code> ve <code>eu-north-1b</code> subnet'lerinde yaşayan iki farklı t3.micro sunucumuza trafiği kusursuz şekilde paylaştırdı.</p>
+
+                <h4>2. Test: API Key Güvenlik Doğrulaması</h4>
+
+                <p>Middleware mekanizmamızın çalıştığını teyit etmek için anahtarsız ve hatalı istekleri test ediyoruz:</p>
+
+<pre><code class="language-bash"># Header olmadan istek atıldığında:
+curl -i http://go-experiment-alb-783582650.eu-north-1.elb.amazonaws.com/items
+# HTTP/1.1 401 Unauthorized
+# {"error":"missing X-API-Key header"}
+
+# Yanlış anahtarla istek atıldığında:
+curl -i -H "X-API-Key: wrong-key" http://go-experiment-alb-783582650.eu-north-1.elb.amazonaws.com/items
+# HTTP/1.1 403 Forbidden
+# {"error":"invalid API key"}</code></pre>
+
+                <h4>3. Test: S3 Audit Logger &amp; Task Role Yetkilendirmesi</h4>
+
+                <p>Uygulamanın EC2 sunucu yetkilerine ihtiyaç duymadan, yalnızca kendi ECS Task Role'ü üzerinden S3'e yazıp yazamadığını AWS CLI ile bucket içeriğini listeleyerek doğruluyoruz:</p>
+
+<pre><code class="language-bash">aws s3 ls s3://go-experiment-request-logs-783582650549/requests/2026/10/23/ --recursive</code></pre>
+
+                <p>Çıktıda isteklerimizin tarih hiyerarşisiyle kaydedildiğini görüyoruz:</p>
+
+<pre><code class="language-text">2026-10-23 15:40:12        342 requests/2026/10/23/15-40-12_uuid1.json
+2026-10-23 15:40:14        345 requests/2026/10/23/15-40-14_uuid2.json</code></pre>
+
+                <p>Objelerden birini indirip içeriğini incelediğimizde:</p>
+
+<pre><code class="language-json">{
+  "request_id": "c71a3964-b52e-4e4f-b6e8-234e402b918a",
+  "timestamp": "2026-10-23T12:40:12.31298412Z",
+  "method": "GET",
+  "path": "/items",
+  "source_ip": "10.0.1.45:49182",
+  "user_agent": "curl/8.5.0",
+  "api_key_hint": "supe***2026",
+  "response_ms": 12,
+  "status_code": 200,
+  "ecs_task_id": "arn:aws:ecs:eu-north-1:783582650549:task/go-experiment-cluster/9a1b2c3d",
+  "az": "eu-north-1a"
+}</code></pre>
+
+                <p>Uygulamamız çalıştığı fiziksel lokasyonu, harcanan milisaniyeyi ve maskelenmiş anahtar ipucunu S3'e başarıyla kaydetmiş durumda.</p>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h3>Temizlik (Maliyet Kontrolü)</h3>
+
+                <p>Bu bir öğrenme ve kurcalama deneyi olduğu için arkamızda çalışan pahalı kaynaklar bırakmamak çok önemli. Özellikle <strong>NAT Gateway</strong> (aylık ~$32) ve <strong>Application Load Balancer</strong> (aylık ~$16) gibi kaynaklar trafik olmasa dahi saatlik ücrete tabidir.</p>
+
+                <p>Deney bittikten sonra tüm altyapıyı temizliyoruz:</p>
+
+<pre><code class="language-bash">cd terraform
+terraform destroy -auto-approve</code></pre>
+
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+                <h2>Sonuç</h2>
+
+                <p>Yazının başına dönersek: <strong>ECS Fargate varken neden EC2 on ECS kullanalım?</strong></p>
+
+                <p>Bu deneyi kurup tamamladıktan sonra edindiğim en somut çıkarımlar şunlar oldu:</p>
+
+                <ol>
+                    <li><strong>Fargate'in Kıymetini Anlamak:</strong> Fargate kullandığımızda aslında arkada ne kadar devasa bir mühendislik yükünden kurtulduğumuzu bizzat gördüm. AMI sürümlerini güncellemek, ECS Agent konfigürasyonu yapmak, Launch Template hazırlamak, Dynamic Port çakışmalarını yönetmek ve Capacity Provider ayarlamak zorunda kalmamak harika bir konfor.</li>
+                    <li><strong>EC2 on ECS Ne Zaman Vazgeçilmez?</strong>
+                        <ul>
+                            <li><strong>Maliyet ve Rezervasyon:</strong> Eğer şirketinizin halihazırda taahhüt edilmiş EC2 Reserved Instances ya da Savings Plans yatırımları varsa, Fargate yerine bu sunucuları ECS Cluster'ına bağlamak devasa bir maliyet avantajı sağlar.</li>
+                            <li><strong>Özel Donanım &amp; GPU:</strong> Machine learning modelleri koşturuyorsanız veya GPU instance'larına ihtiyacınız varsa Fargate sınırlı kalabilir; kontrolün tamamen sizde olduğu EC2 şarttır.</li>
+                            <li><strong>Kernel &amp; Ağ Optimizasyonu:</strong> İşletim sistemi seviyesinde kernel parametrelerine müdahale etmek (<code>sysctl</code>), özel disk mount'ları yapmak gerekiyorsa EC2 tek yoldur.</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <p>Özetle; ürün geliştirmeye ve hıza odaklanıyorsanız <strong>Fargate</strong>, altyapı maliyetini kuruşu kuruşuna optimize etmek veya özel donanım sınırlarını zorlamak istiyorsanız <strong>EC2 on ECS</strong> doğru araçtır.</p>
+
+                <p>Benim için Fargate'in perde arkasında neleri sırtlandığını görmek ve bu çarkları tek tek elle kurmak çok öğretici bir deneyim oldu.</p>
+
+                <p>Okuduğunuz için teşekkür ederim.</p>
+
+            </div>
+
+            <!-- Post Footer -->
+            <footer class="post-footer">
+                <div class="share-section">
+                    <h4>Share this article</h4>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text=ECS%20Fargate%20Yerine%20EC2%20on%20ECS%20Tercih%20Edersek%3F&url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html"
+                            class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://doguhanniltextra.github.io/portfolio/blog/page/devops-cloud/neden_ec2_on_ecs.html"
+                            class="share-btn linkedin" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <div class="author-info">
+                        <h4>Doguhan Ilter</h4>
+                        <p>Backend Developer focused on backend engineering, distributed systems, and practical software architecture.</p>
+                        <div class="author-social">
+                            <a href="https://github.com/doguhanniltextra" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/doguhan-ilter/" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="mailto:doguhannilt@email.com">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </footer>
+        </article>
+    </div>
+
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
+    <!-- Dynamic Terminal Layout Engine -->
+    <script src="../../../layout.js"></script>
+</body>
+
+</html>
